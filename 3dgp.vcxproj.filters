@@ -1,0 +1,757 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Resources">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Sources">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="imgui">
+      <UniqueIdentifier>{5d2ed881-4062-49d0-a1ce-86240074d016}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="HLSL">
+      <UniqueIdentifier>{9f64f4ff-d9e0-43d7-88e1-13e6d3656a89}</UniqueIdentifier>
+      <Extensions>hlsl;hlsli</Extensions>
+    </Filter>
+    <Filter Include="Sources\Scene">
+      <UniqueIdentifier>{1b0d0b43-ffb0-4d84-9ada-dae5ef05b335}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sources\Graphics">
+      <UniqueIdentifier>{e0d61ae8-5832-4ca0-9434-4c5b0d7b61b0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sources\Objects">
+      <UniqueIdentifier>{806fd877-831b-4abe-bf4c-6371963f3cc5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sources\Camera">
+      <UniqueIdentifier>{2149a583-6bbf-4bee-ac37-35ff32142d48}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sources\Functions">
+      <UniqueIdentifier>{baf42a61-b586-4223-94ce-97252b1989fb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sources\Graphics\mesh">
+      <UniqueIdentifier>{26a22975-8e39-4099-9d2d-a1b86b37d1c8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sources\Graphics\sprite">
+      <UniqueIdentifier>{95072b62-9971-427a-a3d5-1777255a5f9c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sources\Graphics\others">
+      <UniqueIdentifier>{e094edff-31e6-40a1-a1d3-d62e74946f30}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sources\Graphics\load">
+      <UniqueIdentifier>{774a99d3-9758-4dd2-8679-cdb9117c0379}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sources\Input">
+      <UniqueIdentifier>{2ef59d4d-1028-4816-a830-fa2fce90d4b7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="HLSL\Basic">
+      <UniqueIdentifier>{b389eeec-017d-49e8-8c6e-b2a703c483df}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="HLSL\Lights">
+      <UniqueIdentifier>{591eb874-363d-445f-be1f-38a08b9b6deb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="HLSL\Sprites">
+      <UniqueIdentifier>{b0db0835-d517-40df-9512-1d05e9ab075e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="HLSL\Functions">
+      <UniqueIdentifier>{baf67dab-4f07-4e70-bb2a-5deeddb7d6ea}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="HLSL\pbr">
+      <UniqueIdentifier>{d11df521-73a4-473c-ad83-7cad415c2229}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sources\Math">
+      <UniqueIdentifier>{3af097f4-b67a-4bed-8d43-b6380b8037b7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sources\Graphics\post effects">
+      <UniqueIdentifier>{d476d084-6b46-48f5-9035-434086143498}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="HLSL\shadow">
+      <UniqueIdentifier>{d86db051-b103-4eef-ab08-f1620c509bfd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sources\Graphics\shadow">
+      <UniqueIdentifier>{cb26bb3e-2d35-43db-90d1-74a1141f898d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="HLSL\post_effects">
+      <UniqueIdentifier>{081addd5-6f45-4164-93ac-78064c228853}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="HLSL\Objects">
+      <UniqueIdentifier>{e9a1c7a1-2377-4744-a41d-9db91c1558db}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sources\Graphics\Particles">
+      <UniqueIdentifier>{ac40cd6d-5063-48c1-8678-4cdf833d5ac1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="HLSL\Particles">
+      <UniqueIdentifier>{5307f33a-4454-4e67-b427-d9bf35749d0c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sources\Graphics\Deferred">
+      <UniqueIdentifier>{9d5a1728-05c8-4989-92c5-6d5bc0c1bb38}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="HLSL\DifferredLight">
+      <UniqueIdentifier>{a6930d27-f69c-434f-b7ad-feed27d87a36}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="HLSL\Differdmodel">
+      <UniqueIdentifier>{32490dea-23c2-4c08-959b-11c62adaf539}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sources\create_terrain">
+      <UniqueIdentifier>{d31ef715-38a6-45ef-825a-a7dffcca54f1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="HLSL\CreateTerrain">
+      <UniqueIdentifier>{43772fef-7d5d-4d16-bb51-be5b442fdfcf}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Sources\Scenes\game_scene.cpp">
+      <Filter>Sources\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\Objects\character.cpp">
+      <Filter>Sources\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\Objects\objects.cpp">
+      <Filter>Sources\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\Graphics\others\render_state.cpp">
+      <Filter>Sources\Graphics\others</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\Graphics\others\shader.cpp">
+      <Filter>Sources\Graphics\others</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\framework.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\main.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\Graphics\mesh\geometric_primitive.cpp">
+      <Filter>Sources\Graphics\mesh</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\Graphics\mesh\static_mesh.cpp">
+      <Filter>Sources\Graphics\mesh</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\Graphics\load\substance.cpp">
+      <Filter>Sources\Graphics\load</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\Graphics\load\texture.cpp">
+      <Filter>Sources\Graphics\load</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\Graphics\mesh\dynamic_mesh.cpp">
+      <Filter>Sources\Graphics\mesh</Filter>
+    </ClCompile>
+    <ClCompile Include="sources\Input\GamePad.cpp">
+      <Filter>Sources\Input</Filter>
+    </ClCompile>
+    <ClCompile Include="sources\Input\Input.cpp">
+      <Filter>Sources\Input</Filter>
+    </ClCompile>
+    <ClCompile Include="sources\Input\Mouse.cpp">
+      <Filter>Sources\Input</Filter>
+    </ClCompile>
+    <ClCompile Include="sources\Objects\skymap.cpp">
+      <Filter>Sources\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="sources\Graphics\sprite\sprite.cpp">
+      <Filter>Sources\Graphics\sprite</Filter>
+    </ClCompile>
+    <ClCompile Include="sources\Graphics\sprite\sprite_batch.cpp">
+      <Filter>Sources\Graphics\sprite</Filter>
+    </ClCompile>
+    <ClCompile Include="sources\Camera\Camera.cpp">
+      <Filter>Sources\Camera</Filter>
+    </ClCompile>
+    <ClCompile Include="imgui\imgui.cpp">
+      <Filter>imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="imgui\imgui_demo.cpp">
+      <Filter>imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="imgui\imgui_draw.cpp">
+      <Filter>imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="imgui\imgui_impl_dx11.cpp">
+      <Filter>imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="imgui\imgui_impl_win32.cpp">
+      <Filter>imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="imgui\imgui_ja_gryph_ranges.cpp">
+      <Filter>imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="imgui\imgui_tables.cpp">
+      <Filter>imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="imgui\imgui_widgets.cpp">
+      <Filter>imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="sources\Graphics\mesh\pbr_dynamic_mesh.cpp">
+      <Filter>Sources\Graphics\mesh</Filter>
+    </ClCompile>
+    <ClCompile Include="sources\Graphics\sprite\playshader.cpp">
+      <Filter>Sources\Graphics\sprite</Filter>
+    </ClCompile>
+    <ClCompile Include="sources\Graphics\mesh\pbr_static_mesh.cpp">
+      <Filter>Sources\Graphics\mesh</Filter>
+    </ClCompile>
+    <ClCompile Include="sources\Math\collision.cpp">
+      <Filter>Sources\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="sources\Graphics\others\framebuffer.cpp">
+      <Filter>Sources\Graphics\others</Filter>
+    </ClCompile>
+    <ClCompile Include="sources\Graphics\post effects\post_processing_effects.cpp">
+      <Filter>Sources\Graphics\post effects</Filter>
+    </ClCompile>
+    <ClCompile Include="sources\Graphics\others\rasterizer.cpp">
+      <Filter>Sources\Graphics\others</Filter>
+    </ClCompile>
+    <ClCompile Include="sources\Graphics\shadow\shadowmap.cpp">
+      <Filter>Sources\Graphics\shadow</Filter>
+    </ClCompile>
+    <ClCompile Include="sources\Graphics\post effects\bloom.cpp">
+      <Filter>Sources\Graphics\post effects</Filter>
+    </ClCompile>
+    <ClCompile Include="sources\Math\math.cpp">
+      <Filter>Sources\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="sources\Objects\terrain.cpp">
+      <Filter>Sources\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="sources\Particles\snow_particles.cpp">
+      <Filter>Sources\Graphics\Particles</Filter>
+    </ClCompile>
+    <ClCompile Include="sources\Objects\rocks.cpp">
+      <Filter>Sources\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="sources\Objects\structures.cpp">
+      <Filter>Sources\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="sources\Graphics\mesh\terrain_mesh.cpp">
+      <Filter>Sources\Graphics\mesh</Filter>
+    </ClCompile>
+    <ClCompile Include="sources\Graphics\deferred\gbuffer.cpp">
+      <Filter>Sources\Graphics\Deferred</Filter>
+    </ClCompile>
+    <ClCompile Include="sources\Graphics\shadow\shadow_map_df.cpp">
+      <Filter>Sources\Graphics\shadow</Filter>
+    </ClCompile>
+    <ClCompile Include="sources\Objects\trees.cpp">
+      <Filter>Sources\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="sources\Objects\water_fall.cpp">
+      <Filter>Sources\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="sources\Objects\water.cpp">
+      <Filter>Sources\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="sources\Math\matrix.cpp">
+      <Filter>Sources\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="sources\Math\vector.cpp">
+      <Filter>Sources\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="sources\Graphics\others\render_target.cpp">
+      <Filter>Sources\Graphics\others</Filter>
+    </ClCompile>
+    <ClCompile Include="sources\Graphics\shadow\cascade_shadow_map_matrix.cpp">
+      <Filter>Sources\Graphics\shadow</Filter>
+    </ClCompile>
+    <ClCompile Include="sources\Camera\light_camera.cpp">
+      <Filter>Sources\Camera</Filter>
+    </ClCompile>
+    <ClCompile Include="sources\CreateTerrain\create_terrain.cpp">
+      <Filter>Sources\create_terrain</Filter>
+    </ClCompile>
+    <ClCompile Include="sources\Scenes\create_terrain_scene.cpp">
+      <Filter>Sources\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="sources\Graphics\sprite\noise_map.cpp">
+      <Filter>Sources\Graphics\sprite</Filter>
+    </ClCompile>
+    <ClCompile Include="sources\Scenes\reflection_scene.cpp">
+      <Filter>Sources\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="sources\Graphics\deferred\gbuffer_02.cpp">
+      <Filter>Sources\Graphics\Deferred</Filter>
+    </ClCompile>
+    <ClCompile Include="sources\Scenes\title_scene.cpp">
+      <Filter>Sources\Scene</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Sources\Scenes\scene.h">
+      <Filter>Sources\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\Scenes\game_scene.h">
+      <Filter>Sources\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\Objects\character.h">
+      <Filter>Sources\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\Camera\Camera.h">
+      <Filter>Sources\Camera</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\Functions\high_resolution_timer.h">
+      <Filter>Sources\Functions</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\Functions\misc.h">
+      <Filter>Sources\Functions</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\Functions\utility_graphics.h">
+      <Filter>Sources\Functions</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\Objects\objects.h">
+      <Filter>Sources\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\Graphics\others\constant_buffer.h">
+      <Filter>Sources\Graphics\others</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\Graphics\others\render_state.h">
+      <Filter>Sources\Graphics\others</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\Graphics\others\shader.h">
+      <Filter>Sources\Graphics\others</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\framework.h">
+      <Filter>Sources</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\Graphics\mesh\geometric_primitive.h">
+      <Filter>Sources\Graphics\mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\Graphics\mesh\static_mesh.h">
+      <Filter>Sources\Graphics\mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\Graphics\load\substance.h">
+      <Filter>Sources\Graphics\load</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\Graphics\load\texture.h">
+      <Filter>Sources\Graphics\load</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\Graphics\mesh\dynamic_mesh.h">
+      <Filter>Sources\Graphics\mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="sources\Input\GamePad.h">
+      <Filter>Sources\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="sources\Input\Input.h">
+      <Filter>Sources\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="sources\Input\Mouse.h">
+      <Filter>Sources\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="sources\Objects\skymap.h">
+      <Filter>Sources\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="sources\Graphics\sprite\sprite.h">
+      <Filter>Sources\Graphics\sprite</Filter>
+    </ClInclude>
+    <ClInclude Include="sources\Graphics\sprite\sprite_batch.h">
+      <Filter>Sources\Graphics\sprite</Filter>
+    </ClInclude>
+    <ClInclude Include="imgui\imconfig.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="imgui\imgui.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="imgui\imgui_impl_dx11.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="imgui\imgui_impl_win32.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="imgui\imgui_internal.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="imgui\imstb_rectpack.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="imgui\imstb_textedit.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="imgui\imstb_truetype.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="sources\Graphics\mesh\pbr_dynamic_mesh.h">
+      <Filter>Sources\Graphics\mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="sources\Graphics\sprite\playshader.h">
+      <Filter>Sources\Graphics\sprite</Filter>
+    </ClInclude>
+    <ClInclude Include="sources\Graphics\mesh\pbr_static_mesh.h">
+      <Filter>Sources\Graphics\mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="sources\Math\collision.h">
+      <Filter>Sources\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="sources\Graphics\others\framebuffer.h">
+      <Filter>Sources\Graphics\others</Filter>
+    </ClInclude>
+    <ClInclude Include="sources\Graphics\post effects\post_processing_effects.h">
+      <Filter>Sources\Graphics\post effects</Filter>
+    </ClInclude>
+    <ClInclude Include="sources\Graphics\others\rasterizer.h">
+      <Filter>Sources\Graphics\others</Filter>
+    </ClInclude>
+    <ClInclude Include="sources\Graphics\shadow\shadowmap.h">
+      <Filter>Sources\Graphics\shadow</Filter>
+    </ClInclude>
+    <ClInclude Include="sources\Graphics\post effects\bloom.h">
+      <Filter>Sources\Graphics\post effects</Filter>
+    </ClInclude>
+    <ClInclude Include="sources\Math\math.h">
+      <Filter>Sources\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="sources\Objects\terrain.h">
+      <Filter>Sources\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="sources\Particles\snow_particles.h">
+      <Filter>Sources\Graphics\Particles</Filter>
+    </ClInclude>
+    <ClInclude Include="sources\Objects\rocks.h">
+      <Filter>Sources\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="sources\Objects\structures.h">
+      <Filter>Sources\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="sources\Graphics\mesh\terrain_mesh.h">
+      <Filter>Sources\Graphics\mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="sources\Graphics\deferred\gbuffer.h">
+      <Filter>Sources\Graphics\Deferred</Filter>
+    </ClInclude>
+    <ClInclude Include="sources\Graphics\shadow\shadow_map_df.h">
+      <Filter>Sources\Graphics\shadow</Filter>
+    </ClInclude>
+    <ClInclude Include="sources\Objects\trees.h">
+      <Filter>Sources\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="sources\Objects\water_fall.h">
+      <Filter>Sources\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="sources\Objects\water.h">
+      <Filter>Sources\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="sources\Math\matrix.h">
+      <Filter>Sources\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="sources\Math\vector.h">
+      <Filter>Sources\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="sources\Graphics\others\render_target.h">
+      <Filter>Sources\Graphics\others</Filter>
+    </ClInclude>
+    <ClInclude Include="sources\Graphics\shadow\cascade_shadow_map_matrix.h">
+      <Filter>Sources\Graphics\shadow</Filter>
+    </ClInclude>
+    <ClInclude Include="sources\Camera\light_camera.h">
+      <Filter>Sources\Camera</Filter>
+    </ClInclude>
+    <ClInclude Include="sources\CreateTerrain\create_terrain.h">
+      <Filter>Sources\create_terrain</Filter>
+    </ClInclude>
+    <ClInclude Include="sources\Scenes\create_terrain_scene.h">
+      <Filter>Sources\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="sources\Graphics\sprite\noise_map.h">
+      <Filter>Sources\Graphics\sprite</Filter>
+    </ClInclude>
+    <ClInclude Include="sources\Scenes\reflection_scene.h">
+      <Filter>Sources\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="sources\Graphics\deferred\gbuffer_02.h">
+      <Filter>Sources\Graphics\Deferred</Filter>
+    </ClInclude>
+    <ClInclude Include="sources\Scenes\title_scene.h">
+      <Filter>Sources\Scene</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="HLSL\render_constants.hlsli">
+      <Filter>HLSL</Filter>
+    </None>
+    <None Include="HLSL\scene_constants.hlsli">
+      <Filter>HLSL</Filter>
+    </None>
+    <None Include="HLSL\skymap.hlsli">
+      <Filter>HLSL</Filter>
+    </None>
+    <None Include="HLSL\dynamic_mesh.hlsli">
+      <Filter>HLSL\Basic</Filter>
+    </None>
+    <None Include="HLSL\static_mesh.hlsli">
+      <Filter>HLSL\Basic</Filter>
+    </None>
+    <None Include="HLSL\geometric_primitive.hlsli">
+      <Filter>HLSL\Basic</Filter>
+    </None>
+    <None Include="HLSL\sprite.hlsli">
+      <Filter>HLSL\Sprites</Filter>
+    </None>
+    <None Include="HLSL\lim_light.hlsli">
+      <Filter>HLSL\Lights</Filter>
+    </None>
+    <None Include="HLSL\shader_functions.hlsli">
+      <Filter>HLSL\Functions</Filter>
+    </None>
+    <None Include="HLSL\pbr_dynamic_mesh.hlsli">
+      <Filter>HLSL\pbr</Filter>
+    </None>
+    <None Include="HLSL\playshader.hlsli">
+      <Filter>HLSL\Sprites</Filter>
+    </None>
+    <None Include="HLSL\pbr_static_mesh.hlsli">
+      <Filter>HLSL\pbr</Filter>
+    </None>
+    <None Include="HLSL\bloom.hlsli">
+      <Filter>HLSL\post_effects</Filter>
+    </None>
+    <None Include="HLSL\post_processing_effects.hlsli">
+      <Filter>HLSL\post_effects</Filter>
+    </None>
+    <None Include="HLSL\terrain.hlsli">
+      <Filter>HLSL\Objects</Filter>
+    </None>
+    <None Include="HLSL\snowfall_particles.hlsli">
+      <Filter>HLSL\Particles</Filter>
+    </None>
+    <None Include="HLSL\noise.hlsli">
+      <Filter>HLSL\Particles</Filter>
+    </None>
+    <None Include="HLSL\rocks.hlsli">
+      <Filter>HLSL\Objects</Filter>
+    </None>
+    <None Include="HLSL\vegetation.hlsli">
+      <Filter>HLSL\Objects</Filter>
+    </None>
+    <None Include="HLSL\differred_light.hlsli">
+      <Filter>HLSL\DifferredLight</Filter>
+    </None>
+    <None Include="HLSL\d_posteffect.hlsli">
+      <Filter>HLSL\DifferredLight</Filter>
+    </None>
+    <None Include="HLSL\shadow_df.hlsli">
+      <Filter>HLSL\shadow</Filter>
+    </None>
+    <None Include="HLSL\tone_map.hlsli">
+      <Filter>HLSL\post_effects</Filter>
+    </None>
+    <None Include="HLSL\water_fall.hlsli">
+      <Filter>HLSL\Objects</Filter>
+    </None>
+    <None Include="HLSL\tree_branch.hlsli">
+      <Filter>HLSL\Objects</Filter>
+    </None>
+    <None Include="HLSL\pbr_common.hlsli">
+      <Filter>HLSL\DifferredLight</Filter>
+    </None>
+    <None Include="HLSL\common.hlsli">
+      <Filter>HLSL\CreateTerrain</Filter>
+    </None>
+    <None Include="HLSL\create_terrain.hlsli">
+      <Filter>HLSL\CreateTerrain</Filter>
+    </None>
+    <None Include="HLSL\noise_create.hlsli">
+      <Filter>HLSL\CreateTerrain</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="HLSL\skymap_ps.hlsl">
+      <Filter>HLSL</Filter>
+    </FxCompile>
+    <FxCompile Include="HLSL\skymap_vs.hlsl">
+      <Filter>HLSL</Filter>
+    </FxCompile>
+    <FxCompile Include="HLSL\dynamic_mesh_ps.hlsl">
+      <Filter>HLSL\Basic</Filter>
+    </FxCompile>
+    <FxCompile Include="HLSL\static_mesh_ps.hlsl">
+      <Filter>HLSL\Basic</Filter>
+    </FxCompile>
+    <FxCompile Include="HLSL\dynamic_mesh_vs.hlsl">
+      <Filter>HLSL\Basic</Filter>
+    </FxCompile>
+    <FxCompile Include="HLSL\static_mesh_vs.hlsl">
+      <Filter>HLSL\Basic</Filter>
+    </FxCompile>
+    <FxCompile Include="HLSL\geometric_primitive_ps.hlsl">
+      <Filter>HLSL\Basic</Filter>
+    </FxCompile>
+    <FxCompile Include="HLSL\geometric_primitive_vs.hlsl">
+      <Filter>HLSL\Basic</Filter>
+    </FxCompile>
+    <FxCompile Include="HLSL\spot_light_ps.hlsl">
+      <Filter>HLSL\Lights</Filter>
+    </FxCompile>
+    <FxCompile Include="HLSL\sprite_ps.hlsl">
+      <Filter>HLSL\Sprites</Filter>
+    </FxCompile>
+    <FxCompile Include="HLSL\sprite_vs.hlsl">
+      <Filter>HLSL\Sprites</Filter>
+    </FxCompile>
+    <FxCompile Include="HLSL\lim_light_vs.hlsl">
+      <Filter>HLSL\Lights</Filter>
+    </FxCompile>
+    <FxCompile Include="HLSL\lim_light_ps.hlsl">
+      <Filter>HLSL\Lights</Filter>
+    </FxCompile>
+    <FxCompile Include="HLSL\point_light_ps.hlsl">
+      <Filter>HLSL\Lights</Filter>
+    </FxCompile>
+    <FxCompile Include="HLSL\hemisphere_light_ps.hlsl">
+      <Filter>HLSL\Lights</Filter>
+    </FxCompile>
+    <FxCompile Include="HLSL\pbr_dynamic_ps.hlsl">
+      <Filter>HLSL\pbr</Filter>
+    </FxCompile>
+    <FxCompile Include="HLSL\pbr_dynamic_vs.hlsl">
+      <Filter>HLSL\pbr</Filter>
+    </FxCompile>
+    <FxCompile Include="HLSL\playshader_vs.hlsl">
+      <Filter>HLSL\Sprites</Filter>
+    </FxCompile>
+    <FxCompile Include="HLSL\pbr_static_vs.hlsl">
+      <Filter>HLSL\pbr</Filter>
+    </FxCompile>
+    <FxCompile Include="HLSL\playshader_ps.hlsl">
+      <Filter>HLSL\Sprites</Filter>
+    </FxCompile>
+    <FxCompile Include="HLSL\gaussian_blur_convolution_ps.hlsl">
+      <Filter>HLSL\post_effects</Filter>
+    </FxCompile>
+    <FxCompile Include="HLSL\gaussian_blur_downsampling_ps.hlsl">
+      <Filter>HLSL\post_effects</Filter>
+    </FxCompile>
+    <FxCompile Include="HLSL\gaussian_blur_horizontal_ps.hlsl">
+      <Filter>HLSL\post_effects</Filter>
+    </FxCompile>
+    <FxCompile Include="HLSL\gaussian_blur_vertical_ps.hlsl">
+      <Filter>HLSL\post_effects</Filter>
+    </FxCompile>
+    <FxCompile Include="HLSL\glow_extraction_ps.hlsl">
+      <Filter>HLSL\post_effects</Filter>
+    </FxCompile>
+    <FxCompile Include="HLSL\lens_flare_ps.hlsl">
+      <Filter>HLSL\post_effects</Filter>
+    </FxCompile>
+    <FxCompile Include="HLSL\post_processing_effects_ps.hlsl">
+      <Filter>HLSL\post_effects</Filter>
+    </FxCompile>
+    <FxCompile Include="HLSL\post_processing_effects_vs.hlsl">
+      <Filter>HLSL\post_effects</Filter>
+    </FxCompile>
+    <FxCompile Include="HLSL\static_shadowcast_vs.hlsl">
+      <Filter>HLSL\shadow</Filter>
+    </FxCompile>
+    <FxCompile Include="HLSL\dynamic_shadowcast_vs.hlsl">
+      <Filter>HLSL\shadow</Filter>
+    </FxCompile>
+    <FxCompile Include="HLSL\terrain_ps.hlsl">
+      <Filter>HLSL\Objects</Filter>
+    </FxCompile>
+    <FxCompile Include="HLSL\terrain_vs.hlsl">
+      <Filter>HLSL\Objects</Filter>
+    </FxCompile>
+    <FxCompile Include="HLSL\snowfall_particles_cs.hlsl">
+      <Filter>HLSL\Particles</Filter>
+    </FxCompile>
+    <FxCompile Include="HLSL\snowfall_particles_gs.hlsl">
+      <Filter>HLSL\Particles</Filter>
+    </FxCompile>
+    <FxCompile Include="HLSL\snowfall_particles_ps.hlsl">
+      <Filter>HLSL\Particles</Filter>
+    </FxCompile>
+    <FxCompile Include="HLSL\snowfall_particles_vs.hlsl">
+      <Filter>HLSL\Particles</Filter>
+    </FxCompile>
+    <FxCompile Include="HLSL\rocks_ps.hlsl">
+      <Filter>HLSL\Objects</Filter>
+    </FxCompile>
+    <FxCompile Include="HLSL\structures_ps.hlsl">
+      <Filter>HLSL\Objects</Filter>
+    </FxCompile>
+    <FxCompile Include="HLSL\vegetation_ps.hlsl">
+      <Filter>HLSL\Objects</Filter>
+    </FxCompile>
+    <FxCompile Include="HLSL\environment_light_ps.hlsl">
+      <Filter>HLSL\DifferredLight</Filter>
+    </FxCompile>
+    <FxCompile Include="HLSL\differred_light_vs.hlsl">
+      <Filter>HLSL\DifferredLight</Filter>
+    </FxCompile>
+    <FxCompile Include="HLSL\composite_ps.hlsl">
+      <Filter>HLSL\DifferredLight</Filter>
+    </FxCompile>
+    <FxCompile Include="HLSL\dir_light_shadow_ps.hlsl">
+      <Filter>HLSL\DifferredLight</Filter>
+    </FxCompile>
+    <FxCompile Include="HLSL\dir_light_ps.hlsl">
+      <Filter>HLSL\DifferredLight</Filter>
+    </FxCompile>
+    <FxCompile Include="HLSL\d_posteffect_ps.hlsl">
+      <Filter>HLSL\DifferredLight</Filter>
+    </FxCompile>
+    <FxCompile Include="HLSL\d_posteffect_vs.hlsl">
+      <Filter>HLSL\DifferredLight</Filter>
+    </FxCompile>
+    <FxCompile Include="HLSL\d_pbr_static_mesh_ps.hlsl">
+      <Filter>HLSL\Differdmodel</Filter>
+    </FxCompile>
+    <FxCompile Include="HLSL\shadow_map_df_ps.hlsl">
+      <Filter>HLSL\shadow</Filter>
+    </FxCompile>
+    <FxCompile Include="HLSL\shadow_map_df_blur_ps.hlsl">
+      <Filter>HLSL\shadow</Filter>
+    </FxCompile>
+    <FxCompile Include="HLSL\shadow_map_blur_df_vs.hlsl">
+      <Filter>HLSL\shadow</Filter>
+    </FxCompile>
+    <FxCompile Include="HLSL\trees_ps.hlsl">
+      <Filter>HLSL\Objects</Filter>
+    </FxCompile>
+    <FxCompile Include="HLSL\water_fall_ps.hlsl">
+      <Filter>HLSL\Objects</Filter>
+    </FxCompile>
+    <FxCompile Include="HLSL\tree_branch_ps.hlsl">
+      <Filter>HLSL\Objects</Filter>
+    </FxCompile>
+    <FxCompile Include="HLSL\tree_branch_vs.hlsl">
+      <Filter>HLSL\Objects</Filter>
+    </FxCompile>
+    <FxCompile Include="HLSL\water_ps.hlsl">
+      <Filter>HLSL\Objects</Filter>
+    </FxCompile>
+    <FxCompile Include="HLSL\water_vs.hlsl">
+      <Filter>HLSL\Objects</Filter>
+    </FxCompile>
+    <FxCompile Include="HLSL\create_terrain_gs.hlsl">
+      <Filter>HLSL\CreateTerrain</Filter>
+    </FxCompile>
+    <FxCompile Include="HLSL\create_terrain_ds.hlsl">
+      <Filter>HLSL\CreateTerrain</Filter>
+    </FxCompile>
+    <FxCompile Include="HLSL\create_terrain_hs.hlsl">
+      <Filter>HLSL\CreateTerrain</Filter>
+    </FxCompile>
+    <FxCompile Include="HLSL\create_terrain_ps.hlsl">
+      <Filter>HLSL\CreateTerrain</Filter>
+    </FxCompile>
+    <FxCompile Include="HLSL\create_terrain_vs.hlsl">
+      <Filter>HLSL\CreateTerrain</Filter>
+    </FxCompile>
+    <FxCompile Include="HLSL\noise_create_vs.hlsl">
+      <Filter>HLSL\CreateTerrain</Filter>
+    </FxCompile>
+    <FxCompile Include="HLSL\noise_create_ps.hlsl">
+      <Filter>HLSL\CreateTerrain</Filter>
+    </FxCompile>
+    <FxCompile Include="HLSL\ssr_light_ps.hlsl">
+      <Filter>HLSL\DifferredLight</Filter>
+    </FxCompile>
+    <FxCompile Include="HLSL\defferred_light_ps.hlsl">
+      <Filter>HLSL\DifferredLight</Filter>
+    </FxCompile>
+    <FxCompile Include="HLSL\ssr_composite.hlsl">
+      <Filter>HLSL\DifferredLight</Filter>
+    </FxCompile>
+  </ItemGroup>
+</Project>

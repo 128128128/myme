@@ -1,0 +1,2 @@
+C:\Users\2200167\Desktop\Sunlit.oc.2019.03.27.01\Sunlit.oc\External_libraries\DirectXTex\Bin\Desktop_2015\Win32\Release\DirectXTex.lib
+C:\Users\2200167\Desktop\個人製作\MyMe02\MyMe\external_library\DirectXTex\Bin\Desktop_2015\x64\Release\DirectXTex.lib
