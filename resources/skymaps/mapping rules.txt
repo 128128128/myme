@@ -1,0 +1,6 @@
++x -> ft
+-x -> bk
++y -> up
+-y -> dn
++z -> rt
+-z -> lt
