@@ -40,4 +40,12 @@ public:
 	void render(ID3D11DeviceContext* immediate_context, float dx, float dy, float dw, float dh, float r, float g, float b, float a, float angle/*degree*/, float sx, float sy, float sw, float sh);
 	void render(ID3D11DeviceContext* immediate_context, float dx, float dy, float dw, float dh);
 	void textout(ID3D11DeviceContext* immediate_context, std::string s, float x, float y, float w, float h, float r, float g, float b, float a);
+
+	//differential   The value for scaling the judgment range from the original image.
+    //·•ª@–{—ˆ‚Ì‰æ‘œ‚©‚ç”»’è‚Ì”ÍˆÍ‚ğŠg‘åk¬‚·‚é‚Æ‚«‚Ì‚»‚Ì’l
+	bool hit_cursor(DirectX::XMFLOAT2 cursor_pos, DirectX::XMFLOAT2 differential = { 0,0 });
+
+private:
+	DirectX::XMFLOAT2 min_position{ 0,0 };
+	DirectX::XMFLOAT2 max_position{ 0,0 };
 };

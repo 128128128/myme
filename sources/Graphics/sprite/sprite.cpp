@@ -197,6 +197,9 @@ void sprite::render(ID3D11DeviceContext* immediate_context,
 	// angle : rotation angle (Rotation centre is sprite's centre), unit is degree
 	// r, g, b : color
 {
+	min_position = { dx,dy };
+	max_position = { dx + dw,dy + dh };
+
 	D3D11_VIEWPORT viewport{};
 	UINT num_viewports{ 1 };
 	immediate_context->RSGetViewports(&num_viewports, &viewport);
@@ -391,4 +394,13 @@ void sprite::textout(ID3D11DeviceContext* immediate_context, std::string s, floa
 		render(immediate_context, x + carriage, y, w, h, r, g, b, a, 0, sw * (c & 0x0F), sh * (c >> 4), sw, sh);
 		carriage += w;
 	}
+}
+
+bool sprite::hit_cursor(DirectX::XMFLOAT2 cursor_pos, DirectX::XMFLOAT2 differential)
+{
+	//differential:·•ª@–{—ˆ‚Ì‰æ‘œ‚©‚ç”»’è‚Ì”ÍˆÍ‚ðŠg‘åk¬‚·‚é‚Æ‚«‚Ì‚»‚Ì’l
+	if (cursor_pos.x > min_position.x && cursor_pos.y < max_position.y && cursor_pos.x < max_position.x && cursor_pos.y > min_position.y)
+		return true;
+
+	return false;
 }

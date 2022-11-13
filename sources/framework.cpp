@@ -269,7 +269,7 @@ bool framework::initialize()
 	immediate_context->OMSetRenderTargets(1, render_target_view.GetAddressOf(), depth_stencil_view.Get());
 	immediate_context->OMSetDepthStencilState(default_depth_stencil_state.Get(), 1);
 
-	current_scene = "game";
+	current_scene = "title";
 
 	scene["create_terrain"] = std::make_unique<create_terrain_scene>();
 	scene["reflection"] = std::make_unique<reflection_scene>();
@@ -291,13 +291,13 @@ void framework::update(float elapsed_time/*Elapsed seconds from last frame*/)
 		ImGui::NewFrame();
 
 	static const char* next_scene = 0;
+	next_scene = scene[current_scene]->update(elapsed_time);
 	if (next_scene)
 	{
 		scene[current_scene]->finilize();
 		scene[next_scene]->initialize(device.Get(), SCREEN_WIDTH, SCREEN_HEIGHT);
 		current_scene = next_scene;
 	}
-	next_scene = scene[current_scene]->update(elapsed_time);
 
 }
 void framework::render(float elapsed_time/*Elapsed seconds from last frame*/)

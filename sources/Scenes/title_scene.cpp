@@ -253,38 +253,26 @@ bool title_scene::initialize(ID3D11Device* device, const LONG screen_width, cons
 
 const char* title_scene::update(float& elapsed_time/*Elapsed seconds from last frame*/)
 {
-	// Control the camera with the mouse
-	static POINT prev_cursorpos;
-	POINT curr_cursorpos;
-	GetCursorPos(&curr_cursorpos);
+	
 
 	Mouse& mouse = Input::Instance().GetMouse();
 
 
 	if (GetKeyState(VK_LBUTTON) < 0)
 	{
-	
-		float dx = static_cast<float>(curr_cursorpos.x - prev_cursorpos.x);
-		float dy = static_cast<float>(curr_cursorpos.y - prev_cursorpos.y);
-		if (GetKeyState(VK_SHIFT) < 0)
+		float m_pos_x = static_cast<float>(mouse.GetPositionX());
+		float m_pos_y = static_cast<float>(mouse.GetPositionY());
+		DirectX::XMFLOAT2 m_pos = { m_pos_x,m_pos_y };
+		if(terrain_create_sp->hit_cursor(m_pos))
 		{
-			const float sensitivity = 10.0f;
-			scene_data.focus_position.x -= sensitivity * dx * elapsed_time;
-			scene_data.focus_position.y += sensitivity * dy * elapsed_time;
+			return "create_terrain";
 		}
-		else if (GetKeyState(VK_CONTROL) < 0)
+		if (sample_map_sp->hit_cursor(m_pos))
 		{
-			const float sensitivity = 50.0f;
-			camera_manipulator.radius += sensitivity * dy * elapsed_time;
+			return "game";
 		}
-		else
-		{
-			const float sensitivity = 1.0f;
-			camera_manipulator.phi += sensitivity * dx * elapsed_time;
-			camera_manipulator.theta += sensitivity * dy * elapsed_time;
-		}
+		
 	}
-	prev_cursorpos = curr_cursorpos;
 
 
 	return 0;
