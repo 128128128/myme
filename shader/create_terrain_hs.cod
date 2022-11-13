@@ -92,7 +92,7 @@ dcl_temps 2
 //   v[2][0].x <- input_patch[2].position.x; v[2][0].y <- input_patch[2].position.y; v[2][0].z <- input_patch[2].position.z; v[2][0].w <- input_patch[2].position.w; 
 //   v[2][1].x <- input_patch[2].texcoord.x; v[2][1].y <- input_patch[2].texcoord.y
 //
-#line 37 "C:\Users\2200167\Desktop\個人製作\MyMe02\MyMe\HLSL\create_terrain_hs.hlsl"
+#line 37 "C:\Users\2200167\Desktop\個人製作\myme03\myme\HLSL\create_terrain_hs.hlsl"
 mov r0.x, vOutputControlPointID
 mov r1.xyzw, v[r0.x + 0][0].xyzw  // r1.x <- output.position.x; r1.y <- output.position.y; r1.z <- output.position.z; r1.w <- output.position.w
 mov r0.xy, v[r0.x + 0][1].xyxx  // r0.x <- output.texcoord.x; r0.y <- output.texcoord.y

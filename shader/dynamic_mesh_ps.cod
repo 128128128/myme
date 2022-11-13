@@ -97,7 +97,7 @@ dcl_temps 4
 //   v4.x <- pin.texcoord.x; v4.y <- pin.texcoord.y; 
 //   o0.x <- <main return value>.x; o0.y <- <main return value>.y; o0.z <- <main return value>.z; o0.w <- <main return value>.w
 //
-#line 17 "C:\Users\2200167\Desktop\個人製作\MyMe02\MyMe\HLSL\dynamic_mesh_ps.hlsl"
+#line 17 "C:\Users\2200167\Desktop\個人製作\myme03\myme\HLSL\dynamic_mesh_ps.hlsl"
 sample_indexable(texture2d)(float,float,float,float) r0.xyzw, v4.xyxx, t0.xyzw, s2  // r0.x <- color.x; r0.y <- color.y; r0.z <- color.z; r0.w <- color.w
 
 #line 18

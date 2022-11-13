@@ -70,7 +70,7 @@ dcl_output o0.xyzw
 //   v2.x <- pin.texcoord.x; v2.y <- pin.texcoord.y; 
 //   o0.x <- <main return value>.x; o0.y <- <main return value>.y; o0.z <- <main return value>.z; o0.w <- <main return value>.w
 //
-#line 7 "C:\Users\2200167\Desktop\個人製作\MyMe02\MyMe\HLSL\snowfall_particles_ps.hlsl"
+#line 7 "C:\Users\2200167\Desktop\個人製作\myme03\myme\HLSL\snowfall_particles_ps.hlsl"
 mul o0.xyz, v1.xyzx, cb2[1].wwww
 mov o0.w, v1.w
 ret 

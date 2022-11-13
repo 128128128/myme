@@ -462,7 +462,7 @@ void gbuffer_02::initialize(ID3D11Device* device, DirectX::XMFLOAT3 dir)
 		sampler_desc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
 
 		HRESULT hr = device->CreateSamplerState(&sampler_desc, samplerState.GetAddressOf());
-		_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
+		_ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
 
 
 		sampler_desc.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
@@ -470,7 +470,7 @@ void gbuffer_02::initialize(ID3D11Device* device, DirectX::XMFLOAT3 dir)
 		sampler_desc.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
 		sampler_desc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
 		hr = device->CreateSamplerState(&sampler_desc, samplerStateClamp.GetAddressOf());
-		_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
+		_ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
 
 
 		//	シャドウマップ用
@@ -483,7 +483,7 @@ void gbuffer_02::initialize(ID3D11Device* device, DirectX::XMFLOAT3 dir)
 		sampler_desc.BorderColor[2] = 1000;
 		sampler_desc.BorderColor[3] = 1000;
 		hr = device->CreateSamplerState(&sampler_desc, samplerStateBorder.GetAddressOf());
-		_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
+		_ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
 	}
 }
 

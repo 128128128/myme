@@ -37,7 +37,7 @@ dcl_temps 3
 //   o1.x <- <main return value>.texcoord.x; o1.y <- <main return value>.texcoord.y; 
 //   o0.x <- <main return value>.position.x; o0.y <- <main return value>.position.y; o0.z <- <main return value>.position.z; o0.w <- <main return value>.position.w
 //
-#line 8 "C:\Users\2200167\Desktop\個人製作\MyMe02\MyMe\HLSL\shadow_map_blur_df_vs.hlsl"
+#line 8 "C:\Users\2200167\Desktop\個人製作\myme03\myme\HLSL\shadow_map_blur_df_vs.hlsl"
 itof r0.xyzw, l(0, 0, 0, 0)  // r0.x <- output.shadow_param.x; r0.y <- output.shadow_param.y; r0.z <- output.shadow_param.z; r0.w <- output.shadow_param.w
 
 #line 9

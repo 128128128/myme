@@ -66,7 +66,7 @@ dcl_temps 3
 //   vicp[2][0].x <- patch[2].position.x; vicp[2][0].y <- patch[2].position.y; vicp[2][0].z <- patch[2].position.z; vicp[2][0].w <- patch[2].position.w; 
 //   vicp[2][1].x <- patch[2].texcoord.x; vicp[2][1].y <- patch[2].texcoord.y
 //
-#line 13 "C:\Users\2200167\Desktop\個人製作\MyMe02\MyMe\HLSL\create_terrain_ds.hlsl"
+#line 13 "C:\Users\2200167\Desktop\個人製作\myme03\myme\HLSL\create_terrain_ds.hlsl"
 mul r0.xy, vDomain.xxxx, vicp[0][0].xzxx
 mul r0.zw, vDomain.yyyy, vicp[1][0].xxxz
 add r0.xy, r0.zwzz, r0.xyxx

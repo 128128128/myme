@@ -89,7 +89,7 @@ dcl_maxout 3
 //   v[2][1].x <- input[2].texcoord.x; v[2][1].y <- input[2].texcoord.y; 
 //   x0 <- positions
 //
-#line 10 "C:\Users\2200167\Desktop\個人製作\MyMe02\MyMe\HLSL\create_terrain_gs.hlsl"
+#line 10 "C:\Users\2200167\Desktop\個人製作\myme03\myme\HLSL\create_terrain_gs.hlsl"
 mul r0.xyzw, cb8[0].xyzw, v[0][0].xxxx
 mul r1.xyzw, cb8[1].xyzw, v[0][0].yyyy
 add r0.xyzw, r0.xyzw, r1.xyzw

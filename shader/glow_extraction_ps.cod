@@ -56,7 +56,7 @@ dcl_temps 1
 //   v1.x <- texcoord.x; v1.y <- texcoord.y; 
 //   o0.x <- <main return value>.x; o0.y <- <main return value>.y; o0.z <- <main return value>.z; o0.w <- <main return value>.w
 //
-#line 11 "C:\Users\2200167\Desktop\個人製作\MyMe02\MyMe\HLSL\glow_extraction_ps.hlsl"
+#line 11 "C:\Users\2200167\Desktop\個人製作\myme03\myme\HLSL\glow_extraction_ps.hlsl"
 sample_indexable(texture2d)(float,float,float,float) r0.xyz, v1.xyxx, t0.xyzw, s0
 mov r0.xyz, r0.xyzx  // r0.x <- color_map_color.x; r0.y <- color_map_color.y; r0.z <- color_map_color.z
 

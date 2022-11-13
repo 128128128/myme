@@ -63,7 +63,7 @@ dcl_thread_group 256, 1, 1
 // Initial variable locations:
 //   vThreadID.x <- dtid.x; vThreadID.y <- dtid.y; vThreadID.z <- dtid.z
 //
-#line 9 "C:\Users\2200167\Desktop\個人製作\MyMe02\MyMe\HLSL\snowfall_particles_cs.hlsl"
+#line 9 "C:\Users\2200167\Desktop\個人製作\myme03\myme\HLSL\snowfall_particles_cs.hlsl"
 mov r0.x, vThreadID.x  // r0.x <- id
 
 #line 10

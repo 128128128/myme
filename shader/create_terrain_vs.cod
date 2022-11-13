@@ -32,7 +32,7 @@ dcl_temps 2
 //   o1.x <- <main return value>.texcoord.x; o1.y <- <main return value>.texcoord.y; 
 //   o0.x <- <main return value>.position.x; o0.y <- <main return value>.position.y; o0.z <- <main return value>.position.z; o0.w <- <main return value>.position.w
 //
-#line 6 "C:\Users\2200167\Desktop\個人製作\MyMe02\MyMe\HLSL\create_terrain_vs.hlsl"
+#line 6 "C:\Users\2200167\Desktop\個人製作\myme03\myme\HLSL\create_terrain_vs.hlsl"
 mov r0.xyzw, v0.xyzw  // r0.x <- vout.position.x; r0.y <- vout.position.y; r0.z <- vout.position.z; r0.w <- vout.position.w
 
 #line 7

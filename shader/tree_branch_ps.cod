@@ -17,11 +17,11 @@
 //
 //   float max_wind_strength;           // Offset:    0 Size:     4 [unused]
 //   float wind_strength;               // Offset:    4 Size:     4 [unused]
-//   float wind_speed;                  // Offset:    8 Size:     4 [unused]
+//   float wind_speed;                  // Offset:    8 Size:     4
 //   float mask;                        // Offset:   12 Size:     4
-//   float3 wind_direction;             // Offset:   16 Size:    12 [unused]
-//   float wind_amplitude;              // Offset:   28 Size:     4 [unused]
-//   float wind_amplitude_multiplier;   // Offset:   32 Size:     4 [unused]
+//   float3 wind_direction;             // Offset:   16 Size:    12
+//   float wind_amplitude;              // Offset:   28 Size:     4
+//   float wind_amplitude_multiplier;   // Offset:   32 Size:     4
 //   float flat_lighting;               // Offset:   36 Size:     4 [unused]
 //   float wind_debug;                  // Offset:   40 Size:     4 [unused]
 //   float pad;                         // Offset:   44 Size:     4 [unused]
@@ -46,6 +46,32 @@
 //
 // }
 //
+// cbuffer SCENE_CONSTANT_BUFFER
+// {
+//
+//   struct LIGHT_DIRECTION
+//   {
+//       
+//       float4 direction;              // Offset:    0
+//       float4 color;                  // Offset:   16
+//       float iTime;                   // Offset:   32
+//       float triple_speed_iTime;      // Offset:   36
+//       float elapsedTime;             // Offset:   40
+//       float shadow_map_num;          // Offset:   44
+//       float4x4 mlvp[3];              // Offset:   48
+//
+//   } light_direction;                 // Offset:    0 Size:   240
+//   
+//   struct PLAYER
+//   {
+//       
+//       float4 position;               // Offset:  240
+//       float4 direction;              // Offset:  256
+//
+//   } player;                          // Offset:  240 Size:    32 [unused]
+//
+// }
+//
 //
 // Resource Bindings:
 //
@@ -53,8 +79,10 @@
 // ------------------------------ ---------- ------- ----------- -------------- ------
 // anisotropic_sampler_state         sampler      NA          NA             s2      1 
 // main_texture                      texture  float4          2d             t0      1 
+// windVectors                       texture  float4          2d             t4      1 
 // OBJECT_CONSTANTS                  cbuffer      NA          NA            cb0      1 
 // CAMERA_CONSTANT_BUFFER            cbuffer      NA          NA            cb1      1 
+// SCENE_CONSTANT_BUFFER             cbuffer      NA          NA            cb2      1 
 // WIND_CONSTANTS                    cbuffer      NA          NA            cb5      1 
 //
 //
@@ -81,12 +109,14 @@
 // SV_TARGET                3   xyzw        3   TARGET   float   xyzw
 //
 ps_5_0
-dcl_globalFlags refactoringAllowed
+dcl_globalFlags refactoringAllowed | skipOptimization
 dcl_constantbuffer CB0[4], immediateIndexed
-dcl_constantbuffer CB5[1], immediateIndexed
+dcl_constantbuffer CB5[3], immediateIndexed
 dcl_constantbuffer CB1[1], immediateIndexed
+dcl_constantbuffer CB2[3], immediateIndexed
 dcl_sampler s2, mode_default
 dcl_resource_texture2d (float,float,float,float) t0
+dcl_resource_texture2d (float,float,float,float) t4
 dcl_input_ps linear v1.xyzw
 dcl_input_ps linear v2.xyzw
 dcl_input_ps linear v3.xy
@@ -94,23 +124,139 @@ dcl_output o0.xyzw
 dcl_output o1.xyzw
 dcl_output o2.xyzw
 dcl_output o3.xyzw
-dcl_temps 2
-sample_indexable(texture2d)(float,float,float,float) r0.xyzw, v3.xyxx, t0.xyzw, s2
-add r1.x, r0.w, -cb5[0].w
-lt r1.x, r1.x, l(0.000000)
-discard_nz r1.x
-add r1.x, cb0[3].y, cb0[3].x
-add r1.x, r1.x, cb0[3].z
+dcl_temps 4
+//
+// Initial variable locations:
+//   v0.x <- pin.sv_position.x; v0.y <- pin.sv_position.y; v0.z <- pin.sv_position.z; v0.w <- pin.sv_position.w; 
+//   v1.x <- pin.position.x; v1.y <- pin.position.y; v1.z <- pin.position.z; v1.w <- pin.position.w; 
+//   v2.x <- pin.normal.x; v2.y <- pin.normal.y; v2.z <- pin.normal.z; v2.w <- pin.normal.w; 
+//   v3.x <- pin.texcoord.x; v3.y <- pin.texcoord.y; 
+//   v4.x <- pin.color.x; v4.y <- pin.color.y; v4.z <- pin.color.z; v4.w <- pin.color.w; 
+//   v5.x <- pin.vertexToFrag332.x; v5.y <- pin.vertexToFrag332.y; v5.z <- pin.vertexToFrag332.z; v5.w <- pin.vertexToFrag332.w; 
+//   o3.x <- <main return value>.Position.x; o3.y <- <main return value>.Position.y; o3.z <- <main return value>.Position.z; o3.w <- <main return value>.Position.w; 
+//   o2.x <- <main return value>.Normal.x; o2.y <- <main return value>.Normal.y; o2.z <- <main return value>.Normal.z; o2.w <- <main return value>.Normal.w; 
+//   o1.x <- <main return value>.Depth.x; o1.y <- <main return value>.Depth.y; o1.z <- <main return value>.Depth.z; o1.w <- <main return value>.Depth.w; 
+//   o0.x <- <main return value>.Color.x; o0.y <- <main return value>.Color.y; o0.z <- <main return value>.Color.z; o0.w <- <main return value>.Color.w
+//
+#line 21 "C:\Users\2200167\Desktop\個人製作\myme03\myme\HLSL\tree_branch_ps.hlsl"
+sample_indexable(texture2d)(float,float,float,float) r0.xyzw, v3.xyxx, t0.wxyz, s2  // r0.y <- tex2d_node19.x; r0.z <- tex2d_node19.y; r0.w <- tex2d_node19.z; r0.x <- tex2d_node19.w
+
+#line 23
+itof r1.xyz, l(1, 1, 1, 0)  // r1.x <- color.x; r1.y <- color.y; r1.z <- color.z
+
+#line 24
+mul r0.yzw, r0.yyzw, r1.xxyz  // r0.y <- temp_output_343_0.x; r0.z <- temp_output_343_0.y; r0.w <- temp_output_343_0.z
+
+#line 25
+itof r1.xyz, l(1, 1, 1, 0)
+mul r0.yzw, r0.yyzw, r1.xxyz  // r0.y <- lerp_result_246.x; r0.z <- lerp_result_246.y; r0.w <- lerp_result_246.z
+
+#line 26
+itof r1.xyzw, l(0, 0, 0, 1)
+mul r2.xyz, r1.xxxx, cb0[0].xyzx
+mul r3.xyz, r1.yyyy, cb0[1].xyzx
+add r2.xyz, r2.xyzx, r3.xyzx
+mul r1.xyz, r1.zzzz, cb0[2].xyzx
+add r1.xyz, r1.xyzx, r2.xyzx
+mul r2.xyz, r1.wwww, cb0[3].xyzx
+add r1.xyz, r1.xyzx, r2.xyzx  // r1.x <- transform_204.x; r1.y <- transform_204.y; r1.z <- transform_204.z
+
+#line 27
+itof r2.xz, l(1, 0, 0, 0)
+add r1.x, r1.y, r1.x
+add r1.x, r1.z, r1.x
 frc r1.x, r1.x
 mul r1.x, r1.x, l(0.184000)
-add r1.yzw, -r0.xxyz, l(0.000000, 1.000000, 0.500000, 0.000000)
-mad_sat o0.xyz, r1.xxxx, r1.yzwy, r0.xyzx
-mov o0.w, r0.w
-add r0.xyzw, v1.xyzw, -cb1[0].xyzw
-dp4 r0.x, r0.xyzw, r0.xyzw
-sqrt o1.x, r0.x
-mov o1.yzw, l(0,0,0,1.000000)
-mov o2.xyzw, v2.xyzw
-mov o3.xyzw, v1.xyzw
+mov r1.yzw, -r0.yyzw
+mov r2.y, l(0.500000)
+add r1.yzw, r1.yyzw, r2.xxyz
+mul r1.xyz, r1.yzwy, r1.xxxx
+add r0.yzw, r0.yyzw, r1.xxyz  // r0.y <- lerp_result_20.x; r0.z <- lerp_result_20.y; r0.w <- lerp_result_20.z
+
+#line 28
+max r0.yzw, r0.yyzw, l(0.000000, 0.000000, 0.000000, 0.000000)
+min r0.yzw, r0.yyzw, l(0.000000, 1.000000, 1.000000, 1.000000)  // r0.y <- color_56.x; r0.z <- color_56.y; r0.w <- color_56.z
+
+#line 30
+mov r1.xy, v1.xzxx  // r1.x <- ase_world_pos.x; r1.y <- ase_world_pos.z
+
+#line 31
+mul r1.z, cb5[0].z, l(0.050000)
+mul r1.z, r1.z, cb2[2].y  // r1.z <- temp_output_60_0
+
+#line 32
+mov r2.xy, cb5[1].xzxx  // r2.x <- append_result_249.x; r2.y <- append_result_249.y
+
+#line 33
+mul r1.w, cb5[1].w, cb5[2].x
+itof r2.zw, l(0, 0, 1, 1)
+mul r1.xy, r1.xyxx, r2.zwzz
+mul r1.xy, r1.xyxx, r1.wwww
+mul r1.zw, r1.zzzz, r2.xxxy
+add r1.xy, r1.zwzz, r1.xyxx
+sample_l_indexable(texture2d)(float,float,float,float) r1.xyz, r1.xyxx, t4.xyzw, s2, l(0.000000)
+mov r1.xyz, r1.xyzx  // r1.x <- wind_vectors_99.x; r1.y <- wind_vectors_99.y; r1.z <- wind_vectors_99.z
+
+#line 34
+mul r1.xyz, r1.xyzx, l(2.000000, 2.000000, 2.000000, 0.000000)
+mov r2.xyz, l(-1.000000,-1.000000,-1.000000,-0.000000)
+add r1.xyz, r1.xyzx, r2.xyzx
+
+#line 35
+mov r1.w, l(0)  // r1.w <- debug
+
+#line 37
+mov r2.xyz, -r0.yzwy
+add r1.xyz, r1.xyzx, r2.xyzx
+mul r1.xyz, r1.xyzx, r1.wwww
+add r2.xyz, r0.yzwy, r1.xyzx  // r2.x <- lerp_result_97.x; r2.y <- lerp_result_97.y; r2.z <- lerp_result_97.z
+
+#line 38
+mov r2.xyz, r2.xyzx  // r2.x <- albedo.x; r2.y <- albedo.y; r2.z <- albedo.z
+
+#line 45
+mov r0.x, r0.x  // r0.x <- alpha_31
+
+#line 46
+mov r0.y, -r0.x
+add r0.y, r0.y, l(1.000000)
+mul r0.y, r0.y, r1.w
+add r2.w, r0.y, r0.x  // r2.w <- lerp_result_101
+
+#line 47
+mov r0.x, -cb5[0].w
+add r0.x, r0.x, r2.w
+lt r0.x, r0.x, l(0.000000)
+and r0.x, r0.x, l(-1)
+discard_nz r0.x
+
+#line 48
+mov r2.xyz, r2.xyzx  // r2.x <- final_color.x; r2.y <- final_color.y; r2.z <- final_color.z
+mov r2.w, r2.w  // r2.w <- final_color.w
+
+#line 50
+mov r2.xyzw, r2.xyzw  // r2.x <- ret.Color.x; r2.y <- ret.Color.y; r2.z <- ret.Color.z; r2.w <- ret.Color.w
+
+#line 51
+mov r0.xyzw, v1.xyzw  // r0.x <- ret.Position.x; r0.y <- ret.Position.y; r0.z <- ret.Position.z; r0.w <- ret.Position.w
+
+#line 52
+mov r1.xyzw, -cb1[0].xyzw
+add r1.xyzw, r1.xyzw, v1.xyzw
+dp4 r1.x, r1.xyzw, r1.xyzw
+sqrt r1.x, r1.x  // r1.x <- dist
+
+#line 53
+itof r1.yzw, l(0, 0, 0, 1)  // r1.y <- ret.Depth.y; r1.z <- ret.Depth.z; r1.w <- ret.Depth.w
+mov r1.x, r1.x  // r1.x <- ret.Depth.x
+
+#line 54
+mov r3.xyzw, v2.xyzw  // r3.x <- ret.Normal.x; r3.y <- ret.Normal.y; r3.z <- ret.Normal.z; r3.w <- ret.Normal.w
+
+#line 55
+mov o0.xyzw, r2.xyzw
+mov o1.xyzw, r1.xyzw
+mov o2.xyzw, r3.xyzw
+mov o3.xyzw, r0.xyzw
 ret 
-// Approximately 18 instruction slots used
+// Approximately 72 instruction slots used

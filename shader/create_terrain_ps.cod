@@ -87,7 +87,7 @@ dcl_temps 4
 //   v3.x <- pin.texcoord.x; v3.y <- pin.texcoord.y; 
 //   o0.x <- <main return value>.x; o0.y <- <main return value>.y; o0.z <- <main return value>.z; o0.w <- <main return value>.w
 //
-#line 10 "C:\Users\2200167\Desktop\個人製作\MyMe02\MyMe\HLSL\create_terrain_ps.hlsl"
+#line 10 "C:\Users\2200167\Desktop\個人製作\myme03\myme\HLSL\create_terrain_ps.hlsl"
 sample_indexable(texture2d)(float,float,float,float) r0.xyz, v3.xyxx, t0.xyzw, s2
 mov r0.xyz, r0.xyzx  // r0.x <- color1.x; r0.y <- color1.y; r0.z <- color1.z
 

@@ -79,7 +79,7 @@ dcl_temps 7
 //   v2.x <- bone_indices.x; v2.y <- bone_indices.y; v2.z <- bone_indices.z; v2.w <- bone_indices.w; 
 //   o0.x <- <main return value>.x; o0.y <- <main return value>.y; o0.z <- <main return value>.z; o0.w <- <main return value>.w
 //
-#line 6 "C:\Users\2200167\Desktop\個人製作\MyMe02\MyMe\HLSL\dynamic_shadowcast_vs.hlsl"
+#line 6 "C:\Users\2200167\Desktop\個人製作\myme03\myme\HLSL\dynamic_shadowcast_vs.hlsl"
 itof r0.xyz, l(0, 0, 0, 0)  // r0.x <- blended_position.x; r0.y <- blended_position.y; r0.z <- blended_position.z
 
 #line 7

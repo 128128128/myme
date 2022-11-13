@@ -26,7 +26,7 @@ dcl_temps 1
 //   v0.x <- vertex_id; 
 //   o0.x <- <main return value>
 //
-#line 6 "C:\Users\2200167\Desktop\個人製作\MyMe02\MyMe\HLSL\snowfall_particles_vs.hlsl"
+#line 6 "C:\Users\2200167\Desktop\個人製作\myme03\myme\HLSL\snowfall_particles_vs.hlsl"
 mov r0.x, v0.x  // r0.x <- vout
 
 #line 7

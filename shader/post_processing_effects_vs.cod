@@ -29,7 +29,7 @@ dcl_temps 2
 //   o1.x <- <main return value>.texcoord.x; o1.y <- <main return value>.texcoord.y; 
 //   o0.x <- <main return value>.position.x; o0.y <- <main return value>.position.y; o0.z <- <main return value>.position.z; o0.w <- <main return value>.position.w
 //
-#line 6 "C:\Users\2200167\Desktop\個人製作\MyMe02\MyMe\HLSL\post_processing_effects_vs.hlsl"
+#line 6 "C:\Users\2200167\Desktop\個人製作\myme03\myme\HLSL\post_processing_effects_vs.hlsl"
 mov r0.x, l(1)
 ishl r0.x, v0.x, r0.x
 mov r0.y, l(2)

@@ -60,7 +60,7 @@ dcl_temps 6
 //   v1.x <- texcoord.x; v1.y <- texcoord.y; 
 //   o0.x <- <main return value>.x; o0.y <- <main return value>.y; o0.z <- <main return value>.z; o0.w <- <main return value>.w
 //
-#line 15 "C:\Users\2200167\Desktop\個人製作\MyMe02\MyMe\HLSL\lens_flare_ps.hlsl"
+#line 15 "C:\Users\2200167\Desktop\個人製作\myme03\myme\HLSL\lens_flare_ps.hlsl"
 mov r0.xy, -v1.xyxx
 itof r0.zw, l(0, 0, 1, 1)
 add r0.xy, r0.zwzz, r0.xyxx  // r0.x <- mimic_texcoord.x; r0.y <- mimic_texcoord.y

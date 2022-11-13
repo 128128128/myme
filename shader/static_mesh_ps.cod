@@ -105,7 +105,7 @@ dcl_temps 6
 //   v6.x <- pin.color.x; v6.y <- pin.color.y; v6.z <- pin.color.z; v6.w <- pin.color.w; 
 //   o0.x <- <main return value>.x; o0.y <- <main return value>.y; o0.z <- <main return value>.z; o0.w <- <main return value>.w
 //
-#line 16 "C:\Users\2200167\Desktop\個人製作\MyMe02\MyMe\HLSL\static_mesh_ps.hlsl"
+#line 16 "C:\Users\2200167\Desktop\個人製作\myme03\myme\HLSL\static_mesh_ps.hlsl"
 sample_indexable(texture2d)(float,float,float,float) r0.xyz, v5.xyxx, t0.xyzw, s2
 mov r0.xyz, r0.xyzx  // r0.x <- color.x; r0.y <- color.y; r0.z <- color.z
 

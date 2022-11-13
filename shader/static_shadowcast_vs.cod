@@ -68,7 +68,7 @@ dcl_temps 3
 //   o2.x <- <main return value>.shadow_param.x; o2.y <- <main return value>.shadow_param.y; o2.z <- <main return value>.shadow_param.z; o2.w <- <main return value>.shadow_param.w; 
 //   o0.x <- <main return value>.position.x; o0.y <- <main return value>.position.y; o0.z <- <main return value>.position.z; o0.w <- <main return value>.position.w
 //
-#line 14 "C:\Users\2200167\Desktop\個人製作\MyMe02\MyMe\HLSL\static_shadowcast_vs.hlsl"
+#line 14 "C:\Users\2200167\Desktop\個人製作\myme03\myme\HLSL\static_shadowcast_vs.hlsl"
 ftou r0.x, cb2[2].w
 imul null, r0.x, r0.x, l(4)
 mul r1.xyzw, v0.xxxx, cb2[r0.x + 3].xyzw

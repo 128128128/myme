@@ -37,7 +37,7 @@ dcl_output o0.xyzw
 //   v1.x <- pin.texcoord.x; v1.y <- pin.texcoord.y; v1.z <- pin.texcoord.z; 
 //   o0.x <- <main return value>.x; o0.y <- <main return value>.y; o0.z <- <main return value>.z; o0.w <- <main return value>.w
 //
-#line 15 "C:\Users\2200167\Desktop\個人製作\MyMe02\MyMe\HLSL\skymap_ps.hlsl"
+#line 15 "C:\Users\2200167\Desktop\個人製作\myme03\myme\HLSL\skymap_ps.hlsl"
 sample_indexable(texture2d)(float,float,float,float) o0.xyzw, v1.xyxx, t0.xyzw, s2
 ret 
 // Approximately 2 instruction slots used

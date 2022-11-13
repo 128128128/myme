@@ -66,7 +66,7 @@ bool game_scene::initialize(ID3D11Device* device, CONST LONG screen_width, CONST
 			{
 				trees = std::make_unique<Trees>(device);
 				shadow_trees = std::make_unique<Ground>();
-				shadow_trees->mesh = std::make_unique<static_mesh>(device, ".\\resources\\factory\\factory_cut_0714.fbx");
+				shadow_trees->mesh = std::make_unique<static_mesh>(device, ".\\resources\\enviroments\\trees\\tree_T.fbx");
 			}
             if (!water_fall)
 			{

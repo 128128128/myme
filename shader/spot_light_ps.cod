@@ -114,7 +114,7 @@ dcl_temps 5
 //   v6.x <- pin.color.x; v6.y <- pin.color.y; v6.z <- pin.color.z; v6.w <- pin.color.w; 
 //   o0.x <- <main return value>.x; o0.y <- <main return value>.y; o0.z <- <main return value>.z; o0.w <- <main return value>.w
 //
-#line 15 "C:\Users\2200167\Desktop\個人製作\MyMe02\MyMe\HLSL\spot_light_ps.hlsl"
+#line 15 "C:\Users\2200167\Desktop\個人製作\myme03\myme\HLSL\spot_light_ps.hlsl"
 sample_indexable(texture2d)(float,float,float,float) r0.x, v5.xyxx, t0.wxyz, s2
 mov r0.x, r0.x  // r0.x <- color.w
 

@@ -118,10 +118,10 @@ dcl_temps 7
 //   v5.x <- pin.texcoord.x; v5.y <- pin.texcoord.y; 
 //   o0.x <- <main return value>.x; o0.y <- <main return value>.y; o0.z <- <main return value>.z; o0.w <- <main return value>.w
 //
-#line 1 "C:\Users\2200167\Desktop\個人製作\MyMe02\MyMe\HLSL\shader_functions.hlsli"
+#line 1 "C:\Users\2200167\Desktop\個人製作\myme03\myme\HLSL\shader_functions.hlsli"
 mov r0.x, l(3.141593)  // r0.x <- PI
 
-#line 190 "C:\Users\2200167\Desktop\個人製作\MyMe02\MyMe\HLSL\pbr_dynamic_ps.hlsl"
+#line 190 "C:\Users\2200167\Desktop\個人製作\myme03\myme\HLSL\pbr_dynamic_ps.hlsl"
 dp3 r0.y, v2.xyzx, v2.xyzx
 rsq r0.y, r0.y
 mul r0.yzw, r0.yyyy, v2.xxyz  // r0.y <- N.x; r0.z <- N.y; r0.w <- N.z
@@ -222,7 +222,7 @@ mov r2.yzw, r2.yyzw
 mov r0.yzw, r0.yyzw
 mov r2.x, r2.x
 
-#line 41 "C:\Users\2200167\Desktop\個人製作\MyMe02\MyMe\HLSL\shader_functions.hlsli"
+#line 41 "C:\Users\2200167\Desktop\個人製作\myme03\myme\HLSL\shader_functions.hlsli"
 mov r3.w, l(0.760000)  // r3.w <- microfacet
 
 #line 45
@@ -336,7 +336,7 @@ mul r0.y, r2.y, r0.y
 div r0.x, r0.y, r0.x
 max r0.x, r0.x, l(0.000000)  // r0.x <- <CookTorranceSpecular return value>
 
-#line 233 "C:\Users\2200167\Desktop\個人製作\MyMe02\MyMe\HLSL\pbr_dynamic_ps.hlsl"
+#line 233 "C:\Users\2200167\Desktop\個人製作\myme03\myme\HLSL\pbr_dynamic_ps.hlsl"
 mul r0.xyz, r0.xxxx, cb2[1].xxxx  // r0.x <- spec.x; r0.y <- spec.y; r0.z <- spec.z
 
 #line 239

@@ -77,7 +77,7 @@ dcl_maxout 4
 //   v[0][0].x <- input; 
 //   x0 <- billboard; x1 <- texcoords
 //
-#line 8 "C:\Users\2200167\Desktop\個人製作\MyMe02\MyMe\HLSL\snowfall_particles_gs.hlsl"
+#line 8 "C:\Users\2200167\Desktop\個人製作\myme03\myme\HLSL\snowfall_particles_gs.hlsl"
 mov x0[0].xyz, l(-1.000000,-1.000000,0,0)
 mov x0[1].xyz, l(1.000000,-1.000000,0,0)
 mov x0[2].xyz, l(-1.000000,1.000000,0,0)
