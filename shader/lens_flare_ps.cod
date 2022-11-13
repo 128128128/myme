@@ -45,7 +45,7 @@
 // SV_TARGET                0   xyzw        0   TARGET   float   xyzw
 //
 ps_5_0
-dcl_globalFlags refactoringAllowed | skipOptimization
+dcl_globalFlags refactoringAllowed
 dcl_constantbuffer CB0[2], immediateIndexed
 dcl_sampler s2, mode_default
 dcl_resource_texture2d (float,float,float,float) t0
@@ -53,102 +53,40 @@ dcl_resource_texture2d (float,float,float,float) t1
 dcl_resource_texture2d (float,float,float,float) t2
 dcl_input_ps linear v1.xy
 dcl_output o0.xyzw
-dcl_temps 6
-//
-// Initial variable locations:
-//   v0.x <- position.x; v0.y <- position.y; v0.z <- position.z; v0.w <- position.w; 
-//   v1.x <- texcoord.x; v1.y <- texcoord.y; 
-//   o0.x <- <main return value>.x; o0.y <- <main return value>.y; o0.z <- <main return value>.z; o0.w <- <main return value>.w
-//
-#line 15 "C:\Users\2200167\Desktop\個人製作\myme03\myme\HLSL\lens_flare_ps.hlsl"
-mov r0.xy, -v1.xyxx
-itof r0.zw, l(0, 0, 1, 1)
-add r0.xy, r0.zwzz, r0.xyxx  // r0.x <- mimic_texcoord.x; r0.y <- mimic_texcoord.y
-
-#line 23
-mov r0.z, -r0.x
-add r1.x, r0.z, l(0.500000)
-mov r0.z, -r0.y
-add r1.y, r0.z, l(0.500000)
-mul r0.zw, r1.xxxy, cb0[0].wwww  // r0.z <- ghost_vector.x; r0.w <- ghost_vector.y
-
-#line 26
-itof r1.xyz, l(0, 0, 0, 0)  // r1.x <- fragment_color.x; r1.y <- fragment_color.y; r1.z <- fragment_color.z
-
-#line 29
-mov r1.w, l(0)  // r1.w <- i
-mov r2.xyz, r1.xyzx  // r2.x <- fragment_color.x; r2.y <- fragment_color.y; r2.z <- fragment_color.z
-mov r2.w, r1.w  // r2.w <- i
+dcl_temps 5
+add r0.xy, -v1.xyxx, l(1.000000, 1.000000, 0.000000, 0.000000)
+add r1.xyzw, -r0.xyxy, l(0.500000, 0.500000, 0.500000, 0.500000)
+mul r0.zw, r1.xxxy, cb0[0].wwww
+mov r2.xyz, l(0,0,0,0)
+mov r1.x, l(0)
 loop 
-  ilt r3.x, r2.w, cb0[1].x
-  breakc_z r3.x
-
-#line 32
-  itof r3.xy, r2.wwww
-  mul r3.xy, r0.zwzz, r3.xyxx
-  add r3.xy, r0.xyxx, r3.xyxx  // r3.x <- offset.x; r3.y <- offset.y
-
-#line 34
+  ige r1.y, r1.x, cb0[1].x
+  breakc_nz r1.y
+  itof r1.y, r1.x
+  mad r3.xy, r0.zwzz, r1.yyyy, r0.xyxx
   sample_indexable(texture2d)(float,float,float,float) r4.xyz, r3.xyxx, t0.xyzw, s2
-  mov r4.xyz, r4.xyzx  // r4.x <- color.x; r4.y <- color.y; r4.z <- color.z
-
-#line 37
-  mov r5.xyz, -cb0[0].zzzz
-  add r4.xyz, r4.xyzx, r5.xyzx
-  itof r5.xyz, l(0, 0, 0, 0)
-  max r4.xyz, r4.xyzx, r5.xyzx
-
-#line 43
-  mov r3.zw, l(-0.000000,-0.000000,-0.500000,-0.500000)
-  add r3.xy, r3.zwzz, r3.xyxx
-  dp2 r3.x, r3.xyxx, r3.xyxx
-  sqrt r3.x, r3.x  // r3.x <- d
-
-#line 45
-  mov r3.y, l(-0.000000)
-  add r3.z, r3.y, l(0.750000)
-  add r3.x, r3.y, r3.x
-  div r3.y, l(1.000000, 1.000000, 1.000000, 1.000000), r3.z
-  mul r3.x, r3.y, r3.x
-  max r3.x, r3.x, l(0.000000)
-  min r3.x, r3.x, l(1.000000)
-  mul r3.y, r3.x, l(-2.000000)
-  add r3.y, r3.y, l(3.000000)
-  mul r3.x, r3.x, r3.x
-  mul r3.x, r3.x, r3.y
-  mov r3.x, -r3.x
-  add r3.x, r3.x, l(1.000000)  // r3.x <- weight
-
-#line 46
-  mul r3.xyz, r3.xxxx, r4.xyzx
-  add r2.xyz, r2.xyzx, r3.xyzx
-
-#line 51
-  iadd r2.w, r2.w, l(1)
+  add r4.xyz, r4.xyzx, -cb0[0].zzzz
+  max r4.xyz, r4.xyzx, l(0.000000, 0.000000, 0.000000, 0.000000)
+  add r3.xy, r3.xyxx, l(-0.500000, -0.500000, 0.000000, 0.000000)
+  dp2 r1.y, r3.xyxx, r3.xyxx
+  sqrt r1.y, r1.y
+  mul r1.y, r1.y, l(1.333333)
+  min r1.y, r1.y, l(1.000000)
+  mad r2.w, r1.y, l(-2.000000), l(3.000000)
+  mul r1.y, r1.y, r1.y
+  mad r1.y, -r2.w, r1.y, l(1.000000)
+  mad r2.xyz, r4.xyzx, r1.yyyy, r2.xyzx
+  iadd r1.x, r1.x, l(1)
 endloop 
-
-#line 52
-dp3 r1.z, r2.xyzx, l(0.212600, 0.715200, 0.072200, 0.000000)
-mov r1.xyz, r1.zzzz  // r1.z <- luminance
-
-#line 53
-mov r1.xyz, r1.xyzx  // r1.x <- fragment_color.x; r1.y <- fragment_color.y; r1.z <- fragment_color.z
-
-#line 55
-mov r0.xy, -r0.xyxx
-add r0.xy, r0.xyxx, l(0.500000, 0.500000, 0.000000, 0.000000)
-dp2 r0.x, r0.xyxx, r0.xyxx
-sqrt r0.x, r0.x
-div r0.x, r0.x, l(0.707107)
-sample_indexable(texture2d)(float,float,float,float) r0.xyz, r0.xxxx, t1.xyzw, s2
-mul r0.xyz, r0.xyzx, r1.xyzx  // r0.x <- fragment_color.x; r0.y <- fragment_color.y; r0.z <- fragment_color.z
-
-#line 58
+dp3 r0.x, r2.xyzx, l(0.212600, 0.715200, 0.072200, 0.000000)
+dp2 r0.y, r1.zwzz, r1.zwzz
+sqrt r0.y, r0.y
+mul r0.y, r0.y, l(1.414214)
+sample_indexable(texture2d)(float,float,float,float) r0.yzw, r0.yyyy, t1.wxyz, s2
+mul r0.xyz, r0.yzwy, r0.xxxx
 sample_indexable(texture2d)(float,float,float,float) r0.w, v1.xyxx, t2.yzwx, s2
 mul r0.xyz, r0.wwww, r0.xyzx
-
-#line 61
 mul o0.xyz, r0.xyzx, cb0[1].yyyy
 mov o0.w, l(1.000000)
 ret 
-// Approximately 60 instruction slots used
+// Approximately 35 instruction slots used

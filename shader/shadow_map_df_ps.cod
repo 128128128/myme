@@ -19,17 +19,9 @@
 // SV_TARGET                0   xyzw        0   TARGET   float   xyzw
 //
 ps_5_0
-dcl_globalFlags refactoringAllowed | skipOptimization
+dcl_globalFlags refactoringAllowed
 dcl_input_ps_siv linear noperspective v0.z, position
 dcl_output o0.xyzw
-//
-// Initial variable locations:
-//   v0.x <- pin.position.x; v0.y <- pin.position.y; v0.z <- pin.position.z; v0.w <- pin.position.w; 
-//   v1.x <- pin.texcoord.x; v1.y <- pin.texcoord.y; 
-//   v2.x <- pin.shadow_param.x; v2.y <- pin.shadow_param.y; v2.z <- pin.shadow_param.z; v2.w <- pin.shadow_param.w; 
-//   o0.x <- <main return value>.x; o0.y <- <main return value>.y; o0.z <- <main return value>.z; o0.w <- <main return value>.w
-//
-#line 10 "C:\Users\2200167\Desktop\個人製作\myme03\myme\HLSL\shadow_map_df_ps.hlsl"
 mov o0.xyz, v0.zzzz
 mov o0.w, l(1.000000)
 ret 

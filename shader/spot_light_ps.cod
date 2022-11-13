@@ -91,7 +91,7 @@
 // SV_TARGET                0   xyzw        0   TARGET   float   xyzw
 //
 ps_5_0
-dcl_globalFlags refactoringAllowed | skipOptimization
+dcl_globalFlags refactoringAllowed
 dcl_constantbuffer CB1[1], immediateIndexed
 dcl_constantbuffer CB4[5], immediateIndexed
 dcl_sampler s1, mode_default
@@ -102,182 +102,73 @@ dcl_input_ps linear v1.xyz
 dcl_input_ps linear v2.xyz
 dcl_input_ps linear v5.xy
 dcl_output o0.xyzw
-dcl_temps 5
-//
-// Initial variable locations:
-//   v0.x <- pin.sv_position.x; v0.y <- pin.sv_position.y; v0.z <- pin.sv_position.z; v0.w <- pin.sv_position.w; 
-//   v1.x <- pin.position.x; v1.y <- pin.position.y; v1.z <- pin.position.z; v1.w <- pin.position.w; 
-//   v2.x <- pin.normal.x; v2.y <- pin.normal.y; v2.z <- pin.normal.z; v2.w <- pin.normal.w; 
-//   v3.x <- pin.tangent.x; v3.y <- pin.tangent.y; v3.z <- pin.tangent.z; v3.w <- pin.tangent.w; 
-//   v4.x <- pin.binormal.x; v4.y <- pin.binormal.y; v4.z <- pin.binormal.z; v4.w <- pin.binormal.w; 
-//   v5.x <- pin.texcoord.x; v5.y <- pin.texcoord.y; 
-//   v6.x <- pin.color.x; v6.y <- pin.color.y; v6.z <- pin.color.z; v6.w <- pin.color.w; 
-//   o0.x <- <main return value>.x; o0.y <- <main return value>.y; o0.z <- <main return value>.z; o0.w <- <main return value>.w
-//
-#line 15 "C:\Users\2200167\Desktop\個人製作\myme03\myme\HLSL\spot_light_ps.hlsl"
-sample_indexable(texture2d)(float,float,float,float) r0.x, v5.xyxx, t0.wxyz, s2
-mov r0.x, r0.x  // r0.x <- color.w
-
-#line 16
-mov r0.x, r0.x  // r0.x <- alpha
-
-#line 17
-dp3 r0.y, v2.xyzx, v2.xyzx
-rsq r0.y, r0.y
-mul r0.yzw, r0.yyyy, v2.xxyz  // r0.y <- N.x; r0.z <- N.y; r0.w <- N.z
-
-#line 18
-itof r1.xy, l(0, 0, 0, 0)  // r1.x <- T.y; r1.y <- T.z
-mov r1.z, l(1.000100)  // r1.z <- T.x
-
-#line 19
-mul r2.xyz, r0.zwyz, r1.yzxy
-mul r1.xyz, r0.wyzw, r1.xyzx
-mov r1.xyz, -r1.xyzx
-add r1.xyz, r1.xyzx, r2.xyzx
-dp3 r1.w, r1.xyzx, r1.xyzx
-rsq r1.w, r1.w
-mul r1.xyz, r1.wwww, r1.xyzx  // r1.x <- B.x; r1.y <- B.y; r1.z <- B.z
-
-#line 20
-mul r2.xyz, r0.wyzw, r1.yzxy
-mul r3.xyz, r0.zwyz, r1.zxyz
-mov r3.xyz, -r3.xyzx
-add r2.xyz, r2.xyzx, r3.xyzx
-dp3 r1.w, r2.xyzx, r2.xyzx
-rsq r1.w, r1.w
-mul r2.xyz, r1.wwww, r2.xyzx  // r2.x <- T.x; r2.y <- T.y; r2.z <- T.z
-
-#line 22
+dcl_temps 4
+dp3 r0.x, v2.xyzx, v2.xyzx
+rsq r0.x, r0.x
+mul r0.xyz, r0.xxxx, v2.xyzx
+mul r1.xyz, r0.zxyz, l(0.000000, 0.000000, 1.000100, 0.000000)
+mad r1.xyz, r0.yzxy, l(0.000000, 1.000100, 0.000000, 0.000000), -r1.xyzx
+dp2 r0.w, r1.yzyy, r1.yzyy
+rsq r0.w, r0.w
+mul r1.xyz, r0.wwww, r1.xyzx
+mul r2.xyz, r0.yzxy, r1.zxyz
+mad r2.xyz, r1.yzxy, r0.zxyz, -r2.xyzx
+dp3 r0.w, r2.xyzx, r2.xyzx
+rsq r0.w, r0.w
+mul r2.xyz, r0.wwww, r2.xyzx
 sample_indexable(texture2d)(float,float,float,float) r3.xyz, v5.xyxx, t3.xyzw, s1
-mov r3.xyz, r3.xyzx  // r3.x <- normal.x; r3.y <- normal.y; r3.z <- normal.z
-
-#line 23
-mul r3.xyz, r3.xyzx, l(2.000000, 2.000000, 2.000000, 0.000000)
-mov r4.xyz, l(-1.000000,-1.000000,-1.000000,-0.000000)
-add r3.xyz, r3.xyzx, r4.xyzx
-
-#line 25
-mul r2.xyz, r2.xyzx, r3.xxxx
+mad r3.xyz, r3.xyzx, l(2.000000, 2.000000, 2.000000, 0.000000), l(-1.000000, -1.000000, -1.000000, 0.000000)
 mul r1.xyz, r1.xyzx, r3.yyyy
-add r1.xyz, r1.xyzx, r2.xyzx
-mul r0.yzw, r0.yyzw, r3.zzzz
-add r0.yzw, r0.yyzw, r1.xxyz
-dp3 r1.x, r0.yzwy, r0.yzwy
-rsq r1.x, r1.x
-mul r0.yzw, r0.yyzw, r1.xxxx  // r0.y <- N.x; r0.z <- N.y; r0.w <- N.z
-
-#line 30
-mov r1.xyz, -v1.xyzx
-add r1.xyz, r1.xyzx, cb1[0].xyzx
-dp3 r1.w, r1.xyzx, r1.xyzx
-rsq r1.w, r1.w
-mul r1.xyz, r1.wwww, r1.xyzx  // r1.x <- E.x; r1.y <- E.y; r1.z <- E.z
-
-#line 34
-mov r2.xyz, -cb4[2].xyzx
-add r2.xyz, r2.xyzx, v1.xyzx  // r2.x <- lig_direction.x; r2.y <- lig_direction.y; r2.z <- lig_direction.z
-
-#line 35
+mad r1.xyz, r3.xxxx, r2.xyzx, r1.xyzx
+mad r0.xyz, r3.zzzz, r0.xyzx, r1.xyzx
+dp3 r0.w, r0.xyzx, r0.xyzx
+rsq r0.w, r0.w
+mul r0.xyz, r0.wwww, r0.xyzx
+add r1.xyz, -v1.xyzx, cb1[0].xyzx
+dp3 r0.w, r1.xyzx, r1.xyzx
+rsq r0.w, r0.w
+add r2.xyz, v1.xyzx, -cb4[2].xyzx
 dp3 r1.w, r2.xyzx, r2.xyzx
-rsq r1.w, r1.w
-mul r2.xyz, r1.wwww, r2.xyzx
-
-#line 37
-itof r1.w, l(0)
-dp3 r2.w, r0.yzwy, r2.xyzx
-max r1.w, r1.w, r2.w
-mul r3.xyz, r1.wwww, cb4[3].xyzx  // r3.x <- diff_spot.x; r3.y <- diff_spot.y; r3.z <- diff_spot.z
-
-#line 39
-itof r1.w, l(0)
-add r1.xyz, r1.xyzx, r2.xyzx
-dp3 r2.w, r1.xyzx, r1.xyzx
-rsq r2.w, r2.w
-mul r1.xyz, r1.xyzx, r2.wwww
-dp3 r0.y, r0.yzwy, r1.xyzx
-max r0.y, r0.y, r1.w
-mov r0.z, l(1.000000)
-mul r0.z, r0.y, r0.z
-mul r0.y, r0.y, r0.y
-mul r0.yzw, r0.yyyy, r0.zzzz  // r0.y <- spec_spot.x; r0.z <- spec_spot.y; r0.w <- spec_spot.z
-
-#line 40
-mov r1.xyz, -cb4[2].xyzx
-add r1.xyz, r1.xyzx, v1.xyzx
-dp3 r1.x, r1.xyzx, r1.xyzx
-sqrt r1.x, r1.x  // r1.x <- distance.x
-
-#line 42
-div r1.y, l(1.000000), cb4[3].w
-mul r1.x, r1.x, r1.y
-mov r1.x, -r1.x
-add r1.x, r1.x, l(1.000000)  // r1.x <- affect
-
-#line 44
-lt r1.y, r1.x, l(0.000000)
-if_nz r1.y
-
-#line 46
-  mov r1.x, l(0)
-
-#line 47
-endif 
-
-#line 49
-mov r1.y, l(1.000000)
-mul r1.y, r1.x, r1.y
-mul r1.x, r1.x, r1.x
-mul r1.x, r1.x, r1.y  // r1.x <- affect
-
-#line 51
-mul r1.yzw, r1.xxxx, r3.xxyz  // r1.y <- diff_spot.x; r1.z <- diff_spot.y; r1.w <- diff_spot.z
-
-#line 52
-mul r0.yzw, r0.yyzw, r1.xxxx
-
-#line 55
-dp3 r1.x, r2.xyzx, cb4[4].xyzx  // r1.x <- angle
-
-#line 56
-mov r2.x, -r1.x
-max r2.y, r1.x, r2.x
-mov r2.z, -r2.y
-add r2.z, r2.z, l(1.000000)
-sqrt r2.z, r2.z
-mul r2.w, r2.y, l(-0.018729)
-add r2.w, r2.w, l(0.074261)
-mul r2.w, r2.y, r2.w
-add r2.w, r2.w, l(-0.212114)
-mul r2.y, r2.y, r2.w
-add r2.y, r2.y, l(1.570729)
-mul r2.y, r2.z, r2.y
-mul r2.z, r2.y, l(-2.000000)
-add r2.z, r2.z, l(3.141593)
-lt r1.x, r1.x, r2.x
-and r1.x, r1.x, r2.z
-add r1.x, r1.x, r2.y
-mov r2.x, -r1.x
-max r1.x, r1.x, r2.x  // r1.x <- angle
-
-#line 59
-div r2.x, l(1.000000), cb4[4].w
-mul r1.x, r1.x, r2.x
-mov r1.x, -r1.x
-add r1.x, r1.x, l(1.000000)  // r1.x <- affect
-
-#line 62
-rsq r1.x, r1.x
-div r1.x, l(1.000000, 1.000000, 1.000000, 1.000000), r1.x  // r1.x <- affect
-
-#line 64
-mul r1.yzw, r1.xxxx, r1.yyzw
-
-#line 65
-mul r0.yzw, r0.yyzw, r1.xxxx
-
-#line 67
-add o0.xyz, r0.yzwy, r1.yzwy
+rsq r2.w, r1.w
+sqrt r1.w, r1.w
+mul r2.xyz, r2.wwww, r2.xyzx
+mad r1.xyz, r1.xyzx, r0.wwww, r2.xyzx
+dp3 r0.w, r1.xyzx, r1.xyzx
+rsq r0.w, r0.w
+mul r1.xyz, r0.wwww, r1.xyzx
+dp3 r0.w, r0.xyzx, r1.xyzx
+dp3 r0.x, r0.xyzx, r2.xyzx
+dp3 r0.y, r2.xyzx, cb4[4].xyzx
+max r0.x, r0.x, l(0.000000)
+mul r1.xyz, r0.xxxx, cb4[3].xyzx
+max r0.x, r0.w, l(0.000000)
+mul r0.z, r0.x, r0.x
+mul r0.x, r0.z, r0.x
+div r0.z, l(1.000000, 1.000000, 1.000000, 1.000000), cb4[3].w
+mad r0.z, -r0.z, r1.w, l(1.000000)
+lt r0.w, r0.z, l(0.000000)
+movc r0.z, r0.w, l(0), r0.z
+mul r0.w, r0.z, r0.z
+mul r0.z, r0.w, r0.z
+mul r0.x, r0.z, r0.x
+mul r1.xyz, r0.zzzz, r1.xyzx
+mad r0.z, |r0.y|, l(-0.018729), l(0.074261)
+mad r0.z, r0.z, |r0.y|, l(-0.212114)
+mad r0.z, r0.z, |r0.y|, l(1.570729)
+add r0.w, -|r0.y|, l(1.000000)
+lt r0.y, r0.y, -r0.y
+sqrt r0.w, r0.w
+mul r1.w, r0.w, r0.z
+mad r1.w, r1.w, l(-2.000000), l(3.141593)
+and r0.y, r0.y, r1.w
+mad r0.y, r0.z, r0.w, r0.y
+div r0.z, l(1.000000, 1.000000, 1.000000, 1.000000), cb4[4].w
+mad r0.y, -r0.z, r0.y, l(1.000000)
+rsq r0.y, r0.y
+div r0.y, l(1.000000, 1.000000, 1.000000, 1.000000), r0.y
+mul r0.x, r0.y, r0.x
+mad o0.xyz, r1.xyzx, r0.yyyy, r0.xxxx
+sample_indexable(texture2d)(float,float,float,float) r0.x, v5.xyxx, t0.wxyz, s2
 mov o0.w, r0.x
 ret 
-// Approximately 109 instruction slots used
+// Approximately 68 instruction slots used

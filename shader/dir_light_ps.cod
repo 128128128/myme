@@ -79,7 +79,7 @@
 // SV_Target                0   xyzw        0   TARGET   float   xyzw
 //
 ps_5_0
-dcl_globalFlags refactoringAllowed | skipOptimization
+dcl_globalFlags refactoringAllowed
 dcl_constantbuffer CB1[1], immediateIndexed
 dcl_constantbuffer CB2[2], immediateIndexed
 dcl_sampler s0, mode_default
@@ -89,306 +89,77 @@ dcl_resource_texture2d (float,float,float,float) t3
 dcl_input_ps linear v1.xy
 dcl_input_ps linear v3.xyz
 dcl_output o0.xyzw
-dcl_temps 8
-//
-// Initial variable locations:
-//   v0.x <- pin.position.x; v0.y <- pin.position.y; v0.z <- pin.position.z; v0.w <- pin.position.w; 
-//   v1.x <- pin.texcoord.x; v1.y <- pin.texcoord.y; 
-//   v2.x <- pin.normal.x; v2.y <- pin.normal.y; v2.z <- pin.normal.z; 
-//   v3.x <- pin.worldpos.x; v3.y <- pin.worldpos.y; v3.z <- pin.worldpos.z; 
-//   o0.x <- <main return value>.x; o0.y <- <main return value>.y; o0.z <- <main return value>.z; o0.w <- <main return value>.w
-//
-#line 4 "C:\Users\2200167\Desktop\個人製作\myme03\myme\HLSL\pbr_common.hlsli"
-mov r0.x, l(3.141593)  // r0.x <- PI
-
-#line 99 "C:\Users\2200167\Desktop\個人製作\myme03\myme\HLSL\dir_light_ps.hlsl"
-sample_indexable(texture2d)(float,float,float,float) r0.yzw, v1.xyxx, t0.wxyz, s0
-mov r0.yzw, r0.yyzw  // r0.y <- albedo_color.x; r0.z <- albedo_color.y; r0.w <- albedo_color.z
-
-#line 101
-sample_indexable(texture2d)(float,float,float,float) r1.xyz, v1.xyxx, t1.xyzw, s0
-mov r1.xyz, r1.xyzx  // r1.x <- normal.x; r1.y <- normal.y; r1.z <- normal.z
-
-#line 103
-mul r1.xyz, r1.xyzx, l(2.000000, 2.000000, 2.000000, 0.000000)
-mov r2.xyz, l(-1.000000,-1.000000,-1.000000,-0.000000)
-add r1.xyz, r1.xyzx, r2.xyzx
-
-#line 105
-mov r2.xyz, v3.xyzx  // r2.x <- worldPos.x; r2.y <- worldPos.y; r2.z <- worldPos.z
-
-#line 107
-mov r0.yzw, r0.yyzw  // r0.y <- specColor.x; r0.z <- specColor.y; r0.w <- specColor.z
-
-#line 109
-sample_indexable(texture2d)(float,float,float,float) r3.xy, v1.xyxx, t3.xwyz, s0
-mov r3.xy, r3.xyxx  // r3.x <- metallic_smooth.x; r3.y <- metallic_smooth.w
-
-#line 114
-mov r2.xyz, -r2.xyzx
-add r2.xyz, r2.xyzx, cb1[0].xyzx
-dp3 r1.w, r2.xyzx, r2.xyzx
-rsq r1.w, r1.w
-mul r2.xyz, r1.wwww, r2.xyzx  // r2.x <- to_eye.x; r2.y <- to_eye.y; r2.z <- to_eye.z
-
-#line 116
-itof r4.xyz, l(0, 0, 0, 0)  // r4.x <- lig.x; r4.y <- lig.y; r4.z <- lig.z
-
-#line 134
-nop 
-mov r1.xyz, r1.xyzx
-mov r5.xyz, -cb2[0].xyzx
-mov r2.xyz, r2.xyzx
-
-#line 95 "C:\Users\2200167\Desktop\個人製作\myme03\myme\HLSL\pbr_common.hlsli"
-add r6.xyz, r2.xyzx, r5.xyzx
-dp3 r1.w, r6.xyzx, r6.xyzx
-rsq r1.w, r1.w
-mul r6.xyz, r1.wwww, r6.xyzx  // r6.x <- H.x; r6.y <- H.y; r6.z <- H.z
-
-#line 98
-mov r1.w, l(0.500000)  // r1.w <- roughness
-
-#line 100
-mov r2.w, l(-0.000000)
-add r2.w, r2.w, l(0.500000)
-mul r2.w, r1.w, r2.w
-add r2.w, r2.w, l(0.000000)  // r2.w <- energyBias
-
-#line 101
-mov r3.z, l(-1.000000)
-add r3.z, r3.z, l(0.662252)
-mul r3.z, r1.w, r3.z
-add r3.z, r3.z, l(1.000000)  // r3.z <- energyFactor
-
-#line 104
-dp3 r3.w, r5.xyzx, r6.xyzx
-max r3.w, r3.w, l(0.000000)
-min r3.w, r3.w, l(1.000000)  // r3.w <- dotLH
-
-#line 108
-mul r4.w, r3.w, l(2.000000)
-mul r3.w, r3.w, r4.w
-mul r1.w, r1.w, r3.w
-add r1.w, r1.w, r2.w  // r1.w <- Fd90
-
-#line 111
-dp3 r2.w, r1.xyzx, r5.xyzx
-max r2.w, r2.w, l(0.000000)
-min r2.w, r2.w, l(1.000000)  // r2.w <- dotNL
-
-#line 112
-itof r3.w, l(1)
-itof r4.w, l(1)
-mov r4.w, -r4.w
-add r4.w, r1.w, r4.w
-itof r5.x, l(1)
-mov r2.w, -r2.w
-add r2.w, r2.w, r5.x
-mov r5.x, l(1.000000)
-mul r5.x, r2.w, r5.x
+dcl_temps 5
+add r0.xyz, -v3.xyzx, cb1[0].xyzx
+dp3 r0.w, r0.xyzx, r0.xyzx
+rsq r0.w, r0.w
+mad r1.xyz, r0.xyzx, r0.wwww, -cb2[0].xyzx
+mul r0.xyz, r0.wwww, r0.xyzx
+dp3 r0.w, r1.xyzx, r1.xyzx
+rsq r0.w, r0.w
+mul r1.xyz, r0.wwww, r1.xyzx
+sample_indexable(texture2d)(float,float,float,float) r2.xyz, v1.xyxx, t1.xyzw, s0
+mad r2.xyz, r2.xyzx, l(2.000000, 2.000000, 2.000000, 0.000000), l(-1.000000, -1.000000, -1.000000, 0.000000)
+dp3_sat r0.w, r2.xyzx, r1.xyzx
+mad r1.w, -r0.w, r0.w, l(1.000000)
+mul r1.w, r1.w, l(-1.731302)
+mul r2.w, r0.w, r0.w
+div r1.w, r1.w, r2.w
 mul r2.w, r2.w, r2.w
-mul r2.w, r2.w, r2.w
-mul r2.w, r2.w, r5.x
-mul r2.w, r2.w, r4.w
-add r2.w, r2.w, r3.w  // r2.w <- FL
-
-#line 115
-dp3 r3.w, r1.xyzx, r2.xyzx
-max r3.w, r3.w, l(0.000000)
-min r3.w, r3.w, l(1.000000)  // r3.w <- dotNV
-
-#line 116
-itof r4.w, l(1)
-itof r5.x, l(1)
-mov r5.x, -r5.x
-add r1.w, r1.w, r5.x
-itof r5.x, l(1)
-mov r3.w, -r3.w
-add r3.w, r3.w, r5.x
-mov r5.x, l(1.000000)
-mul r5.x, r3.w, r5.x
-mul r3.w, r3.w, r3.w
-mul r3.w, r3.w, r3.w
-mul r3.w, r3.w, r5.x
-mul r1.w, r1.w, r3.w
-add r1.w, r1.w, r4.w  // r1.w <- FV
-
-#line 121
+mul r2.w, r2.w, l(2.310400)
+div r2.w, l(1.000000, 1.000000, 1.000000, 1.000000), r2.w
+mul r1.w, r1.w, l(1.442695)
+exp r1.w, r1.w
 mul r1.w, r1.w, r2.w
-mul r1.w, r3.z, r1.w  // r1.w <- <CalcDiffuseFromFresnel return value>
-
-#line 134 "C:\Users\2200167\Desktop\個人製作\myme03\myme\HLSL\dir_light_ps.hlsl"
-mov r1.w, r1.w  // r1.w <- diffuseFromFresnel
-
-#line 138
-mov r5.xyz, -cb2[0].xyzx
-dp3 r2.w, r1.xyzx, r5.xyzx
-max r2.w, r2.w, l(0.000000)
-min r2.w, r2.w, l(1.000000)  // r2.w <- NdotL
-
-#line 139
-mul r5.xyz, r2.wwww, cb2[1].xyzx
-div r5.xyz, r5.xyzx, r0.xxxx  // r5.x <- lambertDiffuse.x; r5.y <- lambertDiffuse.y; r5.z <- lambertDiffuse.z
-
-#line 142
-mul r6.xyz, r0.yzwy, r1.wwww
-mul r5.xyz, r5.xyzx, r6.xyzx  // r5.x <- diffuse.x; r5.y <- diffuse.y; r5.z <- diffuse.z
-
-#line 147
-nop 
-mov r6.xyz, -cb2[0].xyzx
-mov r2.xyz, r2.xyzx
-mov r1.xyz, r1.xyzx
-mov r1.w, r3.y
-
-#line 41 "C:\Users\2200167\Desktop\個人製作\myme03\myme\HLSL\pbr_common.hlsli"
-mov r2.w, l(0.760000)  // r2.w <- microfacet
-
-#line 45
-mov r1.w, r1.w  // r1.w <- f0
-
-#line 48
-add r7.xyz, r2.xyzx, r6.xyzx
-dp3 r3.z, r7.xyzx, r7.xyzx
-rsq r3.z, r3.z
-mul r7.xyz, r3.zzzz, r7.xyzx  // r7.x <- H.x; r7.y <- H.y; r7.z <- H.z
-
-#line 51
-dp3 r3.z, r1.xyzx, r7.xyzx
-max r3.z, r3.z, l(0.000000)
-min r3.z, r3.z, l(1.000000)  // r3.z <- NdotH
-
-#line 52
-dp3 r3.w, r2.xyzx, r7.xyzx
-max r3.w, r3.w, l(0.000000)
-min r3.w, r3.w, l(1.000000)  // r3.w <- VdotH
-
-#line 53
-dp3 r4.w, r1.xyzx, r6.xyzx
-max r4.w, r4.w, l(0.000000)
-min r4.w, r4.w, l(1.000000)  // r4.w <- NdotL
-
-#line 54
-dp3 r1.x, r1.xyzx, r2.xyzx
-max r1.x, r1.x, l(0.000000)
-min r1.x, r1.x, l(1.000000)  // r1.x <- NdotV
-
-#line 57
-nop 
-mov r2.w, r2.w
-mov r3.z, r3.z
-
-#line 16
-mul r1.y, r3.z, r3.z  // r1.y <- t2
-
-#line 17
-mul r1.z, r3.z, r3.z
-mul r1.z, r3.z, r1.z
-mul r1.z, r3.z, r1.z  // r1.z <- t4
-
-#line 18
-mul r2.x, r2.w, r2.w  // r2.x <- m2
-
-#line 19
-mul r2.y, r2.x, l(4.000000)
-mul r1.z, r1.z, r2.y
-div r1.z, l(1.000000), r1.z  // r1.z <- D
-
-#line 20
-div r2.x, l(-1.000000), r2.x
-mov r2.y, -r1.y
-add r2.y, r2.y, l(1.000000)
-mul r2.x, r2.y, r2.x
-div r1.y, r2.x, r1.y
-mul r1.y, r1.y, l(1.442695)
-exp r1.y, r1.y
-mul r1.y, r1.y, r1.z  // r1.y <- D
-
-#line 21
-mov r1.y, r1.y  // r1.y <- <Beckmann return value>
-
-#line 57
-mov r1.y, r1.y  // r1.y <- D
-
-#line 60
-nop 
-mov r1.w, r1.w
-mov r3.w, r3.w
-
-#line 28
-itof r1.z, l(1)
-mov r2.x, -r1.w
-add r1.z, r1.z, r2.x
-itof r2.x, l(1)
-mov r2.y, -r3.w
-add r2.x, r2.y, r2.x
-mov r2.y, l(1.000000)
-mul r2.y, r2.x, r2.y
-mul r2.x, r2.x, r2.x
-mul r2.x, r2.x, r2.x
-mul r2.x, r2.x, r2.y
-mul r1.z, r1.z, r2.x
-add r1.z, r1.z, r1.w  // r1.z <- <SpcFresnel return value>
-
-#line 60
-mov r1.z, r1.z  // r1.z <- F
-
-#line 63
-itof r1.w, l(2)
-mul r1.w, r3.z, r1.w
-mul r1.w, r1.x, r1.w
-div r1.w, r1.w, r3.w
-itof r2.x, l(2)
-mul r2.x, r3.z, r2.x
-mul r2.x, r4.w, r2.x
-div r2.x, r2.x, r3.w
-min r1.w, r1.w, r2.x
-min r1.w, r1.w, l(1.000000)  // r1.w <- G
-
-#line 66
-mul r0.x, r0.x, r1.x
-mul r0.x, r3.z, r0.x  // r0.x <- m
-
-#line 69
-mul r1.x, r1.y, r1.z
-mul r1.x, r1.w, r1.x
-div r0.x, r1.x, r0.x
-max r0.x, r0.x, l(0.000000)  // r0.x <- <CookTorranceSpecular return value>
-
-#line 147 "C:\Users\2200167\Desktop\個人製作\myme03\myme\HLSL\dir_light_ps.hlsl"
-mul r1.xyz, r0.xxxx, cb2[1].xyzx  // r1.x <- spec.x; r1.y <- spec.y; r1.z <- spec.z
-
-#line 153
-mov r2.xyz, l(-1.000000,-1.000000,-1.000000,-0.000000)
-add r2.xyz, r0.yzwy, r2.xyzx
-mul r2.xyz, r2.xyzx, r3.xxxx
-add r2.xyz, r2.xyzx, l(1.000000, 1.000000, 1.000000, 0.000000)
-mul r1.xyz, r1.xyzx, r2.xyzx
-
-#line 157
-mov r0.x, -r3.y
-add r0.x, r0.x, l(1.000000)
-mul r2.xyz, r0.xxxx, r5.xyzx
-mul r1.xyz, r3.yyyy, r1.xyzx
-add r1.xyz, r1.xyzx, r2.xyzx
-add r1.xyz, r1.xyzx, r4.xyzx  // r1.x <- lig.x; r1.y <- lig.y; r1.z <- lig.z
-
-#line 164
-mov r2.xyz, l(1.000000,1.000000,1.000000,0)  // r2.x <- ambient_light.x; r2.y <- ambient_light.y; r2.z <- ambient_light.z
-
-#line 166
-mul r0.xyz, r0.yzwy, r2.xyzx
-add r0.xyz, r0.xyzx, r1.xyzx  // r0.x <- lig.x; r0.y <- lig.y; r0.z <- lig.z
-
-#line 169
-mov r0.w, l(1.000000)  // r0.w <- final_color.w
-
-#line 170
-mov r0.xyz, r0.xyzx  // r0.x <- final_color.x; r0.y <- final_color.y; r0.z <- final_color.z
-
-#line 171
-mov o0.xyz, r0.xyzx
-mov o0.w, r0.w
+dp3_sat r2.w, r0.xyzx, r1.xyzx
+dp3_sat r1.x, -cb2[0].xyzx, r1.xyzx
+mad r1.x, r1.x, r1.x, l(-0.750000)
+dp3_sat r0.x, r2.xyzx, r0.xyzx
+dp3_sat r0.y, r2.xyzx, -cb2[0].xyzx
+add r0.z, -r2.w, l(1.000000)
+mul r1.y, r0.z, r0.z
+mul r1.y, r1.y, r1.y
+mul r0.z, r0.z, r1.y
+sample_indexable(texture2d)(float,float,float,float) r1.yz, v1.xyxx, t3.yxwz, s0
+add r2.x, -r1.z, l(1.000000)
+mad r0.z, r2.x, r0.z, r1.z
+mul r0.z, r1.w, r0.z
+add r1.w, r0.w, r0.w
+mul r0.w, r0.x, r0.w
+mul r0.w, r0.w, l(3.141593)
+mul r2.y, r0.x, r1.w
+mul r1.w, r0.y, r1.w
+div r1.w, r1.w, r2.w
+div r2.y, r2.y, r2.w
+min r1.w, r1.w, r2.y
+min r1.w, r1.w, l(1.000000)
+mul r0.z, r0.z, r1.w
+div r0.z, r0.z, r0.w
+max r0.z, r0.z, l(0.000000)
+mul r2.yzw, r0.zzzz, cb2[1].xxyz
+add r0.x, -r0.x, l(1.000000)
+sample_indexable(texture2d)(float,float,float,float) r3.xyz, v1.xyxx, t0.xyzw, s0
+add r4.xyz, r3.xyzx, l(-1.000000, -1.000000, -1.000000, 0.000000)
+mad r4.xyz, r1.yyyy, r4.xyzx, l(1.000000, 1.000000, 1.000000, 0.000000)
+mul r2.yzw, r2.yyzw, r4.xxyz
+mul r1.yzw, r1.zzzz, r2.yyzw
+mul r0.z, r0.x, r0.x
+mul r0.z, r0.z, r0.z
+mul r0.x, r0.z, r0.x
+mad r0.x, r1.x, r0.x, l(1.000000)
+add r0.z, -r0.y, l(1.000000)
+mul r2.yzw, r0.yyyy, cb2[1].xxyz
+mul r2.yzw, r2.yyzw, l(0.000000, 0.318310, 0.318310, 0.318310)
+mul r0.y, r0.z, r0.z
+mul r0.y, r0.y, r0.y
+mul r0.y, r0.y, r0.z
+mad r0.y, r1.x, r0.y, l(1.000000)
+mul r0.x, r0.x, r0.y
+mul r0.x, r0.x, l(0.831126)
+mul r0.xyz, r0.xxxx, r3.xyzx
+mul r0.xyz, r2.yzwy, r0.xyzx
+mad r0.xyz, r0.xyzx, r2.xxxx, r1.yzwy
+add o0.xyz, r3.xyzx, r0.xyzx
+mov o0.w, l(1.000000)
 ret 
-// Approximately 184 instruction slots used
+// Approximately 72 instruction slots used
