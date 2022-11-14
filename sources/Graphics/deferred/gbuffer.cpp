@@ -532,7 +532,7 @@ void gbuffer::active(ID3D11DeviceContext* immediate_context)
 	immediate_context->RSSetViewports(1, &vp);
 }
 
-void gbuffer::rendering(ID3D11DeviceContext* immediate_context)
+void gbuffer::lightning(ID3D11DeviceContext* immediate_context)
 {
 	//render target to light buffer
 	immediate_context->OMSetRenderTargets(
@@ -591,7 +591,7 @@ void gbuffer::rendering(ID3D11DeviceContext* immediate_context)
 
 void gbuffer::inactive(ID3D11DeviceContext* immediate_context) {
 	comparison_sampler_state->active(immediate_context, 4);
-	rendering(immediate_context);
+	lightning(immediate_context);
 	//back default render target
 	immediate_context->OMSetRenderTargets(1, default_render_target_view.GetAddressOf(), default_depth_stencil_view.Get());
 	comparison_sampler_state->inactive(immediate_context);

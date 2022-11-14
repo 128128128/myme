@@ -92,7 +92,7 @@ private:
 	Microsoft::WRL::ComPtr < ID3D11Texture2D> tex_composite;
 	Microsoft::WRL::ComPtr < ID3D11RenderTargetView> rtv_composite;
 	Microsoft::WRL::ComPtr < ID3D11ShaderResourceView> srv_composite;
-	void rendering(ID3D11DeviceContext* immediate_context);
+	void lightning(ID3D11DeviceContext* immediate_context);
 
 	enum { NONE, ALPHA, ADD, ALPHA_TO_COVERAGE };
 	std::unique_ptr<Descartes::blend_state> blend_states[4];

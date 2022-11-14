@@ -79,9 +79,6 @@
     <Filter Include="HLSL\Objects">
       <UniqueIdentifier>{e9a1c7a1-2377-4744-a41d-9db91c1558db}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Sources\Graphics\Particles">
-      <UniqueIdentifier>{ac40cd6d-5063-48c1-8678-4cdf833d5ac1}</UniqueIdentifier>
-    </Filter>
     <Filter Include="HLSL\Particles">
       <UniqueIdentifier>{5307f33a-4454-4e67-b427-d9bf35749d0c}</UniqueIdentifier>
     </Filter>
@@ -99,6 +96,9 @@
     </Filter>
     <Filter Include="HLSL\CreateTerrain">
       <UniqueIdentifier>{43772fef-7d5d-4d16-bb51-be5b442fdfcf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sources\Graphics\particles">
+      <UniqueIdentifier>{ac40cd6d-5063-48c1-8678-4cdf833d5ac1}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -217,7 +217,7 @@
       <Filter>Sources\Objects</Filter>
     </ClCompile>
     <ClCompile Include="sources\Particles\snow_particles.cpp">
-      <Filter>Sources\Graphics\Particles</Filter>
+      <Filter>Sources\Graphics\particles</Filter>
     </ClCompile>
     <ClCompile Include="sources\Objects\rocks.cpp">
       <Filter>Sources\Objects</Filter>
@@ -405,7 +405,7 @@
       <Filter>Sources\Objects</Filter>
     </ClInclude>
     <ClInclude Include="sources\Particles\snow_particles.h">
-      <Filter>Sources\Graphics\Particles</Filter>
+      <Filter>Sources\Graphics\particles</Filter>
     </ClInclude>
     <ClInclude Include="sources\Objects\rocks.h">
       <Filter>Sources\Objects</Filter>

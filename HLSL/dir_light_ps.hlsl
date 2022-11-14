@@ -102,26 +102,26 @@ float4 main(PS_IN pin) : SV_Target0
     //Restore the normal from a range of 0 to 1 to a range of -1 to 1
     normal = (normal * 2.0f) - 1.0f;
     //Sampling world position
-    float3 worldPos = pin.worldpos;
+    float3 world_pos = pin.worldpos;
     // Specular color should be the same as albedo color.
     float3 specColor = albedo_color;
     // Sampling metallicity and smoothness
     float4 metallic_smooth = rm_texture.Sample(decal_sampler, pin.texcoord);
    
     //Parameters for shadow generation.
-   // float4 shadow_param= shadow_param_texture.Sample(decal_sampler, pin.texcoord);
+  // float4 shadow_param= shadow_param_texture.Sample(decal_sampler, pin.texcoord);
     // Calculate the vector extending toward the line of sight
-    float3 to_eye = normalize(camera_constants.position.xyz - worldPos);
+    float3 to_eye = normalize(camera_constants.position.xyz - world_pos);
 
     float3 lig = 0;
 
     for (int ligNo = 0; ligNo < NUM_DIRECTIONAL_LIGHT; ligNo++)
     {
-        // âeÇÃóéÇøãÔçáÇåvéZÇ∑ÇÈÅB
-       // float shadow = 0.0f;
+       // // âeÇÃóéÇøãÔçáÇåvéZÇ∑ÇÈÅB
+       //float shadow = 0.0f;
        //// if (directionalLight[ligNo].castShadow == 1) {
        //     //âeÇê∂ê¨Ç∑ÇÈÇ»ÇÁÅB
-       //     shadow = calc_shadow_rate(ligNo, worldPos) * shadow_param.r;
+       //     shadow = calc_shadow_rate(ligNo, world_pos) * shadow_param.r;
        // //}
        // if (shadow > 0.9f) {
        //     //ÉâÉCÉgÇÃåvéZÇÇµÇ»Ç¢ÅB

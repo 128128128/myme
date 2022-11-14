@@ -270,42 +270,42 @@ void game_scene::render(ID3D11DeviceContext* immediate_context, float elapsed_ti
 	scene_constants_buffer->active(immediate_context, 2, true, true);
 
 	// generate shadowmap
-	//{
-	//	//shadowmap->clear(immediate_context);
-	//	shadowmap_df->active(immediate_context);
+	{
+		//shadowmap->clear(immediate_context);
+		shadowmap_df->active(immediate_context);
 
-	//	XMVECTOR L = XMVector3Normalize(XMLoadFloat4(&scene_constants_buffer->data.directional_light.direction));
-	//	XMVECTOR P = XMLoadFloat4(&player->position);
-	//	XMStoreFloat4(&light_space_camera->position, P  * L);
-	//	XMStoreFloat4(&light_space_camera->focus, P);
-	//	light_space_camera->perspective_projection = false; //orthographic projection
-	//	light_space_camera->fovy_or_view_width = 100;
-	//	light_space_camera->aspect_ratio = aspect_ratio;
-	//	light_space_camera->near_z = 1.0f;
-	//	light_space_camera->far_z = 100.0f;
-	//	light_space_camera->active(immediate_context, 1, true, true,false,false);
+		XMVECTOR L = XMVector3Normalize(XMLoadFloat4(&scene_constants_buffer->data.directional_light.direction));
+		XMVECTOR P = XMLoadFloat4(&player->position);
+		XMStoreFloat4(&light_space_camera->position, P  * L);
+		XMStoreFloat4(&light_space_camera->focus, P);
+		light_space_camera->perspective_projection = false; //orthographic projection
+		light_space_camera->fovy_or_view_width = 100;
+		light_space_camera->aspect_ratio = aspect_ratio;
+		light_space_camera->near_z = 1.0f;
+		light_space_camera->far_z = 100.0f;
+		light_space_camera->active(immediate_context, 1, true, true,false,false);
 
-	//	Descartes::view_frustum view_frustum(light_space_camera->view_projection(),light_space_camera->inverse_view_projection());
-	//
-	//	//void_ps->active(immediate_context);
+		Descartes::view_frustum view_frustum(light_space_camera->view_projection(),light_space_camera->inverse_view_projection());
+	
+		//void_ps->active(immediate_context);
 
-	//	//dynamic_mesh_shadowcast_vs->active(immediate_context);
-	//	//player->render(immediate_context);
-	//	//dynamic_mesh_shadowcast_vs->inactive(immediate_context);
+		//dynamic_mesh_shadowcast_vs->active(immediate_context);
+		//player->render(immediate_context);
+		//dynamic_mesh_shadowcast_vs->inactive(immediate_context);
 
-	//	static_shadowcast_vs->active(immediate_context);
-	//	//pbr_ship->render(immediate_context);
-	//	//pbr_ship_1->render(immediate_context);
-	//	shadow_trees->render(immediate_context);
-	//	//trees->render(immediate_context);
-	//	static_shadowcast_vs->inactive(immediate_context);
+		static_shadowcast_vs->active(immediate_context);
+		//pbr_ship->render(immediate_context);
+		//pbr_ship_1->render(immediate_context);
+		shadow_trees->render(immediate_context);
+		//trees->render(immediate_context);
+		static_shadowcast_vs->inactive(immediate_context);
 
-	//	//structures->render(immediate_context,view_frustum);
+		//structures->render(immediate_context,view_frustum);
 
-	//	//void_ps->inactive(immediate_context);
+		//void_ps->inactive(immediate_context);
 
-	//	shadowmap_df->inactive(immediate_context);
-	//}
+		shadowmap_df->inactive(immediate_context);
+	}
 
 
 	screen->active(immediate_context);
