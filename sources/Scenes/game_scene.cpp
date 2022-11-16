@@ -1,6 +1,5 @@
 #include "game_scene.h"
 #include "../Math/collision.h"
-#include "../Input/Mouse.h"
 
 using namespace DirectX;
 
@@ -108,7 +107,7 @@ bool game_scene::initialize(ID3D11Device* device, CONST LONG screen_width, CONST
 	shadowmap = std::make_unique<Descartes::framebuffer>(device, 1024 * 5, 1024 * 5, DXGI_FORMAT_R32G32_FLOAT/*not needed*/, DXGI_FORMAT_R32_TYPELESS);
     shadowmap_df = std::make_unique <shadow_map>();
     shadowmap_df->initialize(device);
-	DirectX::XMFLOAT3 dir = { 0.0f, 1.0f, 1.0f };
+	DirectX::XMFLOAT3 dir = { 0.0f, -1.0f, 1.0f };
 	screen = std::make_unique <gbuffer>();
 	screen->initialize(device,dir);
 
@@ -196,9 +195,6 @@ const char* game_scene::update(float& elapsed_time/*Elapsed seconds from last fr
 		eye_space_camera->firstperson_update(elapsed_time,DirectX::XMFLOAT4(player->position.x,player->position.y+2.0f ,player->position.z+player->direction.z*0.1f,0));
 	}
 
-	//light direction
-	ImGui::SliderFloat4("light_direction", &scene_constants_buffer->data.directional_light.direction.x, -1.0f, 1.0f);
-	ImGui::SliderFloat4("light_color", &light_constants_buffer->data.point_light.color.x, 0,256.0f);
 
 	//posteffects
 	//ImGui::Checkbox("enable_post_effects", &enable_post_effects);
@@ -245,10 +241,10 @@ void game_scene::render(ID3D11DeviceContext* immediate_context, float elapsed_ti
 
 	time += elapsed_time;
 	triple_speed_time += elapsed_time*3.0f;
-	scene_constants_buffer->data.directional_light.iTime = time;
-	scene_constants_buffer->data.directional_light.triple_speed_iTime = triple_speed_time;
-	scene_constants_buffer->data.directional_light.elapse_time = elapsed_time;
-	Vector3 light_dir;
+	scene_constants_buffer->data.cb_somthing.iTime = time;
+	scene_constants_buffer->data.cb_somthing.triple_speed_iTime = triple_speed_time;
+	scene_constants_buffer->data.cb_somthing.elapse_time = elapsed_time;
+	/*Vector3 light_dir;
 	light_dir.vec = XMFLOAT3{ scene_constants_buffer->data.directional_light.direction.x,scene_constants_buffer->data.directional_light.direction.y,scene_constants_buffer->data.directional_light.direction.z };
 	light_dir.v[0] = scene_constants_buffer->data.directional_light.direction.x;
 	light_dir.v[1] = scene_constants_buffer->data.directional_light.direction.y;
@@ -265,47 +261,47 @@ void game_scene::render(ID3D11DeviceContext* immediate_context, float elapsed_ti
 			scene_constants_buffer->data.directional_light.shadow_map_num = areaNo;
 			scene_constants_buffer->data.directional_light.mlvp[i][areaNo] = m_cascadeShadowMapMatrix.GetLightViewProjectionCropMatrix(areaNo);
 		}
-	}
-	//immediate_context->GSGetConstantBuffers(2, 1, scene_constants_buffer->buffer_object.GetAddressOf());
-	scene_constants_buffer->active(immediate_context, 2, true, true);
+	}*/
+
+	scene_constants_buffer->active(immediate_context, 3, true, true);
 
 	// generate shadowmap
-	{
-		//shadowmap->clear(immediate_context);
-		shadowmap_df->active(immediate_context);
+	//{
+	//	//shadowmap->clear(immediate_context);
+	//	shadowmap_df->active(immediate_context);
 
-		XMVECTOR L = XMVector3Normalize(XMLoadFloat4(&scene_constants_buffer->data.directional_light.direction));
-		XMVECTOR P = XMLoadFloat4(&player->position);
-		XMStoreFloat4(&light_space_camera->position, P  * L);
-		XMStoreFloat4(&light_space_camera->focus, P);
-		light_space_camera->perspective_projection = false; //orthographic projection
-		light_space_camera->fovy_or_view_width = 100;
-		light_space_camera->aspect_ratio = aspect_ratio;
-		light_space_camera->near_z = 1.0f;
-		light_space_camera->far_z = 100.0f;
-		light_space_camera->active(immediate_context, 1, true, true,false,false);
+	//	XMVECTOR L = XMVector3Normalize(XMLoadFloat4(&scene_constants_buffer->data.directional_light.direction));
+	//	XMVECTOR P = XMLoadFloat4(&player->position);
+	//	XMStoreFloat4(&light_space_camera->position, P  * L);
+	//	XMStoreFloat4(&light_space_camera->focus, P);
+	//	light_space_camera->perspective_projection = false; //orthographic projection
+	//	light_space_camera->fovy_or_view_width = 100;
+	//	light_space_camera->aspect_ratio = aspect_ratio;
+	//	light_space_camera->near_z = 1.0f;
+	//	light_space_camera->far_z = 100.0f;
+	//	light_space_camera->active(immediate_context, 1, true, true,false,false);
 
-		Descartes::view_frustum view_frustum(light_space_camera->view_projection(),light_space_camera->inverse_view_projection());
-	
-		//void_ps->active(immediate_context);
+	//	Descartes::view_frustum view_frustum(light_space_camera->view_projection(),light_space_camera->inverse_view_projection());
+	//
+	//	//void_ps->active(immediate_context);
 
-		//dynamic_mesh_shadowcast_vs->active(immediate_context);
-		//player->render(immediate_context);
-		//dynamic_mesh_shadowcast_vs->inactive(immediate_context);
+	//	//dynamic_mesh_shadowcast_vs->active(immediate_context);
+	//	//player->render(immediate_context);
+	//	//dynamic_mesh_shadowcast_vs->inactive(immediate_context);
 
-		static_shadowcast_vs->active(immediate_context);
-		//pbr_ship->render(immediate_context);
-		//pbr_ship_1->render(immediate_context);
-		shadow_trees->render(immediate_context);
-		//trees->render(immediate_context);
-		static_shadowcast_vs->inactive(immediate_context);
+	//	static_shadowcast_vs->active(immediate_context);
+	//	//pbr_ship->render(immediate_context);
+	//	//pbr_ship_1->render(immediate_context);
+	//	shadow_trees->render(immediate_context);
+	//	//trees->render(immediate_context);
+	//	static_shadowcast_vs->inactive(immediate_context);
 
-		//structures->render(immediate_context,view_frustum);
+	//	//structures->render(immediate_context,view_frustum);
 
-		//void_ps->inactive(immediate_context);
+	//	//void_ps->inactive(immediate_context);
 
-		shadowmap_df->inactive(immediate_context);
-	}
+	//	shadowmap_df->inactive(immediate_context);
+	//}
 
 
 	screen->active(immediate_context);
@@ -316,9 +312,8 @@ void game_scene::render(ID3D11DeviceContext* immediate_context, float elapsed_ti
 	//view frustum
 	const Descartes::view_frustum view_frustum(eye_space_camera->view_projection(),eye_space_camera->inverse_view_projection());
 
-    //scene_constants_buffer->active(immediate_context, 2, true, true);
-    renderer_constants_buffer->active(immediate_context, 3, true, true);
-	light_constants_buffer->active(immediate_context, 4, true, true);
+    //renderer_constants_buffer->active(immediate_context, 3, true, true);
+	//light_constants_buffer->active(immediate_context, 4, true, true);
 
 	d_shadow_constant_buffer->data.light_view_projection = light_space_camera->view_projection();
 	d_shadow_constant_buffer->active(immediate_context, 10);

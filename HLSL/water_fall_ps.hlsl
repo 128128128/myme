@@ -75,11 +75,11 @@ float4 main(VS_OUT pin) : SV_TARGET0
 {
     float2 uv=pin.texcoord;
 
-    float2 flowuv = uv * .03 + float2(0., light_direction.iTime * -0.05);//speed
+    float2 flowuv = uv * .03 + float2(0., something.iTime * -0.05);//speed
     float noise = fbm(noise_map_1, flowuv);
     float2 flowmap = float2(0., smoothstep(0.2, 1., noise)) * .6;
     float weightA, weightB,weightC,weightD;
-    float t = light_direction.iTime * .8;
+    float t = something.iTime * .8;
     float2 uvA = flow(flowuv, flowmap, 0.0, t, weightA);
     float2 uvB = flow(flowuv, flowmap, 0.5, t, weightB);
     float2 uvC = flow(flowuv, flowmap, 0.0, t, weightC);

@@ -18,7 +18,7 @@ pbr_static_mesh::pbr_static_mesh(ID3D11Device* device, const char* filename)
 	PathFindFileNameA(media_directory)[0] = '\0';
 	substance->create_shader_resource_views(device, media_directory);
 
-	load_texture_from_file(device, ".\\resources\\enviroments\\structures\\DropShipTexture\\Dropship_01_MetallicSmooth.tif", metallic_shader_resource_view[0].GetAddressOf(), true, true);
+	/*load_texture_from_file(device, ".\\resources\\enviroments\\structures\\DropShipTexture\\Dropship_01_MetallicSmooth.tif", metallic_shader_resource_view[0].GetAddressOf(), true, true);
 	load_texture_from_file(device, ".\\resources\\enviroments\\structures\\DropShipTexture\\Dropship_02_MetallicSmooth.tif", metallic_shader_resource_view[1].GetAddressOf(), true, true);
 	load_texture_from_file(device, ".\\resources\\enviroments\\structures\\DropShipTexture\\Dropship_03_MetallicSmooth.tif", metallic_shader_resource_view[2].GetAddressOf(), true, true);
 	load_texture_from_file(device, ".\\resources\\enviroments\\structures\\DropShipTexture\\Dropship_04_MetallicSmooth.tif", metallic_shader_resource_view[3].GetAddressOf(), true, true);
@@ -28,7 +28,9 @@ pbr_static_mesh::pbr_static_mesh(ID3D11Device* device, const char* filename)
 	material_name[1] = "Dropship_02_Mat";
 	material_name[2] = "Dropship_03_Mat";
 	material_name[3] = "Dropship_04_Mat";
-	material_name[4] = "Dropship_05_Mat";
+	material_name[4] = "Dropship_05_Mat";*/
+
+	load_texture_from_file(device, ".\\resources\\Jummo\\Textures\\mixbot_low_mixamo_edit1_MetallicSmoothness.png", metallic_shader_resource_view.GetAddressOf(), true, true);
 
 	constant_buffer = std::make_unique<Descartes::constant_buffer<shader_constants>>(device);
 }
@@ -68,13 +70,14 @@ void pbr_static_mesh::render(ID3D11DeviceContext* immediate_context, const XMFLO
 
 
 			//metallic
-			for (int i = 0; i < 5; i++) {
+			/*for (int i = 0; i < 5; i++) {
 			    std::string m = material_name[i];
 				if (m == subset.name) {
 					immediate_context->PSSetShaderResources(6, 1, metallic_shader_resource_view[i].GetAddressOf());
 					break;
 				}
-			}
+			}*/
+			immediate_context->PSSetShaderResources(6, 1, metallic_shader_resource_view.GetAddressOf());
 			immediate_context->DrawIndexed(static_cast<UINT>(subset.index_count), static_cast<UINT>(subset.index_start), 0);
 		}
 		constant_buffer->inactive(immediate_context);		

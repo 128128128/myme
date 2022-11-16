@@ -18,16 +18,34 @@
 // TEXCOORD                 0   xy          1     NONE   float   xy  
 //
 vs_5_0
-dcl_globalFlags refactoringAllowed
+dcl_globalFlags refactoringAllowed | skipOptimization
 dcl_input_sgv v0.x, vertex_id
 dcl_output_siv o0.xyzw, position
 dcl_output o1.xy
-dcl_temps 1
-bfi r0.x, l(1), l(1), v0.x, l(0)
-and r0.z, v0.x, l(2)
-utof r0.xy, r0.xzxx
-mad o0.xy, r0.xyxx, l(2.000000, -2.000000, 0.000000, 0.000000), l(-1.000000, 1.000000, 0.000000, 0.000000)
-mov o1.xy, r0.xyxx
-mov o0.zw, l(0,0,0,1.000000)
+dcl_temps 2
+//
+// Initial variable locations:
+//   v0.x <- vertex_id; 
+//   o1.x <- <main return value>.texcoord.x; o1.y <- <main return value>.texcoord.y; 
+//   o0.x <- <main return value>.position.x; o0.y <- <main return value>.position.y; o0.z <- <main return value>.position.z; o0.w <- <main return value>.position.w
+//
+#line 6 "C:\Users\2200167\Desktop\個人製作\myme03\myme\HLSL\post_processing_effects_vs.hlsl"
+mov r0.x, l(1)
+ishl r0.x, v0.x, r0.x
+mov r0.y, l(2)
+and r0.x, r0.y, r0.x
+mov r0.y, l(2)
+and r0.y, r0.y, v0.x
+utof r1.x, r0.x  // r1.x <- vout.texcoord.x
+utof r1.y, r0.y  // r1.y <- vout.texcoord.y
+
+#line 7
+mul r0.xy, r1.xyxx, l(2.000000, -2.000000, 0.000000, 0.000000)
+add r0.xy, r0.xyxx, l(-1.000000, 1.000000, 0.000000, 0.000000)  // r0.x <- vout.position.x; r0.y <- vout.position.y
+mov r0.zw, l(0,0,0,1.000000)  // r0.z <- vout.position.z; r0.w <- vout.position.w
+
+#line 9
+mov o0.xyzw, r0.xyzw
+mov o1.xy, r1.xyxx
 ret 
-// Approximately 7 instruction slots used
+// Approximately 14 instruction slots used

@@ -36,18 +36,14 @@ PS_OUT main(VS_OUT pin)
 	normal = (normal * 2.0) - 1.0;
 	normal.w = 0;
 	N = normalize((normal.x * T) + (normal.y * B) + (normal.z * N));
+	N = N * 0.5 + 0.5;
 
-	float3 L = normalize(-light_direction.direction.xyz);
-	float3 diffuse = color.rgb * max(0, dot(N, L) );
-
-	float3 finalcolor = diffuse;
-
-	ret.Color = float4(finalcolor, alpha);
-	ret.Normal =float4(N,0.0);
+	ret.Color = float4(color.xyz, alpha);
+	ret.Normal =float4(N,1.0);
 	ret.Position = pin.position;
 	float dist = length(pin.position - camera_constants.position);
 	ret.Depth = float4(dist, 0, 0, 1);
-	ret.RM = float4(0,0,0,1);
+	ret.RM = float4(0,1,0,1);
 	ret.Shadow_param = float4(255.0f * shadow_reciever, 255.0f * shadow_reciever, 255.0f * shadow_reciever, 255.0f * shadow_reciever);
 
     return ret;

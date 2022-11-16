@@ -74,7 +74,7 @@ class pbr_Stage :public Objects
 public:
 	std::unique_ptr<pbr_static_mesh> mesh;
 	XMFLOAT4 position = XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f);
-	XMFLOAT4 direction = XMFLOAT4(0.0f, 90.0f, 0.0f, 0.0f);
+	XMFLOAT4 direction = XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f);
 	XMFLOAT4 velocity = XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f);
 	XMFLOAT3 scale = XMFLOAT3(1.0f, 1.0f, 1.0f);
 
@@ -97,8 +97,8 @@ public:
 	void render(ID3D11DeviceContext* immediate_context)override
 	{
 		pbr_constant_buffer->active(immediate_context, 3, true, true);
-		immediate_context->PSSetShaderResources(5, 1, r_srv.GetAddressOf());
-		immediate_context->PSSetShaderResources(6, 1, m_srv.GetAddressOf());
+		//immediate_context->PSSetShaderResources(5, 1, r_srv.GetAddressOf());
+		//immediate_context->PSSetShaderResources(6, 1, m_srv.GetAddressOf());
 		mesh->render(immediate_context, world_transform);
 
 		pbr_constant_buffer->inactive(immediate_context);

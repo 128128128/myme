@@ -8,29 +8,16 @@
 //
 // Buffer Definitions: 
 //
-// cbuffer SCENE_CONSTANT_BUFFER
+// cbuffer LIGHT_CONSTANT_BUFFER
 // {
 //
-//   struct LIGHT_DIRECTION
+//   struct LIGHT_CONSTANTS
 //   {
 //       
 //       float4 direction;              // Offset:    0
 //       float4 color;                  // Offset:   16
-//       float iTime;                   // Offset:   32
-//       float triple_speed_iTime;      // Offset:   36
-//       float elapsedTime;             // Offset:   40
-//       float shadow_map_num;          // Offset:   44
-//       float4x4 mlvp[3];              // Offset:   48
 //
-//   } light_direction;                 // Offset:    0 Size:   240
-//   
-//   struct PLAYER
-//   {
-//       
-//       float4 position;               // Offset:  240
-//       float4 direction;              // Offset:  256
-//
-//   } player;                          // Offset:  240 Size:    32 [unused]
+//   } light_direction;                 // Offset:    0 Size:    32
 //
 // }
 //
@@ -39,7 +26,7 @@
 //
 // Name                                 Type  Format         Dim      HLSL Bind  Count
 // ------------------------------ ---------- ------- ----------- -------------- ------
-// SCENE_CONSTANT_BUFFER             cbuffer      NA          NA            cb2      1 
+// LIGHT_CONSTANT_BUFFER             cbuffer      NA          NA            cb2      1 
 //
 //
 //
@@ -59,10 +46,18 @@
 // SV_TARGET                0   xyzw        0   TARGET   float   xyzw
 //
 ps_5_0
-dcl_globalFlags refactoringAllowed | forceEarlyDepthStencil
+dcl_globalFlags refactoringAllowed | forceEarlyDepthStencil | skipOptimization
 dcl_constantbuffer CB2[2], immediateIndexed
 dcl_input_ps linear v1.xyzw
 dcl_output o0.xyzw
+//
+// Initial variable locations:
+//   v0.x <- pin.position.x; v0.y <- pin.position.y; v0.z <- pin.position.z; v0.w <- pin.position.w; 
+//   v1.x <- pin.color.x; v1.y <- pin.color.y; v1.z <- pin.color.z; v1.w <- pin.color.w; 
+//   v2.x <- pin.texcoord.x; v2.y <- pin.texcoord.y; 
+//   o0.x <- <main return value>.x; o0.y <- <main return value>.y; o0.z <- <main return value>.z; o0.w <- <main return value>.w
+//
+#line 7 "C:\Users\2200167\Desktop\個人製作\myme03\myme\HLSL\snowfall_particles_ps.hlsl"
 mul o0.xyz, v1.xyzx, cb2[1].wwww
 mov o0.w, v1.w
 ret 

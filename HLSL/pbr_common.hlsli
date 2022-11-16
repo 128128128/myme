@@ -127,7 +127,7 @@ float calc_shadow_rate(int ligNo, float3 world_pos)
     float shadow = 0.0f;
     for (int cascadeIndex = 0; cascadeIndex < NUM_SHADOW_MAP; cascadeIndex++)
     {
-        float4 posInLVP = mul(light_direction.mlvp[ligNo][cascadeIndex], float4(world_pos, 1.0f));
+        float4 posInLVP = mul(something.mlvp[ligNo][cascadeIndex], float4(world_pos, 1.0f));
         float2 shadowMapUV = posInLVP.xy / posInLVP.w;
         float zInLVP = posInLVP.z / posInLVP.w;
         shadowMapUV *= float2(0.5f, -0.5f);

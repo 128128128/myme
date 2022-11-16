@@ -208,8 +208,12 @@
     <ClCompile Include="sources\Camera\light_camera.cpp" />
     <ClCompile Include="sources\CreateTerrain\create_terrain.cpp" />
     <ClCompile Include="Sources\framework.cpp" />
+    <ClCompile Include="sources\Graphics\deferred\df_fullscreen_quad.cpp" />
     <ClCompile Include="sources\Graphics\deferred\gbuffer.cpp" />
     <ClCompile Include="sources\Graphics\deferred\gbuffer_02.cpp" />
+    <ClCompile Include="sources\Graphics\ibl\knife.cpp" />
+    <ClCompile Include="sources\Graphics\lights\light.cpp" />
+    <ClCompile Include="sources\Graphics\lights\light_manager.cpp" />
     <ClCompile Include="Sources\Graphics\load\substance.cpp" />
     <ClCompile Include="Sources\Graphics\load\texture.cpp" />
     <ClCompile Include="Sources\Graphics\mesh\geometric_primitive.cpp" />
@@ -252,6 +256,7 @@
     <ClCompile Include="sources\Particles\snow_particles.cpp" />
     <ClCompile Include="sources\Scenes\create_terrain_scene.cpp" />
     <ClCompile Include="Sources\Scenes\game_scene.cpp" />
+    <ClCompile Include="sources\Scenes\ibl_scene.cpp" />
     <ClCompile Include="sources\Scenes\reflection_scene.cpp" />
     <ClCompile Include="sources\Scenes\title_scene.cpp" />
   </ItemGroup>
@@ -271,8 +276,12 @@
     <ClInclude Include="Sources\Functions\high_resolution_timer.h" />
     <ClInclude Include="Sources\Functions\misc.h" />
     <ClInclude Include="Sources\Functions\utility_graphics.h" />
+    <ClInclude Include="sources\Graphics\deferred\df_fullscreen_quad.h" />
     <ClInclude Include="sources\Graphics\deferred\gbuffer.h" />
     <ClInclude Include="sources\Graphics\deferred\gbuffer_02.h" />
+    <ClInclude Include="sources\Graphics\ibl\knife.h" />
+    <ClInclude Include="sources\Graphics\lights\light.h" />
+    <ClInclude Include="sources\Graphics\lights\light_manager.h" />
     <ClInclude Include="Sources\Graphics\load\substance.h" />
     <ClInclude Include="Sources\Graphics\load\texture.h" />
     <ClInclude Include="Sources\Graphics\mesh\geometric_primitive.h" />
@@ -315,23 +324,29 @@
     <ClInclude Include="sources\Particles\snow_particles.h" />
     <ClInclude Include="sources\Scenes\create_terrain_scene.h" />
     <ClInclude Include="Sources\Scenes\game_scene.h" />
+    <ClInclude Include="sources\Scenes\ibl_scene.h" />
     <ClInclude Include="sources\Scenes\reflection_scene.h" />
     <ClInclude Include="Sources\Scenes\scene.h" />
     <ClInclude Include="sources\Scenes\title_scene.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="HLSL\bidirectional_reflectance_distribution_function.hlsli" />
     <None Include="HLSL\bloom.hlsli" />
     <None Include="HLSL\common.hlsli" />
     <None Include="HLSL\create_terrain.hlsli" />
     <None Include="HLSL\differred_light.hlsli" />
     <None Include="HLSL\d_posteffect.hlsli" />
+    <None Include="HLSL\fullscreen_quad.hlsli" />
     <None Include="HLSL\geometric_primitive.hlsli" />
+    <None Include="HLSL\ibl.hlsli" />
+    <None Include="HLSL\image_based_lighting.hlsli" />
     <None Include="HLSL\lim_light.hlsli" />
     <None Include="HLSL\noise.hlsli" />
     <None Include="HLSL\noise_create.hlsli" />
     <None Include="HLSL\pbr_common.hlsli" />
     <None Include="HLSL\pbr_dynamic_mesh.hlsli" />
     <None Include="HLSL\pbr_static_mesh.hlsli" />
+    <None Include="HLSL\physically_based_rendering.hlsli" />
     <None Include="HLSL\playshader.hlsli" />
     <None Include="HLSL\post_processing_effects.hlsli" />
     <None Include="HLSL\render_constants.hlsli" />
@@ -447,6 +462,18 @@
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
     </FxCompile>
+    <FxCompile Include="HLSL\fullscreen_quad_ps.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+    </FxCompile>
+    <FxCompile Include="HLSL\fullscreen_quad_vs.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+    </FxCompile>
     <FxCompile Include="HLSL\gaussian_blur_convolution_ps.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
@@ -502,6 +529,12 @@
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
     </FxCompile>
     <FxCompile Include="HLSL\hemisphere_light_ps.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+    </FxCompile>
+    <FxCompile Include="HLSL\ibl_ps.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>

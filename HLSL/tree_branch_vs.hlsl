@@ -10,7 +10,7 @@ VS_OUT main(VS_IN vin)
 	VS_OUT vout;
 	
 	float3 ase_worldPos = mul(vin.position.xyz,(float3x3)world); //頂点のワールド座標
-	float temp_output_60_0 = ((wind_speed*0.05) * (light_direction.triple_speed_iTime));
+	float temp_output_60_0 = ((wind_speed*0.05) * (something.triple_speed_iTime));
 	float2 appendResult249 = (float2(wind_direction.x, wind_direction.z));
 	float3 WindVectors99 = windVectors.SampleLevel(anisotropic_sampler_state, (wind_amplitude_multiplier * wind_amplitude * (ase_worldPos.xz * 0.01) + temp_output_60_0 * appendResult249), 0.0);
 	WindVectors99 = WindVectors99 * 2.0 - 1.0;//-1~1

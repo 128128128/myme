@@ -13,6 +13,7 @@ struct PS_OUT {
 	float4 Depth : SV_TARGET1;
 	float4 Normal : SV_TARGET2;
 	float4 Position : SV_TARGET3;
+	float4 RM : SV_TARGET4;
 };
 
 PS_OUT main(VS_OUT pin) :SV_TARGET0
@@ -28,7 +29,7 @@ PS_OUT main(VS_OUT pin) :SV_TARGET0
 	float4 color_56 = saturate(lerp_result_20);
 	
 	float3 ase_world_pos = pin.position.xyz;
-	float temp_output_60_0 = ((wind_speed * 0.05) * light_direction.triple_speed_iTime);
+	float temp_output_60_0 = ((wind_speed * 0.05) * something.triple_speed_iTime);
 	float2 append_result_249 = (float2(wind_direction.x, wind_direction.z));
 	float3 wind_vectors_99 = windVectors.SampleLevel(anisotropic_sampler_state, wind_amplitude_multiplier * wind_amplitude * (ase_world_pos.xz *1) + temp_output_60_0 * append_result_249, 0.0);
 	wind_vectors_99 = wind_vectors_99 * 2.0 - 1.0;
@@ -52,5 +53,6 @@ PS_OUT main(VS_OUT pin) :SV_TARGET0
 	float dist = length(pin.position - camera_constants.position);
 	ret.Depth = float4(dist, 0, 0, 1);
 	ret.Normal = pin.normal;
+	ret.RM = color;
 	return ret;
 }

@@ -63,6 +63,11 @@ bool reflection_scene::initialize(ID3D11Device* device, CONST LONG screen_width,
 	{
 		terrains = std::make_unique<Terrain>(device, true);
 	}
+	if(!knife)
+	{
+		knife = std::make_unique<Knife>();
+		knife->knife= std::make_unique<static_mesh>(device, ".\\resources\\objects\\knife\\knife.fbx");
+	}
 
 	
 	/*if (!structures)
@@ -115,6 +120,8 @@ bool reflection_scene::initialize(ID3D11Device* device, CONST LONG screen_width,
 
 	sky = std::make_unique<sprite>(device, "resources//skymaps//sky.png", true, true);
 
+	
+
 	//shader load
 	{
 		dynamic_mesh_vs = std::make_unique<vertex_shader<dynamic_mesh::vertex>>(device, "shader//dynamic_mesh_vs.cso");
@@ -125,18 +132,9 @@ bool reflection_scene::initialize(ID3D11Device* device, CONST LONG screen_width,
 		pbr_static_mesh_vs = std::make_unique<vertex_shader<pbr_static_mesh::vertex>>(device, "shader//pbr_static_vs.cso");
 		static_mesh_vs = std::make_unique<vertex_shader<static_mesh::vertex>>(device, "shader//static_mesh_vs.cso");
 		static_mesh_ps = std::make_unique<pixel_shader>(device, "shader//static_mesh_ps.cso");
-		lim_light_vs = std::make_unique<vertex_shader<static_mesh::vertex>>(device, "shader//lim_light_vs.cso");
-		lim_light_ps = std::make_unique<pixel_shader>(device, "shader//lim_light_ps.cso");
-		spot_light_mesh_ps = std::make_unique<pixel_shader>(device, "shader//spot_light_ps.cso");
-		point_light_mesh_ps = std::make_unique<pixel_shader>(device, "shader//point_light_ps.cso");
-		hemi_light_ps = std::make_unique<pixel_shader>(device, "shader//hemisphere_light_ps.cso");
 		skydome_vs = std::make_unique<vertex_shader<static_mesh::vertex>>(device, "shader//skymap_vs.cso");
 		skydome_ps = std::make_unique<pixel_shader>(device, "shader//skymap_ps.cso");
 
-		//shadowcast
-		static_shadowcast_vs = std::make_unique<vertex_shader<static_mesh::vertex>>(device, "shader//static_shadowcast_vs.cso");
-		dynamic_mesh_shadowcast_vs = std::make_unique<vertex_shader<dynamic_mesh::vertex>>(device, "shader//dynamic_shadowcast_vs.cso");
-		void_ps = std::make_unique<pixel_shader>(device, nullptr);
 	}
 
 	//constant buffers
@@ -148,11 +146,7 @@ bool reflection_scene::initialize(ID3D11Device* device, CONST LONG screen_width,
 		d_shadow_constant_buffer = std::make_unique < Descartes::constant_buffer <d_shadow_param >>(device);
 	}
 
-	//particles
-	{
-		//XMFLOAT3 ppos{ player->position.x,player->position.y,player->position.z };
-		//snowfall = std::make_unique<snow_particles>(device, ppos);
-	}
+
 
 	return true;
 }
@@ -169,6 +163,7 @@ const char* reflection_scene::update(float& elapsed_time/*Elapsed seconds from l
 	//pbr_ship_1->update(elapsed_time);
 	//ground->update(elapsed_time);
 	terrains->update(elapsed_time);
+	knife->update(elapsed_time);
 	//sky->update(elapsed_time);
 
 	if (freelook)
@@ -225,46 +220,9 @@ void reflection_scene::render(ID3D11DeviceContext* immediate_context, float elap
 	//immediate_context->GSGetConstantBuffers(2, 1, scene_constants_buffer->buffer_object.GetAddressOf());
 	scene_constants_buffer->active(immediate_context, 2, true, true);
 
-	// generate shadowmap
-	//{
-	//	//shadowmap->clear(immediate_context);
-	//	shadowmap_df->active(immediate_context);
 
-	//	XMVECTOR L = XMVector3Normalize(XMLoadFloat4(&scene_constants_buffer->data.directional_light.direction));
-	//	XMVECTOR P = XMLoadFloat4(&player->position);
-	//	XMStoreFloat4(&light_space_camera->position, P * L);
-	//	XMStoreFloat4(&light_space_camera->focus, P);
-	//	light_space_camera->perspective_projection = false; //orthographic projection
-	//	light_space_camera->fovy_or_view_width = 100;
-	//	light_space_camera->aspect_ratio = aspect_ratio;
-	//	light_space_camera->near_z = 1.0f;
-	//	light_space_camera->far_z = 100.0f;
-	//	light_space_camera->active(immediate_context, 1, true, true, false, false);
-
-	//	Descartes::view_frustum view_frustum(light_space_camera->view_projection(), light_space_camera->inverse_view_projection());
-
-	//	//void_ps->active(immediate_context);
-
-	//	//dynamic_mesh_shadowcast_vs->active(immediate_context);
-	//	//player->render(immediate_context);
-	//	//dynamic_mesh_shadowcast_vs->inactive(immediate_context);
-
-	//	static_shadowcast_vs->active(immediate_context);
-	//	//pbr_ship->render(immediate_context);
-	//	//pbr_ship_1->render(immediate_context);
-	//	shadow_trees->render(immediate_context);
-	//	//trees->render(immediate_context);
-	//	static_shadowcast_vs->inactive(immediate_context);
-
-	//	//structures->render(immediate_context,view_frustum);
-
-	//	//void_ps->inactive(immediate_context);
-
-	//	shadowmap_df->inactive(immediate_context);
-	//}
-
-
-	screen->active(immediate_context);
+	//screen->active(immediate_context);
+	framebuffers[1]->active(immediate_context);
 
 	eye_space_camera->aspect_ratio = aspect_ratio;
 	eye_space_camera->active(immediate_context, 1, true, true, false, false);
@@ -282,7 +240,6 @@ void reflection_scene::render(ID3D11DeviceContext* immediate_context, float elap
 	{
 		//sky
 		sky->render(immediate_context, 0, 0, 1280, 720, 1, 1, 1, 1, 0);
-		//screen->set_color_resource(immediate_context, 8);
 
 		static_mesh_vs->active(immediate_context);
 		pbr_dynamic_mesh_ps->active(immediate_context);
@@ -306,12 +263,13 @@ void reflection_scene::render(ID3D11DeviceContext* immediate_context, float elap
 		//skydome_vs->inactive(immediate_context);
 
 		//staticmesh render
-		//static_mesh_vs->active(immediate_context);
-		//static_mesh_ps->active(immediate_context);
+		static_mesh_vs->active(immediate_context);
+		static_mesh_ps->active(immediate_context);
+		knife->render(immediate_context);
 		//pbr_ship_1->render(immediate_context);
 		////ground->render(immediate_context);
-		//static_mesh_ps->inactive(immediate_context);
-		//static_mesh_vs->inactive(immediate_context);
+		static_mesh_ps->inactive(immediate_context);
+		static_mesh_vs->inactive(immediate_context);
 
 		//terrain renderer
 		//terrains->render(immediate_context, view_frustum);
@@ -320,9 +278,9 @@ void reflection_scene::render(ID3D11DeviceContext* immediate_context, float elap
 
 			//sprite
 
-		screen->inactive(immediate_context);
+		//screen->inactive(immediate_context);
 
-		//framebuffers[0]->inactive(immediate_context);
+		framebuffers[1]->inactive(immediate_context);
 
 		if (enable_post_effects)
 		{
@@ -379,6 +337,7 @@ void reflection_scene::render(ID3D11DeviceContext* immediate_context, float elap
 	}
 
 	//terrains->DebugDrawGUI();
+	knife->DebugDrawGUI();
 	//water->DebugDrawGUI();
 	//structures->DebugDrawGUI();
 	//vegetation_small->DebugDrawGUI();
@@ -387,12 +346,12 @@ void reflection_scene::render(ID3D11DeviceContext* immediate_context, float elap
 	//light_space_camera->DrawDebugGUI();
 	//ground->DebugDrawGUI();
 	//player->DebugDrawGUI();
-	//post_effects->DrawDebugGUI();
-	//bloom_effect->DrawDebugGUI();
+	post_effects->DrawDebugGUI();
+	bloom_effect->DrawDebugGUI();
 	//shadowmap_df->DebugDrawGUI();
-	screen->DebugDrawGUI();
+	//screen->DebugDrawGUI();
 	//pbr_ship_1->DebugDrawGUI();
-	pbr_ship->DebugDrawGUI();
+	//pbr_ship->DebugDrawGUI();
 	stage->DebugDrawGUI();
 	ImGui::Render();
 

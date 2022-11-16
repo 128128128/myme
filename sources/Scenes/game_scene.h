@@ -4,14 +4,18 @@
 #include <cereal/archives/json.hpp>
 #include <cereal/types/memory.hpp>
 
-#include "../Input/Input.h"
-
+//-----------scene----------//
 #include "scene.h"
-#include "../Graphics/others/render_state.h"
+
+///----------light------------//
+#include "../Graphics/lights/light.h"
+
+///---------------mesh-------------//
 #include "../Graphics/mesh/dynamic_mesh.h"
 #include "../Graphics/mesh/pbr_dynamic_mesh.h"
 #include "../Graphics/mesh/static_mesh.h"
 
+#include "../Graphics/others/render_state.h"
 #include "../Graphics/others/framebuffer.h"
 #include "../Graphics/deferred/gbuffer.h"
 #include "../Graphics/shadow/shadow_map_df.h"
@@ -155,17 +159,15 @@ public:
 	struct scene_constants
 	{
 		//directional
-		struct directional_light_constants
+		struct something_constants
 		{
-			XMFLOAT4 direction = XMFLOAT4(-0.3f, -1.0f, 1.0f, 1.0f);
-			XMFLOAT4 color{1.0f,1.0f,1.0f,1.0f};
 			float iTime = 0.0f;//triple speed
 			float triple_speed_iTime = 0.0f;//triple speed
 			float elapse_time = 0;
 			float shadow_map_num=0;
 			Matrix mlvp[NUM_DEFERRED_LIGHTING_DIRECTIONAL_LIGHT][NUM_SHADOW_MAP];
 		};
-		directional_light_constants directional_light;
+		something_constants cb_somthing;
 
 		struct player_shader_constants
 		{

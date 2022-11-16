@@ -100,6 +100,15 @@
     <Filter Include="Sources\Graphics\particles">
       <UniqueIdentifier>{ac40cd6d-5063-48c1-8678-4cdf833d5ac1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Sources\Graphics\Lights">
+      <UniqueIdentifier>{19efcd25-d6a4-4303-bd92-1ac32abf8569}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="HLSL\ibl">
+      <UniqueIdentifier>{94df5a95-4061-47eb-9c1f-0499b3e031b7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sources\ibl">
+      <UniqueIdentifier>{cf228387-fa3b-496b-81aa-cb9626a1525e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Sources\Scenes\game_scene.cpp">
@@ -274,6 +283,21 @@
       <Filter>Sources\Graphics\Deferred</Filter>
     </ClCompile>
     <ClCompile Include="sources\Scenes\title_scene.cpp">
+      <Filter>Sources\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="sources\Graphics\lights\light.cpp">
+      <Filter>Sources\Graphics\Lights</Filter>
+    </ClCompile>
+    <ClCompile Include="sources\Graphics\lights\light_manager.cpp">
+      <Filter>Sources\Graphics\Lights</Filter>
+    </ClCompile>
+    <ClCompile Include="sources\Graphics\deferred\df_fullscreen_quad.cpp">
+      <Filter>Sources\Graphics\Deferred</Filter>
+    </ClCompile>
+    <ClCompile Include="sources\Graphics\ibl\knife.cpp">
+      <Filter>Sources\ibl</Filter>
+    </ClCompile>
+    <ClCompile Include="sources\Scenes\ibl_scene.cpp">
       <Filter>Sources\Scene</Filter>
     </ClCompile>
   </ItemGroup>
@@ -464,6 +488,21 @@
     <ClInclude Include="sources\Scenes\title_scene.h">
       <Filter>Sources\Scene</Filter>
     </ClInclude>
+    <ClInclude Include="sources\Graphics\lights\light.h">
+      <Filter>Sources\Graphics\Lights</Filter>
+    </ClInclude>
+    <ClInclude Include="sources\Graphics\lights\light_manager.h">
+      <Filter>Sources\Graphics\Lights</Filter>
+    </ClInclude>
+    <ClInclude Include="sources\Graphics\deferred\df_fullscreen_quad.h">
+      <Filter>Sources\Graphics\Deferred</Filter>
+    </ClInclude>
+    <ClInclude Include="sources\Graphics\ibl\knife.h">
+      <Filter>Sources\ibl</Filter>
+    </ClInclude>
+    <ClInclude Include="sources\Scenes\ibl_scene.h">
+      <Filter>Sources\Scene</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="HLSL\render_constants.hlsli">
@@ -552,6 +591,21 @@
     </None>
     <None Include="HLSL\noise_create.hlsli">
       <Filter>HLSL\CreateTerrain</Filter>
+    </None>
+    <None Include="HLSL\fullscreen_quad.hlsli">
+      <Filter>HLSL\Sprites</Filter>
+    </None>
+    <None Include="HLSL\physically_based_rendering.hlsli">
+      <Filter>HLSL\ibl</Filter>
+    </None>
+    <None Include="HLSL\ibl.hlsli">
+      <Filter>HLSL\ibl</Filter>
+    </None>
+    <None Include="HLSL\bidirectional_reflectance_distribution_function.hlsli">
+      <Filter>HLSL\ibl</Filter>
+    </None>
+    <None Include="HLSL\image_based_lighting.hlsli">
+      <Filter>HLSL\ibl</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
@@ -752,6 +806,15 @@
     </FxCompile>
     <FxCompile Include="HLSL\ssr_composite.hlsl">
       <Filter>HLSL\DifferredLight</Filter>
+    </FxCompile>
+    <FxCompile Include="HLSL\fullscreen_quad_ps.hlsl">
+      <Filter>HLSL\Sprites</Filter>
+    </FxCompile>
+    <FxCompile Include="HLSL\fullscreen_quad_vs.hlsl">
+      <Filter>HLSL\Sprites</Filter>
+    </FxCompile>
+    <FxCompile Include="HLSL\ibl_ps.hlsl">
+      <Filter>HLSL\ibl</Filter>
     </FxCompile>
   </ItemGroup>
 </Project>

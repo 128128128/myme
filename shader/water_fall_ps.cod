@@ -7,26 +7,24 @@
 // cbuffer SCENE_CONSTANT_BUFFER
 // {
 //
-//   struct LIGHT_DIRECTION
+//   struct SOMETHING
 //   {
 //       
-//       float4 direction;              // Offset:    0
-//       float4 color;                  // Offset:   16
-//       float iTime;                   // Offset:   32
-//       float triple_speed_iTime;      // Offset:   36
-//       float elapsedTime;             // Offset:   40
-//       float shadow_map_num;          // Offset:   44
-//       float4x4 mlvp[3];              // Offset:   48
+//       float iTime;                   // Offset:    0
+//       float triple_speed_iTime;      // Offset:    4
+//       float elapsedTime;             // Offset:    8
+//       float shadow_map_num;          // Offset:   12
+//       float4x4 mlvp[3];              // Offset:   16
 //
-//   } light_direction;                 // Offset:    0 Size:   240
+//   } something;                       // Offset:    0 Size:   208
 //   
 //   struct PLAYER
 //   {
 //       
-//       float4 position;               // Offset:  240
-//       float4 direction;              // Offset:  256
+//       float4 position;               // Offset:  208
+//       float4 direction;              // Offset:  224
 //
-//   } player;                          // Offset:  240 Size:    32 [unused]
+//   } player;                          // Offset:  208 Size:    32 [unused]
 //
 // }
 //
@@ -37,7 +35,7 @@
 // ------------------------------ ---------- ------- ----------- -------------- ------
 // anisotropic_sampler_state         sampler      NA          NA             s2      1 
 // noise_map_1                       texture  float4          2d             t5      1 
-// SCENE_CONSTANT_BUFFER             cbuffer      NA          NA            cb2      1 
+// SCENE_CONSTANT_BUFFER             cbuffer      NA          NA            cb3      1 
 //
 //
 //
@@ -61,103 +59,469 @@
 // SV_TARGET                0   xyzw        0   TARGET   float   xyzw
 //
 ps_5_0
-dcl_globalFlags refactoringAllowed
-dcl_constantbuffer CB2[3], immediateIndexed
+dcl_globalFlags refactoringAllowed | skipOptimization
+dcl_constantbuffer CB3[1], immediateIndexed
 dcl_sampler s2, mode_default
 dcl_resource_texture2d (float,float,float,float) t5
 dcl_input_ps linear v5.xy
 dcl_output o0.xyzw
-dcl_temps 4
-mov r0.y, l(0)
-mul r0.xz, cb2[2].xxxx, l(0.800000, 0.000000, -0.050000, 0.000000)
-mad r0.yz, v5.xxyx, l(0.000000, 0.030000, 0.030000, 0.000000), r0.yyzy
-mov r1.xy, r0.yzyy
-mov r1.zw, l(0,0,0.500000,1.000000)
-mov r0.w, l(0)
-mov r2.x, l(0)
+dcl_temps 6
+//
+// Initial variable locations:
+//   v0.x <- pin.sv_position.x; v0.y <- pin.sv_position.y; v0.z <- pin.sv_position.z; v0.w <- pin.sv_position.w; 
+//   v1.x <- pin.position.x; v1.y <- pin.position.y; v1.z <- pin.position.z; v1.w <- pin.position.w; 
+//   v2.x <- pin.normal.x; v2.y <- pin.normal.y; v2.z <- pin.normal.z; v2.w <- pin.normal.w; 
+//   v3.x <- pin.tangent.x; v3.y <- pin.tangent.y; v3.z <- pin.tangent.z; v3.w <- pin.tangent.w; 
+//   v4.x <- pin.binormal.x; v4.y <- pin.binormal.y; v4.z <- pin.binormal.z; v4.w <- pin.binormal.w; 
+//   v5.x <- pin.texcoord.x; v5.y <- pin.texcoord.y; 
+//   v6.x <- pin.color.x; v6.y <- pin.color.y; v6.z <- pin.color.z; v6.w <- pin.color.w; 
+//   o0.x <- <main return value>.x; o0.y <- <main return value>.y; o0.z <- <main return value>.z; o0.w <- <main return value>.w
+//
+#line 76 "C:\Users\2200167\Desktop\個人製作\myme03\myme\HLSL\water_fall_ps.hlsl"
+mov r0.xy, v5.xyxx  // r0.x <- uv.x; r0.y <- uv.y
+
+#line 78
+mul r0.xy, r0.xyxx, l(0.030000, 0.030000, 0.000000, 0.000000)
+mul r1.y, cb3[0].x, l(-0.050000)
+mov r1.x, l(0)
+add r0.xy, r0.xyxx, r1.xyxx  // r0.x <- flowuv.x; r0.y <- flowuv.y
+
+#line 79
+nop 
+nop 
+mov r0.xy, r0.xyxx
+
+#line 57
+mov r0.z, l(0)  // r0.z <- value
+
+#line 58
+mov r0.w, l(0.500000)  // r0.w <- amplitude
+
+#line 59
+mov r1.x, l(1.000000)  // r1.x <- frequency
+
+#line 63
+mov r1.y, l(0)  // r1.y <- i
+mov r1.zw, r0.xxxy  // r1.z <- p.x; r1.w <- p.y
+mov r2.x, r0.w  // r2.x <- amplitude
+mov r2.y, r1.x  // r2.y <- frequency
+mov r2.z, r0.z  // r2.z <- value
+mov r2.w, r1.y  // r2.w <- i
 loop 
-  ige r2.y, r2.x, l(5)
-  breakc_nz r2.y
-  mul r1.xy, r1.wwww, r1.xyxx
-  sample_indexable(texture2d)(float,float,float,float) r2.y, r1.xyxx, t5.yxzw, s2
-  mad r0.w, r1.z, r2.y, r0.w
-  iadd r2.x, r2.x, l(1)
-  mul r1.zw, r1.zzzw, l(0.000000, 0.000000, 0.500000, 2.000000)
+  ilt r3.x, r2.w, l(5)
+  breakc_z r3.x
+
+#line 64
+  mul r1.z, r1.z, r2.y
+
+#line 65
+  mul r1.w, r1.w, r2.y
+
+#line 66
+  sample_indexable(texture2d)(float,float,float,float) r3.x, r1.zwzz, t5.xyzw, s2
+  mov r3.x, r3.x  // r3.x <- col_r
+
+#line 67
+  mul r3.x, r2.x, r3.x
+  add r2.z, r2.z, r3.x
+
+#line 68
+  mul r2.y, r2.y, l(2.000000)
+
+#line 69
+  mul r2.x, r2.x, l(0.500000)
+
+#line 70
+  iadd r2.w, r2.w, l(1)
 endloop 
-add r0.w, r0.w, l(-0.200000)
-mul_sat r0.w, r0.w, l(1.250000)
-mad r1.x, r0.w, l(-2.000000), l(3.000000)
-mul r0.w, r0.w, r0.w
-mul r1.y, r0.w, r1.x
+
+#line 71
+mov r2.z, r2.z  // r2.z <- <fbm return value>
+
+#line 79
+mov r2.z, r2.z  // r2.z <- noise
+
+#line 80
+mov r0.z, l(-0.200000)
+add r0.w, r0.z, l(1.000000)
+add r0.z, r0.z, r2.z
+div r0.w, l(1.000000, 1.000000, 1.000000, 1.000000), r0.w
+mul r0.z, r0.w, r0.z
+max r0.z, r0.z, l(0.000000)
+min r0.z, r0.z, l(1.000000)
+mul r0.w, r0.z, l(-2.000000)
+add r0.w, r0.w, l(3.000000)
+mul r0.z, r0.z, r0.z
+mul r1.y, r0.z, r0.w
 mov r1.x, l(0.600000)
-mul r1.xy, r1.xyxx, l(0.000000, 0.600000, 0.000000, 0.000000)
-frc r0.x, r0.x
-mad r0.w, r0.x, l(2.000000), l(-1.000000)
-add r0.w, -|r0.w|, l(1.000000)
-mad r1.zw, r1.xxxy, r0.xxxx, r0.yyyz
-mad r0.x, cb2[2].x, l(0.800000), l(0.500000)
-frc r0.x, r0.x
-mad r2.x, r0.x, l(2.000000), l(-1.000000)
-add r2.x, -|r2.x|, l(1.000000)
-mad r0.xy, r1.xyxx, r0.xxxx, r0.yzyy
-mov r1.xy, r1.zwzz
-mov r0.z, l(0)
-mov r2.yzw, l(0,0.500000,1.000000,0)
-loop 
-  ige r3.x, r2.w, l(5)
-  breakc_nz r3.x
-  mul r1.xy, r1.xyxx, r2.zzzz
-  sample_indexable(texture2d)(float,float,float,float) r3.x, r1.xyxx, t5.xyzw, s2
-  mad r0.z, r2.y, r3.x, r0.z
-  iadd r2.w, r2.w, l(1)
-  mul r2.yz, r2.yyzy, l(0.000000, 0.500000, 2.000000, 0.000000)
-endloop 
-mov r1.xy, r0.xyxx
-mov r2.yzw, l(0,0.500000,1.000000,0)
-mov r3.x, l(0)
-loop 
-  ige r3.y, r3.x, l(5)
-  breakc_nz r3.y
-  mul r1.xy, r1.xyxx, r2.zzzz
-  sample_indexable(texture2d)(float,float,float,float) r3.y, r1.xyxx, t5.yxzw, s2
-  mad r2.w, r2.y, r3.y, r2.w
-  iadd r3.x, r3.x, l(1)
-  mul r2.yz, r2.yyzy, l(0.000000, 0.500000, 2.000000, 0.000000)
-endloop 
-mul r1.x, r2.x, r2.w
-mov r2.yz, r1.zzwz
-mov r3.xy, l(0.500000,1.000000,0,0)
+mul r0.zw, r1.xxxy, l(0.000000, 0.000000, 0.000000, 0.600000)  // r0.z <- flowmap.x; r0.w <- flowmap.y
+
+#line 82
+mul r1.x, cb3[0].x, l(0.800000)  // r1.x <- t
+
+#line 83
+nop 
+mov r0.xy, r0.xyxx
+mov r0.zw, r0.zzzw
 mov r1.y, l(0)
+mov r1.x, r1.x
+
+#line 48
+add r1.y, r1.y, r1.x
+frc r1.y, r1.y  // r1.y <- progress
+
+#line 49
+mul r1.zw, r0.zzzw, r1.yyyy  // r1.z <- displacement.x; r1.w <- displacement.y
+
+#line 50
+mul r1.y, r1.y, l(2.000000)
+mov r2.x, l(-1.000000)
+add r1.y, r1.y, r2.x
+mov r2.x, -r1.y
+max r1.y, r1.y, r2.x
+mov r1.y, -r1.y
+add r1.y, r1.y, l(1.000000)  // r1.y <- weight
+
+#line 51
+add r1.zw, r0.xxxy, r1.zzzw  // r1.z <- <flow return value>.x; r1.w <- <flow return value>.y
+
+#line 83
+mov r1.y, r1.y  // r1.y <- weightA
+mov r1.zw, r1.zzzw  // r1.z <- uvA.x; r1.w <- uvA.y
+
+#line 84
+nop 
+mov r0.xy, r0.xyxx
+mov r2.x, l(0.500000)
+
+#line 48
+add r2.x, r2.x, r1.x
+frc r2.x, r2.x  // r2.x <- progress
+
+#line 49
+mul r2.yz, r0.zzwz, r2.xxxx  // r2.y <- displacement.x; r2.z <- displacement.y
+
+#line 50
+mul r2.x, r2.x, l(2.000000)
+mov r2.w, l(-1.000000)
+add r2.x, r2.w, r2.x
+mov r2.w, -r2.x
+max r2.x, r2.w, r2.x
+mov r2.x, -r2.x
+add r2.x, r2.x, l(1.000000)  // r2.x <- weight
+
+#line 51
+add r2.yz, r0.xxyx, r2.yyzy  // r2.y <- <flow return value>.x; r2.z <- <flow return value>.y
+
+#line 84
+mov r2.x, r2.x  // r2.x <- weightB
+mov r2.yz, r2.yyzy  // r2.y <- uvB.x; r2.z <- uvB.y
+
+#line 85
+nop 
+mov r0.xy, r0.xyxx
 mov r2.w, l(0)
+
+#line 48
+add r2.w, r2.w, r1.x
+frc r2.w, r2.w  // r2.w <- progress
+
+#line 49
+mul r3.xy, r0.zwzz, r2.wwww  // r3.x <- displacement.x; r3.y <- displacement.y
+
+#line 50
+mul r2.w, r2.w, l(2.000000)
+mov r3.z, l(-1.000000)
+add r2.w, r2.w, r3.z
+mov r3.z, -r2.w
+max r2.w, r2.w, r3.z
+mov r2.w, -r2.w
+add r2.w, r2.w, l(1.000000)  // r2.w <- weight
+
+#line 51
+add r3.xy, r0.xyxx, r3.xyxx  // r3.x <- <flow return value>.x; r3.y <- <flow return value>.y
+
+#line 85
+mov r2.w, r2.w  // r2.w <- weightC
+mov r3.xy, r3.xyxx  // r3.x <- uvC.x; r3.y <- uvC.y
+
+#line 86
+nop 
+mov r0.xy, r0.xyxx
+mov r3.z, l(0.500000)
+
+#line 48
+add r1.x, r3.z, r1.x
+frc r1.x, r1.x  // r1.x <- progress
+
+#line 49
+mul r0.zw, r0.zzzw, r1.xxxx  // r0.z <- displacement.x; r0.w <- displacement.y
+
+#line 50
+mul r1.x, r1.x, l(2.000000)
+mov r3.z, l(-1.000000)
+add r1.x, r1.x, r3.z
+mov r3.z, -r1.x
+max r1.x, r1.x, r3.z
+mov r1.x, -r1.x
+add r1.x, r1.x, l(1.000000)  // r1.x <- weight
+
+#line 51
+add r0.xy, r0.zwzz, r0.xyxx  // r0.x <- <flow return value>.x; r0.y <- <flow return value>.y
+
+#line 86
+mov r1.x, r1.x  // r1.x <- weightD
+mov r0.xy, r0.xyxx  // r0.x <- uvD.x; r0.y <- uvD.y
+
+#line 87
+nop 
+nop 
+mov r1.zw, r1.zzzw
+
+#line 57
+mov r0.z, l(0)  // r0.z <- value
+
+#line 58
+mov r0.w, l(0.500000)  // r0.w <- amplitude
+
+#line 59
+mov r3.z, l(1.000000)  // r3.z <- frequency
+
+#line 63
+mov r3.w, l(0)  // r3.w <- i
+mov r4.xy, r1.zwzz  // r4.x <- p.x; r4.y <- p.y
+mov r5.x, r0.w  // r5.x <- amplitude
+mov r5.y, r3.z  // r5.y <- frequency
+mov r4.z, r0.z  // r4.z <- value
+mov r4.w, r3.w  // r4.w <- i
 loop 
-  ige r3.z, r2.w, l(5)
-  breakc_nz r3.z
-  mul r2.yz, r2.yyzy, r3.yyyy
-  sample_indexable(texture2d)(float,float,float,float) r3.z, r2.yzyy, t5.yzxw, s2
-  mad r1.y, r3.x, r3.z, r1.y
-  iadd r2.w, r2.w, l(1)
-  mul r3.xy, r3.xyxx, l(0.500000, 2.000000, 0.000000, 0.000000)
+  ilt r5.z, r4.w, l(5)
+  breakc_z r5.z
+
+#line 64
+  mul r4.x, r4.x, r5.y
+
+#line 65
+  mul r4.y, r4.y, r5.y
+
+#line 66
+  sample_indexable(texture2d)(float,float,float,float) r5.z, r4.xyxx, t5.yzxw, s2
+  mov r5.z, r5.z  // r5.z <- col_r
+
+#line 67
+  mul r5.z, r5.z, r5.x
+  add r4.z, r4.z, r5.z
+
+#line 68
+  mul r5.y, r5.y, l(2.000000)
+
+#line 69
+  mul r5.x, r5.x, l(0.500000)
+
+#line 70
+  iadd r4.w, r4.w, l(1)
 endloop 
-mov r1.zw, r0.xxxy
-mov r2.yzw, l(0,0.500000,1.000000,0)
-mov r3.x, l(0)
+
+#line 71
+mov r4.z, r4.z  // r4.z <- <fbm return value>
+
+#line 87
+mul r0.z, r1.y, r4.z  // r0.z <- flowA
+
+#line 88
+nop 
+nop 
+mov r2.yz, r2.yyzy
+
+#line 57
+mov r0.w, l(0)  // r0.w <- value
+
+#line 58
+mov r1.y, l(0.500000)  // r1.y <- amplitude
+
+#line 59
+mov r1.z, l(1.000000)  // r1.z <- frequency
+
+#line 63
+mov r1.w, l(0)  // r1.w <- i
+mov r3.zw, r2.yyyz  // r3.z <- p.x; r3.w <- p.y
+mov r4.x, r1.y  // r4.x <- amplitude
+mov r4.y, r1.z  // r4.y <- frequency
+mov r4.z, r0.w  // r4.z <- value
+mov r4.w, r1.w  // r4.w <- i
 loop 
-  ige r3.y, r3.x, l(5)
-  breakc_nz r3.y
-  mul r1.zw, r1.zzzw, r2.zzzz
-  sample_indexable(texture2d)(float,float,float,float) r3.y, r1.zwzz, t5.yxzw, s2
-  mad r2.w, r2.y, r3.y, r2.w
-  iadd r3.x, r3.x, l(1)
-  mul r2.yz, r2.yyzy, l(0.000000, 0.500000, 2.000000, 0.000000)
+  ilt r5.x, r4.w, l(5)
+  breakc_z r5.x
+
+#line 64
+  mul r3.z, r3.z, r4.y
+
+#line 65
+  mul r3.w, r3.w, r4.y
+
+#line 66
+  sample_indexable(texture2d)(float,float,float,float) r5.x, r3.zwzz, t5.xyzw, s2
+  mov r5.x, r5.x  // r5.x <- col_r
+
+#line 67
+  mul r5.x, r4.x, r5.x
+  add r4.z, r4.z, r5.x
+
+#line 68
+  mul r4.y, r4.y, l(2.000000)
+
+#line 69
+  mul r4.x, r4.x, l(0.500000)
+
+#line 70
+  iadd r4.w, r4.w, l(1)
 endloop 
-mad r0.x, r0.z, r0.w, r1.x
-mad r0.x, r1.y, r0.w, r0.x
-mad r0.x, r2.w, r2.x, r0.x
-add r0.y, -r0.x, l(1.000000)
-mov_sat r0.x, r0.x
-mad r0.z, r0.x, l(-2.000000), l(3.000000)
+
+#line 71
+mov r4.z, r4.z  // r4.z <- <fbm return value>
+
+#line 88
+mul r0.w, r2.x, r4.z  // r0.w <- flowB
+
+#line 89
+nop 
+nop 
+mov r3.xy, r3.xyxx
+
+#line 57
+mov r1.y, l(0)  // r1.y <- value
+
+#line 58
+mov r1.z, l(0.500000)  // r1.z <- amplitude
+
+#line 59
+mov r1.w, l(1.000000)  // r1.w <- frequency
+
+#line 63
+mov r2.x, l(0)  // r2.x <- i
+mov r2.yz, r3.xxyx  // r2.y <- p.x; r2.z <- p.y
+mov r4.x, r1.z  // r4.x <- amplitude
+mov r4.y, r1.w  // r4.y <- frequency
+mov r3.z, r1.y  // r3.z <- value
+mov r3.w, r2.x  // r3.w <- i
+loop 
+  ilt r4.z, r3.w, l(5)
+  breakc_z r4.z
+
+#line 64
+  mul r2.y, r2.y, r4.y
+
+#line 65
+  mul r2.z, r2.z, r4.y
+
+#line 66
+  sample_indexable(texture2d)(float,float,float,float) r4.z, r2.yzyy, t5.yzxw, s2
+  mov r4.z, r4.z  // r4.z <- col_r
+
+#line 67
+  mul r4.z, r4.z, r4.x
+  add r3.z, r3.z, r4.z
+
+#line 68
+  mul r4.y, r4.y, l(2.000000)
+
+#line 69
+  mul r4.x, r4.x, l(0.500000)
+
+#line 70
+  iadd r3.w, r3.w, l(1)
+endloop 
+
+#line 71
+mov r3.z, r3.z  // r3.z <- <fbm return value>
+
+#line 89
+mul r1.y, r2.w, r3.z  // r1.y <- flowC
+
+#line 90
+nop 
+nop 
+mov r0.xy, r0.xyxx
+
+#line 57
+mov r1.z, l(0)  // r1.z <- value
+
+#line 58
+mov r1.w, l(0.500000)  // r1.w <- amplitude
+
+#line 59
+mov r2.x, l(1.000000)  // r2.x <- frequency
+
+#line 63
+mov r2.y, l(0)  // r2.y <- i
+mov r2.zw, r0.xxxy  // r2.z <- p.x; r2.w <- p.y
+mov r3.x, r1.w  // r3.x <- amplitude
+mov r3.y, r2.x  // r3.y <- frequency
+mov r3.z, r1.z  // r3.z <- value
+mov r3.w, r2.y  // r3.w <- i
+loop 
+  ilt r4.x, r3.w, l(5)
+  breakc_z r4.x
+
+#line 64
+  mul r2.z, r2.z, r3.y
+
+#line 65
+  mul r2.w, r2.w, r3.y
+
+#line 66
+  sample_indexable(texture2d)(float,float,float,float) r4.x, r2.zwzz, t5.xyzw, s2
+  mov r4.x, r4.x  // r4.x <- col_r
+
+#line 67
+  mul r4.x, r3.x, r4.x
+  add r3.z, r3.z, r4.x
+
+#line 68
+  mul r3.y, r3.y, l(2.000000)
+
+#line 69
+  mul r3.x, r3.x, l(0.500000)
+
+#line 70
+  iadd r3.w, r3.w, l(1)
+endloop 
+
+#line 71
+mov r3.z, r3.z  // r3.z <- <fbm return value>
+
+#line 90
+mul r0.x, r1.x, r3.z  // r0.x <- flowD
+
+#line 91
+add r0.y, r0.w, r0.z
+add r0.y, r1.y, r0.y
+add r0.x, r0.x, r0.y  // r0.x <- flow
+
+#line 93
+mov r1.xyzw, l(0.600000,0.600000,0.900000,0.200000)  // r1.x <- blue.x; r1.y <- blue.y; r1.z <- blue.z; r1.w <- blue.w
+
+#line 94
+mov r0.y, -r0.x
+add r0.y, r0.y, l(1.000000)
+mul r1.xyzw, r1.xyzw, r0.yyyy
+mov r0.y, l(-0.000000)
+add r0.z, r0.y, l(1.000000)
+add r0.x, r0.y, r0.x
+div r0.y, l(1.000000, 1.000000, 1.000000, 1.000000), r0.z
+mul r0.x, r0.y, r0.x
+max r0.x, r0.x, l(0.000000)
+min r0.x, r0.x, l(1.000000)
+mul r0.y, r0.x, l(-2.000000)
+add r0.y, r0.y, l(3.000000)
 mul r0.x, r0.x, r0.x
-mul r0.x, r0.x, r0.z
-mad o0.xyzw, r0.yyyy, l(0.600000, 0.600000, 0.900000, 0.200000), r0.xxxx
+mul r0.x, r0.x, r0.y
+add r0.xyzw, r0.xxxx, r1.xyzw  // r0.x <- waterfall.x; r0.y <- waterfall.y; r0.z <- waterfall.z; r0.w <- waterfall.w
+
+#line 96
+mov r0.xyzw, r0.xyzw  // r0.x <- final_color.x; r0.y <- final_color.y; r0.z <- final_color.z; r0.w <- final_color.w
+
+#line 97
+mov o0.xyzw, r0.xyzw
 ret 
-// Approximately 92 instruction slots used
+// Approximately 242 instruction slots used

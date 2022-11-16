@@ -12,29 +12,16 @@
 //
 // }
 //
-// cbuffer SCENE_CONSTANT_BUFFER
+// cbuffer LIGHT_CONSTANT_BUFFER
 // {
 //
-//   struct LIGHT_DIRECTION
+//   struct LIGHT_CONSTANTS
 //   {
 //       
 //       float4 direction;              // Offset:    0
 //       float4 color;                  // Offset:   16
-//       float iTime;                   // Offset:   32
-//       float triple_speed_iTime;      // Offset:   36
-//       float elapsedTime;             // Offset:   40
-//       float shadow_map_num;          // Offset:   44
-//       float4x4 mlvp[3];              // Offset:   48
 //
-//   } light_direction;                 // Offset:    0 Size:   240
-//   
-//   struct PLAYER
-//   {
-//       
-//       float4 position;               // Offset:  240
-//       float4 direction;              // Offset:  256
-//
-//   } player;                          // Offset:  240 Size:    32 [unused]
+//   } light_direction;                 // Offset:    0 Size:    32
 //
 // }
 //
@@ -48,8 +35,8 @@
 // diffuse_map                       texture  float4          2d             t0      1 
 // normal_map                        texture  float4          2d             t3      1 
 // emissive_map                      texture  float4          2d             t5      1 
-// SCENE_CONSTANT_BUFFER             cbuffer      NA          NA            cb2      1 
-// VESETATION_CONSTANTS              cbuffer      NA          NA            cb3      1 
+// LIGHT_CONSTANT_BUFFER             cbuffer      NA          NA            cb2      1 
+// VESETATION_CONSTANTS              cbuffer      NA          NA            cb4      1 
 //
 //
 //
@@ -73,8 +60,8 @@
 // SV_TARGET                0   xyzw        0   TARGET   float   xyzw
 //
 ps_5_0
-dcl_globalFlags refactoringAllowed
-dcl_constantbuffer CB3[1], immediateIndexed
+dcl_globalFlags refactoringAllowed | skipOptimization
+dcl_constantbuffer CB4[1], immediateIndexed
 dcl_constantbuffer CB2[1], immediateIndexed
 dcl_sampler s1, mode_default
 dcl_sampler s2, mode_default
@@ -84,37 +71,97 @@ dcl_resource_texture2d (float,float,float,float) t5
 dcl_input_ps linear v2.xyz
 dcl_input_ps linear v5.xy
 dcl_output o0.xyzw
-dcl_temps 4
-dp3 r0.x, v2.xyzx, v2.xyzx
-rsq r0.x, r0.x
-mul r0.xyz, r0.xxxx, v2.xyzx
-mul r1.xyz, r0.zxyz, l(0.000000, 0.000000, 1.000100, 0.000000)
-mad r1.xyz, r0.yzxy, l(0.000000, 1.000100, 0.000000, 0.000000), -r1.xyzx
-dp2 r0.w, r1.yzyy, r1.yzyy
-rsq r0.w, r0.w
-mul r1.xyz, r0.wwww, r1.xyzx
-mul r2.xyz, r0.yzxy, r1.zxyz
-mad r2.xyz, r1.yzxy, r0.zxyz, -r2.xyzx
-dp3 r0.w, r2.xyzx, r2.xyzx
-rsq r0.w, r0.w
-mul r2.xyz, r0.wwww, r2.xyzx
-sample_indexable(texture2d)(float,float,float,float) r3.xyz, v5.xyxx, t3.xyzw, s1
-mad r3.xyz, r3.xyzx, l(2.000000, 2.000000, 2.000000, 0.000000), l(-1.000000, -1.000000, -1.000000, 0.000000)
-mul r1.xyz, r1.xyzx, r3.yyyy
-mad r1.xyz, r3.xxxx, r2.xyzx, r1.xyzx
-mad r0.xyz, r3.zzzz, r0.xyzx, r1.xyzx
-dp3 r0.w, r0.xyzx, r0.xyzx
-rsq r0.w, r0.w
-mul r0.xyz, r0.wwww, r0.xyzx
-dp3 r0.w, -cb2[0].xyzx, -cb2[0].xyzx
-rsq r0.w, r0.w
-mul r1.xyz, r0.wwww, -cb2[0].xyzx
-dp3 r0.x, r0.xyzx, r1.xyzx
-max r0.x, r0.x, l(0.000000)
-sample_indexable(texture2d)(float,float,float,float) r1.xyzw, v5.xyxx, t0.xyzw, s2
-mul r1.xyz, r0.xxxx, r1.xyzx
-sample_indexable(texture2d)(float,float,float,float) r0.xyzw, v5.xyxx, t5.xyzw, s2
-mul r0.xyz, r0.xyzx, cb3[0].yzwy
-mad o0.xyzw, r0.xyzw, cb3[0].xxxx, r1.xyzw
+dcl_temps 6
+//
+// Initial variable locations:
+//   v0.x <- pin.sv_position.x; v0.y <- pin.sv_position.y; v0.z <- pin.sv_position.z; v0.w <- pin.sv_position.w; 
+//   v1.x <- pin.position.x; v1.y <- pin.position.y; v1.z <- pin.position.z; v1.w <- pin.position.w; 
+//   v2.x <- pin.normal.x; v2.y <- pin.normal.y; v2.z <- pin.normal.z; v2.w <- pin.normal.w; 
+//   v3.x <- pin.tangent.x; v3.y <- pin.tangent.y; v3.z <- pin.tangent.z; v3.w <- pin.tangent.w; 
+//   v4.x <- pin.binormal.x; v4.y <- pin.binormal.y; v4.z <- pin.binormal.z; v4.w <- pin.binormal.w; 
+//   v5.x <- pin.texcoord.x; v5.y <- pin.texcoord.y; 
+//   v6.x <- pin.color.x; v6.y <- pin.color.y; v6.z <- pin.color.z; v6.w <- pin.color.w; 
+//   o0.x <- <main return value>.x; o0.y <- <main return value>.y; o0.z <- <main return value>.z; o0.w <- <main return value>.w
+//
+#line 18 "C:\Users\2200167\Desktop\個人製作\myme03\myme\HLSL\vegetation_ps.hlsl"
+sample_indexable(texture2d)(float,float,float,float) r0.xyzw, v5.xyxx, t0.xyzw, s2  // r0.x <- color.x; r0.y <- color.y; r0.z <- color.z; r0.w <- color.w
+
+#line 19
+mov r0.w, r0.w  // r0.w <- alpha
+
+#line 20
+dp3 r1.x, v2.xyzx, v2.xyzx
+rsq r1.x, r1.x
+mul r1.xyz, r1.xxxx, v2.xyzx  // r1.x <- N.x; r1.y <- N.y; r1.z <- N.z
+
+#line 21
+itof r2.xy, l(0, 0, 0, 0)  // r2.x <- T.y; r2.y <- T.z
+mov r2.z, l(1.000100)  // r2.z <- T.x
+
+#line 22
+mul r3.xyz, r1.yzxy, r2.yzxy
+mul r2.xyz, r1.zxyz, r2.xyzx
+mov r2.xyz, -r2.xyzx
+add r2.xyz, r2.xyzx, r3.xyzx
+dp3 r1.w, r2.xyzx, r2.xyzx
+rsq r1.w, r1.w
+mul r2.xyz, r1.wwww, r2.xyzx  // r2.x <- B.x; r2.y <- B.y; r2.z <- B.z
+
+#line 23
+mul r3.xyz, r1.zxyz, r2.yzxy
+mul r4.xyz, r1.yzxy, r2.zxyz
+mov r4.xyz, -r4.xyzx
+add r3.xyz, r3.xyzx, r4.xyzx
+dp3 r1.w, r3.xyzx, r3.xyzx
+rsq r1.w, r1.w
+mul r3.xyz, r1.wwww, r3.xyzx  // r3.x <- T.x; r3.y <- T.y; r3.z <- T.z
+
+#line 25
+sample_indexable(texture2d)(float,float,float,float) r4.xyz, v5.xyxx, t3.xyzw, s1
+mov r4.xyz, r4.xyzx  // r4.x <- normal.x; r4.y <- normal.y; r4.z <- normal.z
+
+#line 26
+mul r4.xyz, r4.xyzx, l(2.000000, 2.000000, 2.000000, 0.000000)
+mov r5.xyz, l(-1.000000,-1.000000,-1.000000,-0.000000)
+add r4.xyz, r4.xyzx, r5.xyzx
+
+#line 28
+mul r3.xyz, r3.xyzx, r4.xxxx
+mul r2.xyz, r2.xyzx, r4.yyyy
+add r2.xyz, r2.xyzx, r3.xyzx
+mul r1.xyz, r1.xyzx, r4.zzzz
+add r1.xyz, r1.xyzx, r2.xyzx
+dp3 r1.w, r1.xyzx, r1.xyzx
+rsq r1.w, r1.w
+mul r1.xyz, r1.wwww, r1.xyzx  // r1.x <- N.x; r1.y <- N.y; r1.z <- N.z
+
+#line 30
+mov r2.xyz, -cb2[0].xyzx
+dp3 r1.w, r2.xyzx, r2.xyzx
+rsq r1.w, r1.w
+mul r2.xyz, r1.wwww, r2.xyzx  // r2.x <- L.x; r2.y <- L.y; r2.z <- L.z
+
+#line 31
+itof r1.w, l(0)
+dp3 r1.x, r1.xyzx, r2.xyzx
+max r1.x, r1.x, r1.w
+mul r0.xyz, r0.xyzx, r1.xxxx  // r0.x <- diffuse.x; r0.y <- diffuse.y; r0.z <- diffuse.z
+
+#line 33
+sample_indexable(texture2d)(float,float,float,float) r1.xyzw, v5.xyxx, t5.xyzw, s2  // r1.x <- emis.x; r1.y <- emis.y; r1.z <- emis.z; r1.w <- emis.w
+
+#line 35
+mov r0.xyz, r0.xyzx  // r0.x <- finalcolor.x; r0.y <- finalcolor.y; r0.z <- finalcolor.z
+mov r0.w, r0.w  // r0.w <- finalcolor.w
+
+#line 36
+itof r2.x, l(1)
+mul r3.xyz, r1.xyzx, cb4[0].yzwy
+mul r3.w, r1.w, r2.x
+mul r1.xyzw, r3.xyzw, cb4[0].xxxx
+add r0.xyzw, r0.xyzw, r1.xyzw
+
+#line 38
+mov o0.xyzw, r0.xyzw
 ret 
-// Approximately 32 instruction slots used
+// Approximately 52 instruction slots used

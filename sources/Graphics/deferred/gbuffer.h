@@ -8,6 +8,9 @@
 #include "../others/render_state.h"
 #include "../../Graphics/others/constant_buffer.h"
 
+
+#include "../lights/light_manager.h"
+
 class gbuffer
 {
 public:
@@ -18,7 +21,6 @@ public:
 	void inactive(ID3D11DeviceContext* immediate_context);
 	void render(ID3D11DeviceContext* immediate_context);
 
-	void set_color_resource(ID3D11DeviceContext* immediate_context, int slot);
 	void DebugDrawGUI();
 protected:
 
@@ -79,6 +81,12 @@ private:
 	Microsoft::WRL::ComPtr <ID3D11Texture2D> tex_RM;
 	Microsoft::WRL::ComPtr <ID3D11RenderTargetView> rtv_RM;
 	Microsoft::WRL::ComPtr <ID3D11ShaderResourceView> srv_RM;
+
+	//light buffer
+	Microsoft::WRL::ComPtr <ID3D11Texture2D> tex_light;
+	Microsoft::WRL::ComPtr <ID3D11RenderTargetView> rtv_light;
+	Microsoft::WRL::ComPtr <ID3D11ShaderResourceView> srv_light;
+
 	// Shadow Param buffer
 	Microsoft::WRL::ComPtr <ID3D11Texture2D> tex_shadow_param;
 	Microsoft::WRL::ComPtr <ID3D11RenderTargetView> rtv_shadow_param;
@@ -110,16 +118,18 @@ private:
 
 	Microsoft::WRL::ComPtr<ID3D11Buffer> vertex_buffer;
 	Microsoft::WRL::ComPtr<ID3D11Buffer> index_buffer;
-	Microsoft::WRL::ComPtr<ID3D11VertexShader> differred_light_vs;
-	Microsoft::WRL::ComPtr<ID3D11PixelShader> env_light_ps;
-	Microsoft::WRL::ComPtr<ID3D11PixelShader> dir_light_ps;
-	Microsoft::WRL::ComPtr<ID3D11PixelShader> dir_light_shadow_ps;
-	Microsoft::WRL::ComPtr<ID3D11PixelShader> composite_ps;
-	Microsoft::WRL::ComPtr<ID3D11VertexShader> post_effect_vs;
-	Microsoft::WRL::ComPtr<ID3D11PixelShader> post_effect_ps;
 	Microsoft::WRL::ComPtr<ID3D11InputLayout> input_layout;
 	Microsoft::WRL::ComPtr<ID3D11InputLayout> input_layout_1;
+	Microsoft::WRL::ComPtr<ID3D11VertexShader> differred_light_vs;
+	Microsoft::WRL::ComPtr<ID3D11PixelShader> env_light_ps;
+	std::unique_ptr<pixel_shader> composite_ps;
+	Microsoft::WRL::ComPtr<ID3D11VertexShader> post_effect_vs;
+	Microsoft::WRL::ComPtr<ID3D11PixelShader> post_effect_ps;
 
+	//lights
+	std::shared_ptr<directional_light> dir_light;
 
-	std::unique_ptr<Descartes::sampler_state> comparison_sampler_state;
+	Microsoft::WRL::ComPtr<ID3D11RasterizerState> rasterizer_state;
+	Microsoft::WRL::ComPtr<ID3D11DepthStencilState> depth_stencil_state;
+
 };

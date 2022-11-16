@@ -1,4 +1,4 @@
-cbuffer OBJECT_CONSTANTS : register(b3)
+cbuffer OBJECT_CONSTANTS : register(b4)
 {
 	float speed;
 	float offset;

@@ -24,7 +24,7 @@ cbuffer OBJECT_CONSTANTS : register(b0)
 	float4 color;
 };
 
-cbuffer PBR_CONSTANTS:register(b3)
+cbuffer PBR_CONSTANTS:register(b4)
 {
 	float metallic_param;
 	float smooth_param;

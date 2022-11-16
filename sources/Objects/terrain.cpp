@@ -172,10 +172,10 @@ void Terrain::DebugDrawGUI()
 
 	if (ImGui::Begin("Terrain", nullptr, ImGuiWindowFlags_None))
 	{
-		//トランスフォーム
+		//transform
 		if (ImGui::CollapsingHeader("Transform", ImGuiTreeNodeFlags_DefaultOpen))
 		{
-			//位置
+			//position
 			ImGui::SliderFloat3("Position", &this->position.x, -100.0f, 100.0f);
 			//Scale
 			ImGui::InputFloat3("Scale", &this->scale.x);

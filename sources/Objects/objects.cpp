@@ -73,18 +73,19 @@ void Cube::DebugDrawGUI()
 pbr_Stage::pbr_Stage(ID3D11Device* device)
 {
 	//mesh= std::make_unique<pbr_static_mesh>(device, ".\\resources\\enviroments\\structures\\DropShip.fbx");
+	mesh= std::make_unique<pbr_static_mesh>(device, ".\\resources\\Jummo\\Jummo.fbx");
 	position = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
 	velocity = XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f);
 
-	float angle = 0;
+	float angle = 180;
 	direction.x = sinf(angle * 0.01745f);
 	direction.y = 0;
 	direction.z = cosf(angle * 0.01745f);
 
 	pbr_constant_buffer = std::make_unique<Descartes::constant_buffer<pbr_constants>>(device);
 
-	load_texture_from_file(device, ".\\resources\\ball.fbm\\space-cruiser-panels2_r.dds", r_srv.GetAddressOf(), true, true);
-	load_texture_from_file(device, ".\\resources\\ball.fbm\\space-cruiser-panels2_m.dds", m_srv.GetAddressOf(), true, true);
+	//load_texture_from_file(device, ".\\resources\\ball.fbm\\space-cruiser-panels2_r.dds", r_srv.GetAddressOf(), true, true);
+	//load_texture_from_file(device, ".\\resources\\ball.fbm\\space-cruiser-panels2_m.dds", m_srv.GetAddressOf(), true, true);
 }
 
 void pbr_Stage::update(float elapsed_time)
@@ -133,8 +134,7 @@ void pbr_Stage::DebugDrawGUI()
 		if (ImGui::CollapsingHeader("Transform", ImGuiTreeNodeFlags_DefaultOpen))
 		{
 			ImGui::SliderFloat3("Position", &this->position.x, -100.0f, 100.0f);
-			ImGui::InputFloat3("Position", &this->position.x);
-		
+			
 			ImGui::InputFloat3("Scale", &this->scale.x);
 		}
 		//pbr
@@ -258,7 +258,7 @@ void VegetationSmall::render(ID3D11DeviceContext* immediate_context)
 {
 	ps->active(immediate_context);
 	vs->active(immediate_context);
-	constants_buffer->active(immediate_context, 3);
+	constants_buffer->active(immediate_context, 4);
 	immediate_context->PSSetShaderResources(5, 1, emissive_shader_resource_view.GetAddressOf());
 
 	vegetation->render(immediate_context, world_transform);

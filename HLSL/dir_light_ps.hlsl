@@ -1,4 +1,7 @@
-#include "pbr_common.hlsli"
+//#include "common.hlsli"
+//#include "pbr_common.hlsli"
+#include "fullscreen_quad.hlsli"
+#include "scene_constants.hlsli"
 //texture
 Texture2D albedo_texture : register(t0);
 Texture2D normal_texture : register(t1);
@@ -9,8 +12,10 @@ Texture2D depth_texture : register(t4);
 Texture2D shadow_param_texture : register(t7);    // 影param
 Texture2D env_texture : register(t15);
 
-SamplerComparisonState comparison_sampler_state : register(s4);
-
+#define POINT 0
+#define LINEAR 1
+#define ANISOTROPIC 2
+SamplerState sampler_states[3] : register(s0);
 
 //float4 main(PS_IN input) : SV_TARGET0
 //{
@@ -91,82 +96,114 @@ SamplerComparisonState comparison_sampler_state : register(s4);
 //    return finalColor;
 //}
 
+//float4 main(PS_IN pin) : SV_Target0
+//{
+//    //Writing with G-Buffer contents
+//    //Sampling albedo color
+//    float4 albedo_color = albedo_texture.Sample(decal_sampler, pin.texcoord);
+//    //Sampling normal color
+//    float3 normal = normal_texture.Sample(decal_sampler, pin.texcoord).xyz;
+//    //Restore the normal from a range of 0 to 1 to a range of -1 to 1
+//    normal = (normal * 2.0f) - 1.0f;
+//    //Sampling world position
+//    float3 world_pos = pin.worldpos;
+//    // Specular color should be the same as albedo color.
+//    float3 specColor = albedo_color;
+//    // Sampling metallicity and smoothness
+//    float4 metallic_smooth = rm_texture.Sample(decal_sampler, pin.texcoord);
+//   
+//    //Parameters for shadow generation.
+//  // float4 shadow_param= shadow_param_texture.Sample(decal_sampler, pin.texcoord);
+//    // Calculate the vector extending toward the line of sight
+//    float3 to_eye = normalize(camera_constants.position.xyz - world_pos);
+//
+//    float3 lig = 0;
+//
+//    for (int ligNo = 0; ligNo < NUM_DIRECTIONAL_LIGHT; ligNo++)
+//    {
+//       // // 影の落ち具合を計算する。
+//       //float shadow = 0.0f;
+//       //// if (directionalLight[ligNo].castShadow == 1) {
+//       //     //影を生成するなら。
+//       //     shadow = calc_shadow_rate(ligNo, world_pos) * shadow_param.r;
+//       // //}
+//       // if (shadow > 0.9f) {
+//       //     //ライトの計算をしない。
+//       //     //影が落ちていると環境光の影響も下げる。
+//       //     continue;
+//       // }
+//        
+//        // Implement Disney-based diffuse reflection
+//        // Calculate diffuse reflections taking Fresnel reflections into account
+//        float diffuseFromFresnel = CalcDiffuseFromFresnel(
+//            normal,-light_direction.direction.xyz /*-directionalLight[ligNo].direction*/, to_eye);
+//
+//        // Find the normalized Lambert diffuse reflection
+//        float NdotL = saturate(dot(normal, -light_direction.direction.xyz /*-directionalLight[ligNo].direction*/));
+//        float3 lambertDiffuse = light_direction.color.xyz/*directionalLight[ligNo].color*/ * NdotL / PI;
+//
+//        // Calculate the final diffuse reflected light
+//        float3 diffuse = albedo_color * diffuseFromFresnel * lambertDiffuse;
+//
+//       
+//        // Calculate specular reflectance using the Cook-Trans model
+//        // Calculate the specular reflectance of the cooktrans model
+//        float3 spec = CookTorranceSpecular(
+//            -light_direction.direction.xyz /*-directionalLight[ligNo].direction*/, to_eye, normal, metallic_smooth.w)
+//            * light_direction.color.xyz/*directionalLight[ligNo].color*/;
+//
+//        // If metallicity is high, specular reflection is specular color, if low, white
+//        // Treat specular color intensity as specular reflectance
+//        spec *= lerp(float3(1.0f, 1.0f, 1.0f), specColor, metallic_smooth.x);
+//
+//        // Use smoothness to combine diffuse and specular reflected light
+//        // The higher the smoothness, the weaker the diffuse reflection.
+//        lig += diffuse * (1.0f - metallic_smooth.w) + spec * metallic_smooth.w;
+//
+//       
+//        }
+//       
+// 
+//
+//    float3 ambient_light = float3(1.0, 1.0, 1.0);
+//    // Raise the bottom line with ambient light
+//    lig += ambient_light * albedo_color;
+//
+//    
+//    float4 final_color = 1.0f;
+//    final_color.xyz = lig;
+//    return final_color ;
+//}
 
-float4 main(PS_IN pin) : SV_Target0
+float4 main(VS_OUT pin) : SV_TARGET
 {
-    //Writing with G-Buffer contents
-    //Sampling albedo color
-    float4 albedo_color = albedo_texture.Sample(decal_sampler, pin.texcoord);
-    //Sampling normal color
-    float3 normal = normal_texture.Sample(decal_sampler, pin.texcoord).xyz;
-    //Restore the normal from a range of 0 to 1 to a range of -1 to 1
-    normal = (normal * 2.0f) - 1.0f;
-    //Sampling world position
-    float3 world_pos = pin.worldpos;
-    // Specular color should be the same as albedo color.
-    float3 specColor = albedo_color;
-    // Sampling metallicity and smoothness
-    float4 metallic_smooth = rm_texture.Sample(decal_sampler, pin.texcoord);
-   
-    //Parameters for shadow generation.
-  // float4 shadow_param= shadow_param_texture.Sample(decal_sampler, pin.texcoord);
-    // Calculate the vector extending toward the line of sight
-    float3 to_eye = normalize(camera_constants.position.xyz - world_pos);
+    float4 tex = normal_texture.Sample(sampler_states[ANISOTROPIC], pin.texcoord); // *input.Color;
 
-    float3 lig = 0;
-
-    for (int ligNo = 0; ligNo < NUM_DIRECTIONAL_LIGHT; ligNo++)
-    {
-       // // 影の落ち具合を計算する。
-       //float shadow = 0.0f;
-       //// if (directionalLight[ligNo].castShadow == 1) {
-       //     //影を生成するなら。
-       //     shadow = calc_shadow_rate(ligNo, world_pos) * shadow_param.r;
-       // //}
-       // if (shadow > 0.9f) {
-       //     //ライトの計算をしない。
-       //     //影が落ちていると環境光の影響も下げる。
-       //     continue;
-       // }
-        
-        // Implement Disney-based diffuse reflection
-        // Calculate diffuse reflections taking Fresnel reflections into account
-        float diffuseFromFresnel = CalcDiffuseFromFresnel(
-            normal,-light_direction.direction.xyz /*-directionalLight[ligNo].direction*/, to_eye);
-
-        // Find the normalized Lambert diffuse reflection
-        float NdotL = saturate(dot(normal, -light_direction.direction.xyz /*-directionalLight[ligNo].direction*/));
-        float3 lambertDiffuse = light_direction.color.xyz/*directionalLight[ligNo].color*/ * NdotL / PI;
-
-        // Calculate the final diffuse reflected light
-        float3 diffuse = albedo_color * diffuseFromFresnel * lambertDiffuse;
-
-       
-        // Calculate specular reflectance using the Cook-Trans model
-        // Calculate the specular reflectance of the cooktrans model
-        float3 spec = CookTorranceSpecular(
-            -light_direction.direction.xyz /*-directionalLight[ligNo].direction*/, to_eye, normal, metallic_smooth.w)
-            * light_direction.color.xyz/*directionalLight[ligNo].color*/;
-
-        // If metallicity is high, specular reflection is specular color, if low, white
-        // Treat specular color intensity as specular reflectance
-        spec *= lerp(float3(1.0f, 1.0f, 1.0f), specColor, metallic_smooth.x);
-
-        // Use smoothness to combine diffuse and specular reflected light
-        // The higher the smoothness, the weaker the diffuse reflection.
-        lig += diffuse * (1.0f - metallic_smooth.w) + spec * metallic_smooth.w;
-
-       
-        }
-       
- 
-
-    float3 ambient_light = float3(1.0, 1.0, 1.0);
-    // Raise the bottom line with ambient light
-    lig += ambient_light * albedo_color;
-
-    
-    float4 final_color = 1.0f;
-    final_color.xyz = lig;
-    return final_color ;
+    //point light
+    float3 PLightPos = light_direction.direction.xyz;
+    float4 P = position_texture.Sample(sampler_states[ANISOTROPIC], pin.texcoord);
+    float3 PLightDir = P.xyz - PLightPos;
+    // ライトタイプ判定(0:平行光 1:点光源)
+    float lighttype = step(0.01, light_direction.direction.w);
+    // 方向決定(平行光:w=0.0 点光源:w>0)
+    //float3 dir = LightDir.w < 0.001 ? LightDir.xyz : PLightDir;
+    float3 dir = lerp(
+        light_direction.direction.xyz, PLightDir, lighttype);
+    //減衰
+    float attenuation = light_direction.direction.w < 0.001 ?
+        1.0 :
+        1.0 - (length(PLightDir) / light_direction.direction.w);
+    attenuation = saturate(attenuation); //0.0<--->1.0
+    // ライト計算
+    float3 L = dir; //方向
+    float3 C = light_direction.color.rgb; //カラー
+    C *= attenuation; // 減衰
+    float3 N = tex * 2.0 - 1.0; //法線
+    L = normalize(L);
+    N = normalize(N);
+    // 当たり具合 = -cos = -内積
+    float i = -dot(N, L);
+    i = saturate(i); // 0.0～1.0
+    tex.rgb = C * i; // ライトカラー決定
+    return tex;
 }

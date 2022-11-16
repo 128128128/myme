@@ -330,7 +330,7 @@ void camera::DrawDebugGUI()
 			//position
 			ImGui::SliderFloat3("Position", &position.x, -100, 100);
 			//focus
-			ImGui::SliderFloat("camerafocusZ", &focus.z, -100.0f, 180.0f);
+			ImGui::SliderFloat3("camerafocus", &focus.x, -180.0f, 180.0f);
 
 		}
 	}

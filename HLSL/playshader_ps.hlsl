@@ -596,7 +596,7 @@ float3 render_sky_color(
 ) {
     float3 rd = eye.direction;
     //sun speed setting
-    float3 sun_dir = normalize(float3(0, abs(sin(light_direction.iTime * .05)), -1));
+    float3 sun_dir = normalize(float3(0, abs(sin(something.iTime * .05)), -1));
     float sun_amount = max(dot(rd, sun_dir), 0.0);
 
     //sky gradation
@@ -634,11 +634,11 @@ float light(
 
     float3 pos = origin;
 
-    float3 dir_step = normalize(float3(0, abs(sin(light_direction.iTime * .000001)), -1)) * march_step;
+    float3 dir_step = normalize(float3(0, abs(sin(something.iTime * .000001)), -1)) * march_step;
     float T = 1.; // transmitance
 
     for (int i = 0; i < steps; i++) {
-        float dens = density(pos, float3(0, 0, -light_direction.iTime * .2), 0.);
+        float dens = density(pos, float3(0, 0, -something.iTime * .2), 0.);
 
         float T_i = exp(-ABSORPTION * dens * march_step);
         T *= T_i;
@@ -675,7 +675,7 @@ float4 render_clouds(
     for (int i = 0; i < steps; i++) {
         float h = float(i) / float(steps);
         //cloud speed & density setting
-        float dens = density(pos, float3(0, 0, -light_direction.iTime * cloud_speed), h);
+        float dens = density(pos, float3(0, 0, -something.iTime * cloud_speed), h);
 
         float T_i = exp(-ABSORPTION * dens * march_step);
         T *= T_i;
@@ -725,7 +725,7 @@ float rain_noise(in float2 uv)
 
 float rain(float2 uv)
 {
-    float travelTime = (light_direction.iTime * 0.2) + 0.1;
+    float travelTime = (something.iTime * 0.2) + 0.1;
 
     float2 tiling = float2(1., .01);
     float2 offset = float2(travelTime * 0.5 + uv.x * 0.2, travelTime * 0.2);

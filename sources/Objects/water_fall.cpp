@@ -58,7 +58,7 @@ void Water_Fall::render(ID3D11DeviceContext* immediate_context)
 
 	ps->active(immediate_context);
 	vs->active(immediate_context);
-	water_fall_constants_buffer->active(immediate_context,3);
+	water_fall_constants_buffer->active(immediate_context,4);
 	water_fall->render(immediate_context, world_transform);
 	ps->inactive(immediate_context);
 	vs->inactive(immediate_context);

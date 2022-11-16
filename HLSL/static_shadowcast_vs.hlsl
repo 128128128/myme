@@ -11,7 +11,7 @@ PS_IN main(float4 position : POSITION)
     return output;*/
 
     PS_IN pin;
-    pin.position = mul( light_direction.mlvp[0][light_direction.shadow_map_num],position);
+    pin.position = mul( something.mlvp[0][something.shadow_map_num],position);
     pin.shadow_param = pin.position;
 
     return pin;

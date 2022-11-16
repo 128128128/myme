@@ -76,7 +76,8 @@ public:
 	std::unique_ptr<Descartes::substance<vertex>> substance;
 
 private:
-	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> metallic_shader_resource_view[5];
+	//Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> metallic_shader_resource_view[5];
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> metallic_shader_resource_view;
 	const char* material_name[5];
 
 };

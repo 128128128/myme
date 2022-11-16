@@ -1,9 +1,7 @@
 
 
-struct LIGHT_DIRECTION
+struct SOMETHING
 {
-	float4 direction;
-	float4 color;
 	float iTime;
 	float triple_speed_iTime;
 	float elapsedTime;
@@ -53,19 +51,28 @@ struct CAMERA_CONSTANTS
 	row_major float4x4 inverse_view_projection;
 };
 
+struct LIGHT_CONSTANTS
+{
+	float4 direction;
+	float4 color;
+};
+
 cbuffer CAMERA_CONSTANT_BUFFER:register(b1)
 {
 	CAMERA_CONSTANTS camera_constants;
 }
 
-cbuffer SCENE_CONSTANT_BUFFER : register(b2)
+cbuffer LIGHT_CONSTANT_BUFFER : register(b2)
 {
-	LIGHT_DIRECTION light_direction;
+	LIGHT_CONSTANTS light_direction;
+}
+
+cbuffer SCENE_CONSTANT_BUFFER : register(b3)
+{
+	SOMETHING something;
 	PLAYER player;
-	//row_major float4x4 view_projection;
-	//float4 light_direction;
-	//float4 camera_position;
 };
+
 
 cbuffer LIGHT_CONSTANT_BUFFER : register(b4)
 {

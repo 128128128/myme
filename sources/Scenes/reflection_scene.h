@@ -4,7 +4,6 @@
 #include <cereal/archives/json.hpp>
 #include <cereal/types/memory.hpp>
 
-#include "../Input/Input.h"
 
 #include "scene.h"
 #include "../Graphics/others/render_state.h"
@@ -24,6 +23,7 @@
 #include "../Objects/character.h"
 #include "../Objects/objects.h"
 #include "../Objects/terrain.h"
+#include "../Graphics/ibl/knife.h"
 
 //------Camera------//
 #include "../Camera/Camera.h"
@@ -38,7 +38,6 @@
 #include "../Graphics/sprite/playshader.h"
 
 //----particle-----//
-#include "../Particles/snow_particles.h"
 
 //----IMGUI---//
 #include "../../imgui/imgui.h"
@@ -87,6 +86,7 @@ public:
 	//std::unique_ptr<Ground>ground;//factory
 	//std::unique_ptr<dynamic_mesh> test;
 	std::unique_ptr<Terrain> terrains;
+	std::unique_ptr<Knife> knife;
 	//std::unique_ptr<Ground>shadow_trees;
 	//std::unique_ptr<Structures> structures;
 	//std::unique_ptr<VegetationSmall> vegetation_small;
@@ -119,18 +119,8 @@ public:
 	std::unique_ptr<pixel_shader> pbr_dynamic_mesh_ps;
 	std::unique_ptr<vertex_shader<static_mesh::vertex>>static_mesh_vs;
 	std::unique_ptr<pixel_shader> static_mesh_ps;
-	std::unique_ptr<pixel_shader> spot_light_mesh_ps;
-	std::unique_ptr<pixel_shader> point_light_mesh_ps;
-	std::unique_ptr<vertex_shader<static_mesh::vertex>>lim_light_vs;
-	std::unique_ptr<pixel_shader> lim_light_ps;
-	std::unique_ptr<pixel_shader> hemi_light_ps;
 	std::unique_ptr<vertex_shader<static_mesh::vertex>>skydome_vs;
 	std::unique_ptr<pixel_shader> skydome_ps;
-
-	//shadowcast shaders
-	std::unique_ptr<vertex_shader<dynamic_mesh::vertex>> dynamic_mesh_shadowcast_vs;
-	std::unique_ptr<vertex_shader<static_mesh::vertex>> static_shadowcast_vs;
-	std::unique_ptr<pixel_shader> void_ps;
 
 	//camera
 	float focal_length = 1;
@@ -241,7 +231,7 @@ private:
 
 	bool post_blooming = false;
 	bool enable_lens_flare = false;
-	bool enable_post_effects = false;
+	bool enable_post_effects = true;
 
 	shadow::CascadeShadowMapMatrix m_cascadeShadowMapMatrix;    // カスケードシャドウマップの行列を扱うオブジェクト
 

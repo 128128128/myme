@@ -26,13 +26,3 @@ cbuffer OBJECT_CONSTANTS : register(b0)
 	float shadow_reciever;
 	float3 pad;
 };
-
-cbuffer TERRAIN_CONSTANTS:register(b3)
-{
-	float Falloff01;
-	float Falloff02;
-	float _TextureScale01;
-	float _TextureScale02;
-	float _TextureScale03;
-	float3 pad1;
-};

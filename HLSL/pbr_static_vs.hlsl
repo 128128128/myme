@@ -12,8 +12,7 @@ VS_OUT main(VS_IN vin)
 
 	vout.binormal = normalize(mul(vin.binormal, world));
 
-	vout.tangent.xyz = normalize(mul(vin.tangent.xyz, (float3x3)world));
-	vout.tangent.w = vin.tangent.w;
+	vout.tangent.xyz = normalize(mul(vin.tangent, world));
 
 	vout.texcoord = vin.texcoord;
 
