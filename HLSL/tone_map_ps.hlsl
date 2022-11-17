@@ -61,7 +61,7 @@ float3 tonemap_aces_hill(float3 color)
 //#define TONEMAP_ACES_HILL_EXPOSURE_BOOST
 float3 tonemap(float3 color)
 {
-	color *= scene_data.exposure;
+	color *= 1.0;
 
 #ifdef TONEMAP_ACES_NARKOWICZ
 	color = tonemap_aces_narkowicz(color);

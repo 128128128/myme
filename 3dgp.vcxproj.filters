@@ -816,5 +816,11 @@
     <FxCompile Include="HLSL\ibl_ps.hlsl">
       <Filter>HLSL\ibl</Filter>
     </FxCompile>
+    <FxCompile Include="HLSL\background_ps.hlsl">
+      <Filter>HLSL\ibl</Filter>
+    </FxCompile>
+    <FxCompile Include="HLSL\tone_map_ps.hlsl">
+      <Filter>HLSL\ibl</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>

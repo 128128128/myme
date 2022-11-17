@@ -50,9 +50,10 @@ bool ibl_scene::initialize(ID3D11Device* device, CONST LONG screen_width, CONST 
 				player->player = std::make_unique<dynamic_mesh>(device, ".\\resources\\rock_girl\\rock_girl.fbx", true);
 				//player->player= std::make_unique<pbr_dynamic_mesh>(device, ".\\resources\\objects\\chest\\chest1.fbx", ".\\resources\\objects\\chest\\WoodChest_Wood_Chest_MetallicSmoothness.png");
 				pbr_ship = std::make_unique<pbr_Stage>(device);
-				pbr_ship->position = DirectX::XMFLOAT4(-14.286f, 8.204f, 24.0f, 1.0f);
+				//pbr_ship->position = DirectX::XMFLOAT4(-14.286f, 8.204f, 24.0f, 1.0f);
 				pbr_ship_1 = std::make_unique<pbr_Stage>(device);
-				pbr_ship_1->position = DirectX::XMFLOAT4(-14.286f, 16.204f, 24.0f, 1.0f );
+				//pbr_ship_1->position = DirectX::XMFLOAT4(-14.286f, 16.204f, 24.0f, 1.0f );
+				pbr_ship_1->position = DirectX::XMFLOAT4(-2.0f, 0.0f, 0.0f, 1.0f );
 			}
 		
 
@@ -66,7 +67,8 @@ bool ibl_scene::initialize(ID3D11Device* device, CONST LONG screen_width, CONST 
 			if (!eye_space_camera)
 			{
 				eye_space_camera = std::make_unique<camera>(device);
-				eye_space_camera->reset({ 106.6f,37.2f,51.0f,1.0 }, { 1.0f,1.0f,1.0f,1.0f }, focal_length, 1.8f/*height_above_ground*/);
+				//eye_space_camera->reset({ 106.6f,37.2f,51.0f,1.0 }, { 1.0f,1.0f,1.0f,1.0f }, focal_length, 1.8f/*height_above_ground*/);
+				eye_space_camera->reset({ -0.174f,0.149f,-1.978f,1.0 }, { 1.0f,1.0f,1.0f,1.0f }, focal_length, 1.8f/*height_above_ground*/);
 			}
 			if (!light_space_camera)
 			{
@@ -231,6 +233,12 @@ bool ibl_scene::initialize(ID3D11Device* device, CONST LONG screen_width, CONST 
 		static_shadowcast_vs = std::make_unique<vertex_shader<static_mesh::vertex>>(device, "shader//static_shadowcast_vs.cso");
 		dynamic_mesh_shadowcast_vs = std::make_unique<vertex_shader<dynamic_mesh::vertex>>(device, "shader//dynamic_shadowcast_vs.cso");
 		void_ps = std::make_unique<pixel_shader>(device, nullptr);
+	}
+
+	{
+		bit_block_transfer = std::make_unique<Descartes::fullscreen_quad>(device);
+		create_ps_from_cso(device, "shader//tone_map_ps.cso", tone_map_ps.ReleaseAndGetAddressOf());
+		create_ps_from_cso(device, "shader//background_ps.cso", background_ps.ReleaseAndGetAddressOf());
 	}
 
 	//constant buffers
@@ -444,7 +452,17 @@ void ibl_scene::render(ID3D11DeviceContext* immediate_context, float elapsed_tim
 	//objects render
 	{
 		//sky
-		white->render(immediate_context, 0, 0, 1280, 720, 1, 1, 1, 1, 0);
+		//white->render(immediate_context, 0, 0, 1280, 720, 1, 1, 1, 1, 0);
+		depth_stencil_states[ZT_OFF_ZW_OFF]->active(immediate_context);
+		rasterizer_states[SOLID_CULL_NONE]->active(immediate_context);
+		immediate_context->PSSetShader(background_ps.Get(), 0, 0);
+		bit_block_transfer->blit(immediate_context, false, false,  false);
+
+		depth_stencil_states[ZT_OFF_ZW_OFF]->inactive(immediate_context);
+		rasterizer_states[SOLID_CULL_NONE]->inactive(immediate_context);
+
+		rasterizer_states[SOLID]->active(immediate_context);
+		depth_stencil_states[ZT_ON_ZW_ON]->active(immediate_context);
 
 		//dynamic_mesh_vs->active(immediate_context);
 		//dynamic_mesh_ps->active(immediate_context);
@@ -559,7 +577,7 @@ void ibl_scene::render(ID3D11DeviceContext* immediate_context, float elapsed_tim
 			else
 			{
 				//generate bloom texture from scene framebuffer
-				bloom_effect->generate(immediate_context, framebuffers[0]->render_target_shader_resource_view.Get(), enable_lens_flare);
+				bloom_effect->generate(immediate_context, framebuffers[1]->render_target_shader_resource_view.Get(), enable_lens_flare);
 
 				//convolute bloom texture to scene framebuffer
 				//blend_states[ADD]->activate(immediate_context);
@@ -572,6 +590,23 @@ void ibl_scene::render(ID3D11DeviceContext* immediate_context, float elapsed_tim
 				//post effects (shadow, fog and bokeh)
 				framebuffers[2]->active(immediate_context);
 				post_effects->blit(immediate_context, framebuffers[1]->render_target_shader_resource_view.Get(), framebuffers[1]->depth_stencil_shader_resource_view.Get(), shadowmap->depth_stencil_shader_resource_view.Get(), light_space_camera->view_projection());
+				framebuffers[2]->inactive(immediate_context);
+
+				//tone map
+				framebuffers[2]->active(immediate_context);
+				depth_stencil_states[ZT_ON_ZW_ON]->active(immediate_context);
+				rasterizer_states[SOLID_CULL_NONE]->active(immediate_context);
+				blend_states[NONE]->active(immediate_context);
+
+				immediate_context->PSSetShader(tone_map_ps.Get(), 0, 0);
+				rasterizer->blit(immediate_context, framebuffers[2]->render_target_shader_resource_view.Get(), 0, 0, viewport.Width, viewport.Height,0,0,viewport.Width,viewport.Height,0,1,1,1,1,true,false,false,false,false);
+				depth_stencil_states[ZT_ON_ZW_ON]->inactive(immediate_context);
+				rasterizer_states[SOLID_CULL_NONE]->inactive(immediate_context);
+				blend_states[NONE]->inactive(immediate_context);
+
+				rasterizer_states[SOLID]->active(immediate_context);
+				blend_states[ALPHA]->active(immediate_context);
+				depth_stencil_states[ZT_ON_ZW_ON]->active(immediate_context);
 				framebuffers[2]->inactive(immediate_context);
 			}
 			rasterizer->blit(immediate_context, framebuffers[2]->render_target_shader_resource_view.Get(), 0, 0, viewport.Width, viewport.Height);

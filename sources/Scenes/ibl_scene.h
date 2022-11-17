@@ -159,7 +159,7 @@ public:
 		//directional
 		struct directional_light_constants
 		{
-			XMFLOAT4 direction = XMFLOAT4(0.0f, -1.0f, 1.0f, 1.0f);
+			XMFLOAT4 direction = XMFLOAT4(-1.0f, -1.0f, 1.0f, 1.0f);
 			XMFLOAT4 color{1.0f,1.0f,1.0f,1.0f};
 			float iTime = 0;
 			float elapseTime = 0;
@@ -236,7 +236,7 @@ public:
 		int image_based_lighting = 1;
 		float pure_white{ 3.0f };
 		float emissive_intensity{ 1.0f };
-		float roughness_factor =1.0f;
+		float roughness_factor =0.0f;
 		float metallic_factor =1.0f;
 		float emissive_factor =1.0f;
 		float occlusion_factor =1.0f;
@@ -261,4 +261,8 @@ private:
 
 	std::vector<std::unique_ptr<environment_textures>> environment_textures;
 	size_t active_environment_textures = 0;
+
+	std::unique_ptr<Descartes::fullscreen_quad> bit_block_transfer;
+	Microsoft::WRL::ComPtr<ID3D11PixelShader> tone_map_ps;
+	Microsoft::WRL::ComPtr<ID3D11PixelShader> background_ps;
 };

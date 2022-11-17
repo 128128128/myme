@@ -1,5 +1,6 @@
 #include "fullscreen_quad.hlsli"
 #include "image_based_lighting.hlsli"
+#include "scene_constants.hlsli"
 
 float4 main(VS_OUT pin) : SV_TARGET
 {
@@ -9,10 +10,10 @@ float4 main(VS_OUT pin) : SV_TARGET
 	ndc.z = 1;
 	ndc.w = 1;
 	
-	float4 R = mul(ndc, scene_data.inv_view_projection);
+	float4 R = mul(ndc, camera_constants.inverse_view_projection);
 	R /= R.w;
 	
-	float roughness = scene_data.skybox_roughness;
+	float roughness = 0.0;// skybox_roughness;
 #if 1
 	return sample_skybox(R.xyz, roughness);
 #else

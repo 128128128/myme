@@ -34,7 +34,7 @@ public:
 			float highlight_intensity = 1;
 			DirectX::XMFLOAT3 highlight_color = DirectX::XMFLOAT3(255 / 255.0f, 255 / 255.0f, 255 / 255.0f);
 			float highlight_power = 18.0f;
-			float global_density = 0.0110f;
+			float global_density = 0.0f;
 			float height_falloff = 0.050f;
 			float start_depth = 0.0f;
 			float start_height = -25.0f;
