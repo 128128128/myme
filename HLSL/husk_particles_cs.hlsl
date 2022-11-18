@@ -24,7 +24,7 @@ void main(uint3 dtid : SV_DISPATCHTHREADID)
 		{
 		case 0:
 			//p = husk_particle_buffer[id];
-			p.color.a = 0.8;
+			p.color.a =1.0;
 			p.state = 1;
 			p.age = 0;
 			completed_particle_buffer.IncrementCounter();
@@ -44,7 +44,7 @@ void main(uint3 dtid : SV_DISPATCHTHREADID)
 			float3 x = normalize(dot(v, z) * v - z);
 			z = normalize(z);
 			float3 y = normalize(cross(z, x));
-			p.velocity = normalize(v * 5.0 + y * 2.0 - x * 0.2) * 20;
+			p.velocity = normalize(v * 1.0 + y * 1.0 - x * 0.2) * 20;
 			p.position += p.velocity * delta_time;
 			if (dot(v, z) < 0.0)
 			{
@@ -56,7 +56,7 @@ void main(uint3 dtid : SV_DISPATCHTHREADID)
 			}
 			break;
 		case 3:
-			const float force = 50.0 * snoise(p.position * 0.054);
+			const float force = 1.0 * snoise(p.position * 0.054);
 			float3 acceleration = normalize(target_location.xyz - p.position) * force - p.velocity * 0.02;
 			p.velocity += acceleration * delta_time;
 			p.position += p.velocity * delta_time;

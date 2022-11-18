@@ -161,6 +161,7 @@ const char* particle_scene::update(float& elapsed_time/*Elapsed seconds from las
 		particles->particle_data.target_location.y = pbr_ship->position.y+pbr_ship->direction.y*distance;
 		particles->particle_data.target_location.z = pbr_ship->position.z+pbr_ship->direction.z*distance;
 		particles->particle_data.emitter_location = pbr_ship->position;
+		particles->particle_data.elapsed_time = elapsed_time;
 	}
 
 	//light direction

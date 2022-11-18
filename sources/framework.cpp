@@ -270,7 +270,7 @@ bool framework::initialize()
 	immediate_context->OMSetRenderTargets(1, render_target_view.GetAddressOf(), depth_stencil_view.Get());
 	immediate_context->OMSetDepthStencilState(default_depth_stencil_state.Get(), 1);
 
-	current_scene = "particle";
+	current_scene = "ibl";
 
 	scene["create_terrain"] = std::make_unique<create_terrain_scene>();
 	scene["particle"] = std::make_unique<particle_scene>();

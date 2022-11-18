@@ -85,7 +85,7 @@ struct husk_particles
 		uint32_t particle_count{};
 		float particle_size{ 0.01f };
 		float streak_factor{ 0.05f };
-		float threshold_level{ 0.0f };
+		float elapsed_time{ 0.0f };
 	};
 
 	particle_constants particle_data;
