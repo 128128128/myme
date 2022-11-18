@@ -69,7 +69,7 @@ private:
 
 };
 
-class pbr_Stage :public Objects
+class pbr_Stage
 {
 public:
 	std::unique_ptr<pbr_static_mesh> mesh;
@@ -92,19 +92,19 @@ public:
 	pbr_Stage(ID3D11Device* device);
 	~pbr_Stage() = default;
 
-	void update(float elapsed_time)override;
+	void update(float elapsed_time);
 
-	void render(ID3D11DeviceContext* immediate_context)override
+	void render(ID3D11DeviceContext* immediate_context, ID3D11PixelShader* replaced_pixel_shader=nullptr)
 	{
 		pbr_constant_buffer->active(immediate_context, 3, true, true);
 		//immediate_context->PSSetShaderResources(5, 1, r_srv.GetAddressOf());
 		//immediate_context->PSSetShaderResources(6, 1, m_srv.GetAddressOf());
-		mesh->render(immediate_context, world_transform);
+		mesh->render(immediate_context, world_transform, replaced_pixel_shader);
 
 		pbr_constant_buffer->inactive(immediate_context);
 	}
 
-	void reset(XMFLOAT4& location)override
+	void reset(XMFLOAT4& location)
 	{
 		position = location;
 		float angle = 180;
@@ -113,7 +113,7 @@ public:
 		direction.z = cosf(angle * 0.01745f);
 	}
 	//Debug
-	void DebugDrawGUI()override;
+	void DebugDrawGUI();
 
 	//getter setter
 	XMFLOAT4 GetPosition() { return position; }
@@ -128,7 +128,7 @@ private:
 
 };
 
-class Ground :public Objects
+class Ground
 {
 public:
 	std::unique_ptr<static_mesh> mesh;
@@ -141,14 +141,14 @@ public:
 	Ground();
 	~Ground() = default;
 
-	void update(float elapsed_time)override;
+	void update(float elapsed_time);
 
-	void render(ID3D11DeviceContext* immediate_context)override
+	void render(ID3D11DeviceContext* immediate_context, ID3D11PixelShader* replaced_pixel_shader = nullptr)
 	{
-		mesh->render(immediate_context, world_transform);
+		mesh->render(immediate_context, world_transform, replaced_pixel_shader);
 	}
 
-	void reset(XMFLOAT4& location)override
+	void reset(XMFLOAT4& location)
 	{
 		position = location;
 		float angle = 180;
@@ -157,7 +157,7 @@ public:
 		direction.z = cosf(angle * 0.01745f);
 	}
 	//Debug
-	void DebugDrawGUI()override;
+	void DebugDrawGUI();
 
 	//getter setter
 	XMFLOAT4 GetPosition() { return position; }

@@ -9,12 +9,15 @@
 //
 //   float4 current_eye_position;       // Offset:    0 Size:    16 [unused]
 //   float4 previous_eye_position;      // Offset:   16 Size:    16 [unused]
-//   float4x4 camera_view;              // Offset:   32 Size:    64
-//   float4x4 camera_projection;        // Offset:   96 Size:    64
+//   row_major float4x4 camera_view;    // Offset:   32 Size:    64
+//   row_major float4x4 camera_projection;// Offset:   96 Size:    64
 //   float outermost_radius;            // Offset:  160 Size:     4 [unused]
 //   float snowfall_area_height;        // Offset:  164 Size:     4 [unused]
 //   float particle_size;               // Offset:  168 Size:     4
 //   uint particle_count;               // Offset:  172 Size:     4 [unused]
+//   float elapsed_time;                // Offset:  176 Size:     4 [unused]
+//   float time;                        // Offset:  180 Size:     4 [unused]
+//   float2 padd;                       // Offset:  184 Size:     8 [unused]
 //
 // }
 //
@@ -36,8 +39,8 @@
 //
 // Name                                 Type  Format         Dim      HLSL Bind  Count
 // ------------------------------ ---------- ------- ----------- -------------- ------
-// particle_buffer                   texture  struct         r/o             t9      1 
-// PARTICLE_CONSTANTS                cbuffer      NA          NA            cb9      1 
+// particle_buffer                   texture  struct         r/o            t10      1 
+// PARTICLE_CONSTANTS                cbuffer      NA          NA           cb10      1 
 //
 //
 //
@@ -57,11 +60,13 @@
 // TEXCOORD                 0   xy          2     NONE   float   xy  
 //
 gs_5_0
-dcl_globalFlags refactoringAllowed
-dcl_constantbuffer CB9[11], immediateIndexed
-dcl_resource_structured t9, 24
+dcl_globalFlags refactoringAllowed | skipOptimization
+dcl_constantbuffer CB10[11], immediateIndexed
+dcl_resource_structured t10, 24
 dcl_input v[1][0].x
-dcl_temps 3
+dcl_temps 4
+dcl_indexableTemp x0[4], 4
+dcl_indexableTemp x1[4], 4
 dcl_inputprimitive point 
 dcl_stream m0
 dcl_outputtopology trianglestrip 
@@ -69,63 +74,149 @@ dcl_output_siv o0.xyzw, position
 dcl_output o1.xyzw
 dcl_output o2.xy
 dcl_maxout 4
-ld_structured_indexable(structured_buffer, stride=24)(mixed,mixed,mixed,mixed) r0.xyz, v[0][0].x, l(0), t9.xyzx
-mov r0.w, l(1.000000)
-dp4 r1.x, r0.xyzw, cb9[2].xyzw
-dp4 r1.y, r0.xyzw, cb9[3].xyzw
-dp4 r1.z, r0.xyzw, cb9[4].xyzw
-mad r0.xyz, cb9[10].zzzz, l(-1.000000, -1.000000, 0.000000, 0.000000), r1.xyzx
-mov r0.w, l(1.000000)
-dp4 r1.w, r0.xyzw, cb9[6].xyzw
-mov o0.x, r1.w
-dp4 r1.w, r0.xyzw, cb9[7].xyzw
-mov o0.y, r1.w
-dp4 r1.w, r0.xyzw, cb9[8].xyzw
-dp4 r0.x, r0.xyzw, cb9[9].xyzw
-mov o0.z, r1.w
-mov o0.w, r0.x
-mov o1.xyzw, l(1.000000,1.000000,1.000000,0.800000)
-mov o2.xy, l(0,1.000000,0,0)
+//
+// Initial variable locations:
+//   m0 <- output; 
+//   v[0][0].x <- input; 
+//   x0 <- billboard; x1 <- texcoords
+//
+#line 7 "C:\Users\2200167\Desktop\個人製作\myme03\myme\HLSL\snowfall_particles_gs.hlsl"
+mov x0[0].xyz, l(-1.000000,-1.000000,0,0)
+mov x0[1].xyz, l(1.000000,-1.000000,0,0)
+mov x0[2].xyz, l(-1.000000,1.000000,0,0)
+mov x0[3].xyz, l(1.000000,1.000000,0,0)
+
+#line 14
+mov x1[0].xy, l(0,1.000000,0,0)
+mov x1[1].xy, l(1.000000,1.000000,0,0)
+mov x1[2].xy, l(0,0,0,0)
+mov x1[3].xy, l(1.000000,0,0,0)
+
+#line 22
+ld_structured_indexable(structured_buffer, stride=24)(mixed,mixed,mixed,mixed) r0.x, v[0][0].x, l(0), t10.xxxx  // r0.x <- p.position.x
+ld_structured_indexable(structured_buffer, stride=24)(mixed,mixed,mixed,mixed) r0.y, v[0][0].x, l(4), t10.xxxx  // r0.y <- p.position.y
+ld_structured_indexable(structured_buffer, stride=24)(mixed,mixed,mixed,mixed) r0.z, v[0][0].x, l(8), t10.xxxx  // r0.z <- p.position.z
+
+#line 25
+mul r1.xyz, r0.xxxx, cb10[2].xyzx
+mul r0.xyw, r0.yyyy, cb10[3].xyxz
+add r0.xyw, r0.xyxw, r1.xyxz
+mul r1.xyz, r0.zzzz, cb10[4].xyzx
+add r0.xyz, r0.xywx, r1.xyzx
+mul r1.xyz, cb10[5].xyzx, l(1.000000, 1.000000, 1.000000, 0.000000)
+add r0.xyz, r0.xyzx, r1.xyzx  // r0.x <- view_space_pos.x; r0.y <- view_space_pos.y; r0.z <- view_space_pos.z
+
+#line 32
+mov r1.xyz, x0[0].xyzx
+mul r1.xyz, r1.xyzx, cb10[10].zzzz  // r1.x <- corner_pos.x; r1.y <- corner_pos.y; r1.z <- corner_pos.z
+
+#line 34
+add r1.xyz, r0.xyzx, r1.xyzx
+itof r0.w, l(1)
+mul r2.xyzw, r1.xxxx, cb10[6].xyzw
+mul r3.xyzw, r1.yyyy, cb10[7].xyzw
+add r2.xyzw, r2.xyzw, r3.xyzw
+mul r1.xyzw, r1.zzzz, cb10[8].xyzw
+add r1.xyzw, r1.xyzw, r2.xyzw
+mul r2.xyzw, r0.wwww, cb10[9].xyzw
+add r1.xyzw, r1.xyzw, r2.xyzw  // r1.x <- element.position.x; r1.y <- element.position.y; r1.z <- element.position.z; r1.w <- element.position.w
+
+#line 35
+mov r2.xyzw, l(1.000000,1.000000,1.000000,0.500000)  // r2.x <- element.color.x; r2.y <- element.color.y; r2.z <- element.color.z; r2.w <- element.color.w
+
+#line 36
+mov r3.xy, x1[0].xyxx  // r3.x <- element.texcoord.x; r3.y <- element.texcoord.y
+
+#line 37
+mov o0.xyzw, r1.xyzw
+mov o1.xyzw, r2.xyzw
+mov o2.xy, r3.xyxx
 emit_stream m0
-mad r0.xyz, cb9[10].zzzz, l(1.000000, -1.000000, 0.000000, 0.000000), r1.xyzx
-mov r0.w, l(1.000000)
-dp4 r1.w, r0.xyzw, cb9[6].xyzw
-mov o0.x, r1.w
-dp4 r1.w, r0.xyzw, cb9[7].xyzw
-mov o0.y, r1.w
-dp4 r1.w, r0.xyzw, cb9[8].xyzw
-dp4 r0.x, r0.xyzw, cb9[9].xyzw
-mov o0.z, r1.w
-mov o0.w, r0.x
-mov o1.xyzw, l(1.000000,1.000000,1.000000,0.800000)
-mov o2.xy, l(1.000000,1.000000,0,0)
+
+#line 32
+mov r1.xyz, x0[1].xyzx
+mul r1.xyz, r1.xyzx, cb10[10].zzzz  // r1.x <- corner_pos.x; r1.y <- corner_pos.y; r1.z <- corner_pos.z
+
+#line 34
+add r1.xyz, r0.xyzx, r1.xyzx
+itof r0.w, l(1)
+mul r2.xyzw, r1.xxxx, cb10[6].xyzw
+mul r3.xyzw, r1.yyyy, cb10[7].xyzw
+add r2.xyzw, r2.xyzw, r3.xyzw
+mul r1.xyzw, r1.zzzz, cb10[8].xyzw
+add r1.xyzw, r1.xyzw, r2.xyzw
+mul r2.xyzw, r0.wwww, cb10[9].xyzw
+add r1.xyzw, r1.xyzw, r2.xyzw  // r1.x <- element.position.x; r1.y <- element.position.y; r1.z <- element.position.z; r1.w <- element.position.w
+
+#line 35
+mov r2.xyzw, l(1.000000,1.000000,1.000000,0.500000)  // r2.x <- element.color.x; r2.y <- element.color.y; r2.z <- element.color.z; r2.w <- element.color.w
+
+#line 36
+mov r3.xy, x1[1].xyxx  // r3.x <- element.texcoord.x; r3.y <- element.texcoord.y
+
+#line 37
+mov o0.xyzw, r1.xyzw
+mov o1.xyzw, r2.xyzw
+mov o2.xy, r3.xyxx
 emit_stream m0
-mad r0.xyz, cb9[10].zzzz, l(-1.000000, 1.000000, 0.000000, 0.000000), r1.xyzx
-mad r1.xyz, cb9[10].zzzz, l(1.000000, 1.000000, 0.000000, 0.000000), r1.xyzx
-mov r0.w, l(1.000000)
-dp4 r2.x, r0.xyzw, cb9[6].xyzw
-mov o0.x, r2.x
-dp4 r2.x, r0.xyzw, cb9[7].xyzw
-mov o0.y, r2.x
-dp4 r2.x, r0.xyzw, cb9[8].xyzw
-dp4 r0.x, r0.xyzw, cb9[9].xyzw
-mov o0.z, r2.x
-mov o0.w, r0.x
-mov o1.xyzw, l(1.000000,1.000000,1.000000,0.800000)
-mov o2.xy, l(0,0,0,0)
+
+#line 32
+mov r1.xyz, x0[2].xyzx
+mul r1.xyz, r1.xyzx, cb10[10].zzzz  // r1.x <- corner_pos.x; r1.y <- corner_pos.y; r1.z <- corner_pos.z
+
+#line 34
+add r1.xyz, r0.xyzx, r1.xyzx
+itof r0.w, l(1)
+mul r2.xyzw, r1.xxxx, cb10[6].xyzw
+mul r3.xyzw, r1.yyyy, cb10[7].xyzw
+add r2.xyzw, r2.xyzw, r3.xyzw
+mul r1.xyzw, r1.zzzz, cb10[8].xyzw
+add r1.xyzw, r1.xyzw, r2.xyzw
+mul r2.xyzw, r0.wwww, cb10[9].xyzw
+add r1.xyzw, r1.xyzw, r2.xyzw  // r1.x <- element.position.x; r1.y <- element.position.y; r1.z <- element.position.z; r1.w <- element.position.w
+
+#line 35
+mov r2.xyzw, l(1.000000,1.000000,1.000000,0.500000)  // r2.x <- element.color.x; r2.y <- element.color.y; r2.z <- element.color.z; r2.w <- element.color.w
+
+#line 36
+mov r3.xy, x1[2].xyxx  // r3.x <- element.texcoord.x; r3.y <- element.texcoord.y
+
+#line 37
+mov o0.xyzw, r1.xyzw
+mov o1.xyzw, r2.xyzw
+mov o2.xy, r3.xyxx
 emit_stream m0
-mov r1.w, l(1.000000)
-dp4 r0.x, r1.xyzw, cb9[6].xyzw
-mov o0.x, r0.x
-dp4 r0.x, r1.xyzw, cb9[7].xyzw
-mov o0.y, r0.x
-dp4 r0.x, r1.xyzw, cb9[8].xyzw
-dp4 r0.y, r1.xyzw, cb9[9].xyzw
-mov o0.z, r0.x
-mov o0.w, r0.y
-mov o1.xyzw, l(1.000000,1.000000,1.000000,0.800000)
-mov o2.xy, l(1.000000,0,0,0)
+
+#line 32
+mov r1.xyz, x0[3].xyzx
+mul r1.xyz, r1.xyzx, cb10[10].zzzz  // r1.x <- corner_pos.x; r1.y <- corner_pos.y; r1.z <- corner_pos.z
+
+#line 34
+add r0.xyz, r0.xyzx, r1.xyzx
+itof r0.w, l(1)
+mul r1.xyzw, r0.xxxx, cb10[6].xyzw
+mul r2.xyzw, r0.yyyy, cb10[7].xyzw
+add r1.xyzw, r1.xyzw, r2.xyzw
+mul r2.xyzw, r0.zzzz, cb10[8].xyzw
+add r1.xyzw, r1.xyzw, r2.xyzw
+mul r0.xyzw, r0.wwww, cb10[9].xyzw
+add r0.xyzw, r0.xyzw, r1.xyzw  // r0.x <- element.position.x; r0.y <- element.position.y; r0.z <- element.position.z; r0.w <- element.position.w
+
+#line 35
+mov r1.xyzw, l(1.000000,1.000000,1.000000,0.500000)  // r1.x <- element.color.x; r1.y <- element.color.y; r1.z <- element.color.z; r1.w <- element.color.w
+
+#line 36
+mov r2.xy, x1[3].xyxx  // r2.x <- element.texcoord.x; r2.y <- element.texcoord.y
+
+#line 37
+mov o0.xyzw, r0.xyzw
+mov o1.xyzw, r1.xyzw
+mov o2.xy, r2.xyxx
 emit_stream m0
+
+#line 39
 cut_stream m0
+
+#line 40
 ret 
-// Approximately 59 instruction slots used
+// Approximately 88 instruction slots used

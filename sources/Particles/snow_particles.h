@@ -29,12 +29,15 @@ struct snow_particles
 		float particle_size;
 		uint32_t particle_count;
 
+		float elapsed_time;
+		float time;
+        DirectX::XMFLOAT2 padd;
 	};
 	particle_constants particle_data;
 
 	snow_particles(ID3D11Device* device, DirectX::XMFLOAT3 initial_position);
 
-	void integrate(ID3D11DeviceContext* immediate_context, DirectX::XMFLOAT3 eye_position, DirectX::XMFLOAT4X4 camera_view, DirectX::XMFLOAT4X4 camera_view_projection);
+	void integrate(ID3D11DeviceContext* immediate_context, DirectX::XMFLOAT3 eye_position, DirectX::XMFLOAT4X4 camera_view, DirectX::XMFLOAT4X4 camera_view_projection, float elapsd_time, float time);
 	void render(ID3D11DeviceContext* immediate_context);
 
 private:

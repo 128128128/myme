@@ -113,29 +113,33 @@ snow_particles::snow_particles(ID3D11Device* device, DirectX::XMFLOAT3 initial_p
 	particle_data.previous_eye_position = { initial_position.x,initial_position.y,initial_position.z,1.0f };
 	particle_data.snowfall_area_height = snowfall_area_height;
 	particle_data.outermost_radius = outermost_radius;
-	particle_data.particle_size = 1.055f;
+	particle_data.particle_size = 0.01f;
 	particle_data.particle_count = static_cast<uint32_t>(snow_particle_count);
 
 }
 
-UINT align(UINT num, UINT alignment)
+UINT s_align(UINT num, UINT alignment)
 {
 	return (num + (alignment - 1)) & ~(alignment - 1);
 }
-void snow_particles::integrate(ID3D11DeviceContext* immediate_context, DirectX::XMFLOAT3 eye_position, XMFLOAT4X4 camera_view, DirectX::XMFLOAT4X4 camera_projection)
+
+void snow_particles::integrate(ID3D11DeviceContext* immediate_context, DirectX::XMFLOAT3 eye_position, XMFLOAT4X4 camera_view, DirectX::XMFLOAT4X4 camera_projection,float elapsd_time,float time)
 {
 	HRESULT hr{ S_OK };
 	particle_data.previous_eye_position = particle_data.current_eye_position;
 	particle_data.current_eye_position = { eye_position.x,eye_position.y,eye_position.z,1.0f };
 	particle_data.camera_view = camera_view;
 	particle_data.camera_projection = camera_projection;
+	particle_data.elapsed_time = elapsd_time;
+	particle_data.time = time;
+
 	immediate_context->UpdateSubresource(constant_buffer.Get(), 0, 0, &particle_data, 0, 0);
-	immediate_context->CSSetConstantBuffers(9, 1, constant_buffer.GetAddressOf());
+	immediate_context->CSSetConstantBuffers(10, 1, constant_buffer.GetAddressOf());
 
 	immediate_context->CSSetShader(compute_shader.Get(), NULL, 0);
 	immediate_context->CSSetUnorderedAccessViews(0, 1, particle_buffer_uav.GetAddressOf(), nullptr);
 
-	UINT num_threads = align(static_cast<UINT>(snow_particle_count), 256);
+	UINT num_threads = s_align(static_cast<UINT>(snow_particle_count), 256);
 	immediate_context->Dispatch(num_threads / 256, 1, 1);
 
 	ID3D11UnorderedAccessView* null_unordered_access_view{};
@@ -151,8 +155,8 @@ void snow_particles::render(ID3D11DeviceContext* immediate_context)
 	immediate_context->VSSetShader(vertex_shader.Get(), NULL, 0);
 	immediate_context->PSSetShader(pixel_shader.Get(), NULL, 0);
 	immediate_context->GSSetShader(geometry_shader.Get(), NULL, 0);
-	immediate_context->GSSetShaderResources(9, 1, particle_buffer_srv.GetAddressOf());
-	immediate_context->GSSetConstantBuffers(9, 1, constant_buffer.GetAddressOf());
+	immediate_context->GSSetShaderResources(10, 1, particle_buffer_srv.GetAddressOf());
+	immediate_context->GSSetConstantBuffers(10, 1, constant_buffer.GetAddressOf());
 
 	immediate_context->IASetInputLayout(NULL);
 	immediate_context->IASetVertexBuffers(0, 0, NULL, NULL, NULL);

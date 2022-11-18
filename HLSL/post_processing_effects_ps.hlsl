@@ -72,8 +72,8 @@ float4 main(VS_OUT pin, uint sample_index: SV_SAMPLEINDEX) : SV_TARGET
 		}
 	}
 
-	//fragment_color = apply_fog(fragment_color, position_in_world_space.xyz, camera_constants.position.xyz);
-	fragment_color = apply_fog(fragment_color, position_in_world_space.xyz, player.position.xyz);
+	fragment_color = apply_fog(fragment_color, position_in_world_space.xyz, camera_constants.position.xyz);
+	//fragment_color = apply_fog(fragment_color, position_in_world_space.xyz, player.position.xyz);
 	//fragment_color = atmospheric_effects(fragment_color, position_in_world_space.xyz, player.position.xyz);
 
 	return float4(fragment_color, alpha);

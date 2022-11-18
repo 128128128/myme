@@ -20,7 +20,7 @@ public:
 	static_mesh(static_mesh&) = delete;
 	static_mesh& operator=(static_mesh&) = delete;
 
-	void render(ID3D11DeviceContext* immediate_context, const DirectX::XMFLOAT4X4& world);
+	void render(ID3D11DeviceContext* immediate_context, const DirectX::XMFLOAT4X4& world, ID3D11PixelShader* replaced_pixel_shader = nullptr);
 
 	struct shader_constants
 	{

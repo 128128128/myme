@@ -1,9 +1,9 @@
-#include "reflection_scene.h"
+#include "particle_scene.h"
 #include "../Math/collision.h"
 
 using namespace DirectX;
 
-bool reflection_scene::initialize(ID3D11Device* device, CONST LONG screen_width, CONST LONG screen_height)
+bool particle_scene::initialize(ID3D11Device* device, CONST LONG screen_width, CONST LONG screen_height)
 {
 	//blend state
 	blend_states[NONE] = std::make_unique<Descartes::blend_state>(device, BLEND_MODE::NONE);
@@ -27,6 +27,16 @@ bool reflection_scene::initialize(ID3D11Device* device, CONST LONG screen_width,
 	depth_stencil_states[ZT_OFF_ZW_ON] = std::make_unique<Descartes::depth_stencil_state>(device, FALSE, D3D11_DEPTH_WRITE_MASK_ALL, D3D11_COMPARISON_LESS);
 	depth_stencil_states[ZT_OFF_ZW_OFF] = std::make_unique<Descartes::depth_stencil_state>(device, FALSE, D3D11_DEPTH_WRITE_MASK_ZERO, D3D11_COMPARISON_LESS);
 
+	D3D11_BUFFER_DESC buffer_desc{};
+	buffer_desc.ByteWidth = sizeof(scene_constants);
+	buffer_desc.Usage = D3D11_USAGE_DEFAULT;
+	buffer_desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	buffer_desc.CPUAccessFlags = 0;
+	buffer_desc.MiscFlags = 0;
+	buffer_desc.StructureByteStride = 0;
+	HRESULT hr = device->CreateBuffer(&buffer_desc, nullptr, particle_constant_buffers.GetAddressOf());
+	_ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
+
 	if (!player)
 	{
 		player = std::make_unique<Player>();
@@ -34,56 +44,22 @@ bool reflection_scene::initialize(ID3D11Device* device, CONST LONG screen_width,
 		player->player = std::make_unique<dynamic_mesh>(device, ".\\resources\\rock_girl\\rock_girl.fbx", true);
 		//player->player= std::make_unique<pbr_dynamic_mesh>(device, ".\\resources\\objects\\chest\\chest1.fbx", ".\\resources\\objects\\chest\\WoodChest_Wood_Chest_MetallicSmoothness.png");
 		pbr_ship = std::make_unique<pbr_Stage>(device);
-		pbr_ship->mesh = std::make_unique<pbr_static_mesh>(device, ".\\resources\\ball.fbx");
+		pbr_ship->mesh= std::make_unique<pbr_static_mesh>(device, ".\\resources\\Jummo\\Jummo.fbx");
 		pbr_ship->SetPosition({ 0.0f, 0.0f, 0.0f ,0.0f });
-		pbr_ship->SetScale({ 100.0f, 100.0f, 100.0f });
+		//ground = std::make_unique<Ground>();
+		//ground->mesh = std::make_unique<static_mesh>(device, ".\\resources\\sphere.fbx");
+		
+		//particle
+		particles = std::make_unique<husk_particles>(device);
 
-		stage = std::make_unique<pbr_Stage>(device);
-		stage->mesh = std::make_unique<pbr_static_mesh>(device, ".\\resources\\create_terrain\\.grid.fbx");
-		stage->SetScale({1000.0f, 1000.0f, 1000.0f});
+		//stage = std::make_unique<pbr_Stage>(device);
+		//stage->mesh = std::make_unique<pbr_static_mesh>(device, ".\\resources\\create_terrain\\.grid.fbx");
+		//stage->SetScale({1000.0f, 1000.0f, 1000.0f});
 		//pbr_ship_1 = std::make_unique<pbr_Stage>(device);
 		//pbr_ship_1->position.z += 5.5f;
 		//pbr_ship->position.z -= 5.5f;
 	}
 
-	//to factory model
-			/*if (!ground)
-			{
-				ground = std::make_unique<Ground>();
-				ground->mesh = std::make_unique<static_mesh>(device, ".\\resources\\factory\\factory_cut_0714.fbx");
-			}*/
-			//if (!collision_mesh)
-			//{
-			//	collision_mesh = std::make_unique<Descartes::collision::mesh>(".\\resources\\enviroments\\structures\\structures_collision.fbx");
-			//	//collision_mesh = std::make_unique<Descartes::collision::mesh>(".\\resources\\enviroments\\terrains\\terrains_0813.fbx");
-			//}
-
-
-	if (!terrains)
-	{
-		terrains = std::make_unique<Terrain>(device, true);
-	}
-	if(!knife)
-	{
-		knife = std::make_unique<Knife>();
-		knife->knife= std::make_unique<static_mesh>(device, ".\\resources\\objects\\knife\\knife.fbx");
-	}
-
-	
-	/*if (!structures)
-	{
-		structures = std::make_unique<Structures>(device);
-	}*/
-	/*if(!vegetation_small)
-	{
-		vegetation_small = std::make_unique < VegetationSmall > (device);
-	}*/
-	//if (!sky)
-	//{
-	//	sky = std::make_unique<skydome>();
-	//	//skydome->skydome = std::make_unique<static_mesh>(device, ".\\resources\\Model\\Skydome\\skydome.fbx");
-	//	sky->Initialize(device);
-	//}
 
 	if (!eye_space_camera)
 	{
@@ -145,13 +121,17 @@ bool reflection_scene::initialize(ID3D11Device* device, CONST LONG screen_width,
 
 		d_shadow_constant_buffer = std::make_unique < Descartes::constant_buffer <d_shadow_param >>(device);
 	}
+	//particle
+	{
+		snow = std::make_unique<snow_particles>(device, XMFLOAT3(pbr_ship->position.x, pbr_ship->position.y, pbr_ship->position.z));
 
+	}
 
 
 	return true;
 }
 
-const char* reflection_scene::update(float& elapsed_time/*Elapsed seconds from last frame*/)
+const char* particle_scene::update(float& elapsed_time/*Elapsed seconds from last frame*/)
 {
 
 	//player->update(collision_mesh.get(),elapsed_time);
@@ -159,11 +139,11 @@ const char* reflection_scene::update(float& elapsed_time/*Elapsed seconds from l
 	scene_constants_buffer->data.player_object.direction = player->direction;
 
 	pbr_ship->update(elapsed_time);
-	stage->update(elapsed_time);
+	//stage->update(elapsed_time);
 	//pbr_ship_1->update(elapsed_time);
 	//ground->update(elapsed_time);
-	terrains->update(elapsed_time);
-	knife->update(elapsed_time);
+	//terrains->update(elapsed_time);
+	//knife->update(elapsed_time);
 	//sky->update(elapsed_time);
 
 	if (freelook)
@@ -175,25 +155,42 @@ const char* reflection_scene::update(float& elapsed_time/*Elapsed seconds from l
 		//eye_space_camera->update(player->position, elapsed_time);
 		eye_space_camera->firstperson_update(elapsed_time, DirectX::XMFLOAT4(player->position.x, player->position.y + 2.0f, player->position.z + player->direction.z * 0.1f, 0));
 	}
+	if (integrate_particles) {
+		const float distance{ 30 };
+		particles->particle_data.target_location.x = pbr_ship->position.x+pbr_ship->direction.x*distance;
+		particles->particle_data.target_location.y = pbr_ship->position.y+pbr_ship->direction.y*distance;
+		particles->particle_data.target_location.z = pbr_ship->position.z+pbr_ship->direction.z*distance;
+		particles->particle_data.emitter_location = pbr_ship->position;
+	}
 
 	//light direction
 	ImGui::SliderFloat4("light_direction", &scene_constants_buffer->data.directional_light.direction.x, -1.0f, 1.0f);
 	ImGui::SliderFloat4("light_color", &light_constants_buffer->data.point_light.color.x, 0, 256.0f);
 
 	//posteffects
-	//ImGui::Checkbox("enable_post_effects", &enable_post_effects);
-	//ImGui::Checkbox("post_blooming", &post_blooming);
-	//ImGui::Checkbox("lens_flare", &enable_lens_flare);
+	ImGui::Checkbox("enable_post_effects", &enable_post_effects);
+	ImGui::Checkbox("post_blooming", &post_blooming);
+	ImGui::Checkbox("lens_flare", &enable_lens_flare);
 
 	//camera
 	if (ImGui::Button("freeLook"))
 		freelook = !freelook;
 
+	ImGui::Text("accumulated husk particle count %d", particles->particle_data.particle_count);
+	if (ImGui::Checkbox("integrate_particles", &integrate_particles))
+	{
+		accumulate_husk_particles = false;
+	}
+	if (ImGui::Checkbox("accumulate_husk_particles", &accumulate_husk_particles))
+	{
+		integrate_particles = false;
+	}
+	ImGui::SliderFloat("particle_data.size", &particles->particle_data.particle_size, +0.0f, +0.05f, "%.4f");
 
 	return 0;
 }
 
-void reflection_scene::render(ID3D11DeviceContext* immediate_context, float elapsed_time/*Elapsed seconds from last frame*/)
+void particle_scene::render(ID3D11DeviceContext* immediate_context, float elapsed_time/*Elapsed seconds from last frame*/)
 {
 	rasterizer_states[SOLID]->active(immediate_context);
 	blend_states[ALPHA]->active(immediate_context);
@@ -211,6 +208,8 @@ void reflection_scene::render(ID3D11DeviceContext* immediate_context, float elap
 	//camera setting
 	float aspect_ratio{ viewport.Width / viewport.Height };
 
+
+
 	time += elapsed_time;
 	triple_speed_time += elapsed_time * 3.0f;
 	scene_constants_buffer->data.directional_light.iTime = time;
@@ -220,12 +219,31 @@ void reflection_scene::render(ID3D11DeviceContext* immediate_context, float elap
 	//immediate_context->GSGetConstantBuffers(2, 1, scene_constants_buffer->buffer_object.GetAddressOf());
 	scene_constants_buffer->active(immediate_context, 2, true, true);
 
+	//particles
+	if (integrate_particles)
+	{
+		particles->integrate(immediate_context, elapsed_time);
+	}
+	snow->integrate(immediate_context, XMFLOAT3(pbr_ship->position.x, pbr_ship->position.y, pbr_ship->position.z), eye_space_camera->view(), eye_space_camera->view_projection(), elapsed_time, time);
+	
 
 	//screen->active(immediate_context);
-	framebuffers[1]->active(immediate_context);
+	framebuffers[0]->clear(immediate_context,1,1,1,1);
+	framebuffers[0]->active(immediate_context);
 
 	eye_space_camera->aspect_ratio = aspect_ratio;
 	eye_space_camera->active(immediate_context, 1, true, true, false, false);
+
+	particle_constants data{};
+	data.view_projection = eye_space_camera->view_projection();
+	data.light_direction = scene_constants_buffer->data.directional_light.direction;
+	data.view = eye_space_camera->view();
+	data.projection = eye_space_camera->projection();
+	data.camera_position = eye_space_camera->position;
+	immediate_context->UpdateSubresource(particle_constant_buffers.Get(), 0, 0, &data, 0, 0);
+	immediate_context->VSSetConstantBuffers(8, 1, particle_constant_buffers.GetAddressOf());
+	immediate_context->PSSetConstantBuffers(8, 1, particle_constant_buffers.GetAddressOf());
+
 
 	//view frustum
 	const Descartes::view_frustum view_frustum(eye_space_camera->view_projection(), eye_space_camera->inverse_view_projection());
@@ -241,12 +259,12 @@ void reflection_scene::render(ID3D11DeviceContext* immediate_context, float elap
 		//sky
 		sky->render(immediate_context, 0, 0, 1280, 720, 1, 1, 1, 1, 0);
 
-		static_mesh_vs->active(immediate_context);
-		pbr_dynamic_mesh_ps->active(immediate_context);
-		stage->render(immediate_context);
-		pbr_ship->render(immediate_context);
-		static_mesh_vs->inactive(immediate_context);
-		pbr_dynamic_mesh_ps->inactive(immediate_context);
+		//static_mesh_vs->active(immediate_context);
+		//pbr_dynamic_mesh_ps->active(immediate_context);
+		//stage->render(immediate_context);
+		//pbr_ship->render(immediate_context);
+		//static_mesh_vs->inactive(immediate_context);
+		//pbr_dynamic_mesh_ps->inactive(immediate_context);
 
 		//pbr
 		/*pbr_dynamic_mesh_ps->active(immediate_context);
@@ -255,21 +273,87 @@ void reflection_scene::render(ID3D11DeviceContext* immediate_context, float elap
 		pbr_static_mesh_vs->inactive(immediate_context);
 		pbr_dynamic_mesh_ps->inactive(immediate_context);*/
 
-		//skydome
-		//skydome_vs->active(immediate_context);
-		//skydome_ps->active(immediate_context);
-		//sky->Render(immediate_context);
-		//skydome_ps->inactive(immediate_context);
-		//skydome_vs->inactive(immediate_context);
-
 		//staticmesh render
-		static_mesh_vs->active(immediate_context);
-		static_mesh_ps->active(immediate_context);
-		knife->render(immediate_context);
-		//pbr_ship_1->render(immediate_context);
-		////ground->render(immediate_context);
-		static_mesh_ps->inactive(immediate_context);
-		static_mesh_vs->inactive(immediate_context);
+		//static_mesh_vs->active(immediate_context);
+		//static_mesh_ps->active(immediate_context);
+		//knife->render(immediate_context);
+		//pbr_ship->render(immediate_context);
+		//ground->render(immediate_context);
+		//static_mesh_ps->inactive(immediate_context);
+		//static_mesh_vs->inactive(immediate_context);
+
+		if (!integrate_particles)
+		{
+			blend_states[NONE]->active(immediate_context);
+			depth_stencil_states[ZT_OFF_ZW_OFF]->active(immediate_context);
+			particles->accumulate_husk_particles(immediate_context, [&](ID3D11PixelShader* accumulate_husk_particles_ps) {
+				//static_mesh_vs->active(immediate_context);
+				//ground->render(immediate_context, accumulate_husk_particles_ps);
+				//static_mesh_vs->inactive(immediate_context);
+				pbr_static_mesh_vs->active(immediate_context);
+				pbr_ship->render(immediate_context,accumulate_husk_particles_ps);
+				pbr_static_mesh_vs->inactive(immediate_context);
+
+				});
+			depth_stencil_states[ZT_OFF_ZW_OFF]->inactive(immediate_context);
+			blend_states[NONE]->inactive(immediate_context);
+
+		}
+
+		depth_stencil_states[ZT_ON_ZW_ON]->active(immediate_context);
+		immediate_context->GSSetConstantBuffers(8, 1, particle_constant_buffers.GetAddressOf());
+		rasterizer_states[SOLID_CULL_NONE]->active(immediate_context);
+		if (integrate_particles)
+		{
+			switch (particles->state)
+			{
+			case 0:
+			case 1:
+				particles->particle_data.particle_size = 0.01f;
+				particles->particle_data.streak_factor = 0.00f;
+				blend_states[ADD]->active(immediate_context);
+				break;
+			case 4:
+				particles->particle_data.particle_size = 0.02f;
+				particles->particle_data.streak_factor = 0.00f;
+				blend_states[ADD]->active(immediate_context);
+				break;
+			case 2:
+			case 3:
+				particles->particle_data.particle_size = 0.02f;
+				particles->particle_data.streak_factor = 0.2f;
+				blend_states[ADD]->active(immediate_context);
+
+				break;
+			case 5:
+				particles->particle_data.particle_size = 0.01f;
+				particles->particle_data.streak_factor = 0.0f;
+				blend_states[ALPHA]->active(immediate_context);
+
+				break;
+			default:
+				_ASSERT_EXPR(FALSE, L"");
+			}
+		}
+		else
+		{
+			particles->particle_data.particle_size = 0.01f;
+			particles->particle_data.streak_factor = 0.0f;
+			blend_states[ALPHA]->active(immediate_context);
+
+		}
+		particles->render(immediate_context);
+	    //particles->render(immediate_context);
+		depth_stencil_states[ZT_ON_ZW_ON]->inactive(immediate_context);
+		rasterizer_states[SOLID_CULL_NONE]->inactive(immediate_context);
+		rasterizer_states[SOLID]->active(immediate_context);
+
+		// Snowfall particles drawing process
+		blend_states[ALPHA]->active(immediate_context);
+		depth_stencil_states[ZT_ON_ZW_OFF]->active(immediate_context);
+		snow->render(immediate_context);
+		depth_stencil_states[ZT_ON_ZW_OFF]->inactive(immediate_context);
+		depth_stencil_states[ZT_ON_ZW_ON]->active(immediate_context);
 
 		//terrain renderer
 		//terrains->render(immediate_context, view_frustum);
@@ -280,7 +364,7 @@ void reflection_scene::render(ID3D11DeviceContext* immediate_context, float elap
 
 		//screen->inactive(immediate_context);
 
-		framebuffers[1]->inactive(immediate_context);
+		framebuffers[0]->inactive(immediate_context);
 
 		if (enable_post_effects)
 		{
@@ -320,12 +404,13 @@ void reflection_scene::render(ID3D11DeviceContext* immediate_context, float elap
 				post_effects->blit(immediate_context, framebuffers[1]->render_target_shader_resource_view.Get(), framebuffers[1]->depth_stencil_shader_resource_view.Get(), shadowmap->depth_stencil_shader_resource_view.Get(), light_space_camera->view_projection());
 				framebuffers[2]->inactive(immediate_context);
 			}
+			//rasterizer->blit(immediate_context, framebuffers[2]->render_target_shader_resource_view.Get(), 0, 0, viewport.Width, viewport.Height);
 			rasterizer->blit(immediate_context, framebuffers[2]->render_target_shader_resource_view.Get(), 0, 0, viewport.Width, viewport.Height);
 		}
 		else
 		{
-			screen->render(immediate_context);
-			//rasterizer->blit(immediate_context, framebuffers[0]->render_target_shader_resource_view.Get(), 0, 0, viewport.Width, viewport.Height);
+			//screen->render(immediate_context);
+			rasterizer->blit(immediate_context, framebuffers[0]->render_target_shader_resource_view.Get(), 0, 0, viewport.Width, viewport.Height);
 		}
 
 		depth_stencil_states[ZT_ON_ZW_ON]->inactive(immediate_context);
@@ -337,7 +422,7 @@ void reflection_scene::render(ID3D11DeviceContext* immediate_context, float elap
 	}
 
 	//terrains->DebugDrawGUI();
-	knife->DebugDrawGUI();
+	//knife->DebugDrawGUI();
 	//water->DebugDrawGUI();
 	//structures->DebugDrawGUI();
 	//vegetation_small->DebugDrawGUI();
@@ -351,8 +436,8 @@ void reflection_scene::render(ID3D11DeviceContext* immediate_context, float elap
 	//shadowmap_df->DebugDrawGUI();
 	//screen->DebugDrawGUI();
 	//pbr_ship_1->DebugDrawGUI();
-	//pbr_ship->DebugDrawGUI();
-	stage->DebugDrawGUI();
+	pbr_ship->DebugDrawGUI();
+	//stage->DebugDrawGUI();
 	ImGui::Render();
 
 	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());

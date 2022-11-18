@@ -14,12 +14,12 @@ struct particle
 	float3 velocity;
 };
 
-cbuffer PARTICLE_CONSTANTS : register(b9)
+cbuffer PARTICLE_CONSTANTS : register(b10)
 {
 	float4 current_eye_position;
 	float4 previous_eye_position;
-	float4x4 camera_view;
-	float4x4 camera_projection;
+	row_major float4x4 camera_view;
+	row_major float4x4 camera_projection;
 
 	// Radius of outermost orbit 
 	float outermost_radius;
@@ -28,5 +28,9 @@ cbuffer PARTICLE_CONSTANTS : register(b9)
 
 	float particle_size;
 	uint particle_count;
+
+	float elapsed_time;
+	float time;
+	float2 padd;
 };
 

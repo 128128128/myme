@@ -58,9 +58,6 @@
     <Filter Include="HLSL\Functions">
       <UniqueIdentifier>{baf67dab-4f07-4e70-bb2a-5deeddb7d6ea}</UniqueIdentifier>
     </Filter>
-    <Filter Include="HLSL\pbr">
-      <UniqueIdentifier>{d11df521-73a4-473c-ad83-7cad415c2229}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Sources\Math">
       <UniqueIdentifier>{3af097f4-b67a-4bed-8d43-b6380b8037b7}</UniqueIdentifier>
     </Filter>
@@ -108,6 +105,12 @@
     </Filter>
     <Filter Include="Sources\ibl">
       <UniqueIdentifier>{cf228387-fa3b-496b-81aa-cb9626a1525e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="HLSL\pbr">
+      <UniqueIdentifier>{d11df521-73a4-473c-ad83-7cad415c2229}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="HLSL\Particles\husk">
+      <UniqueIdentifier>{88371740-0ee9-4688-9702-0be13eadb356}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -276,9 +279,6 @@
     <ClCompile Include="sources\Graphics\sprite\noise_map.cpp">
       <Filter>Sources\Graphics\sprite</Filter>
     </ClCompile>
-    <ClCompile Include="sources\Scenes\reflection_scene.cpp">
-      <Filter>Sources\Scene</Filter>
-    </ClCompile>
     <ClCompile Include="sources\Graphics\deferred\gbuffer_02.cpp">
       <Filter>Sources\Graphics\Deferred</Filter>
     </ClCompile>
@@ -298,6 +298,12 @@
       <Filter>Sources\ibl</Filter>
     </ClCompile>
     <ClCompile Include="sources\Scenes\ibl_scene.cpp">
+      <Filter>Sources\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="sources\Particles\husk_particles.cpp">
+      <Filter>Sources\Graphics\particles</Filter>
+    </ClCompile>
+    <ClCompile Include="sources\Scenes\particle_scene.cpp">
       <Filter>Sources\Scene</Filter>
     </ClCompile>
   </ItemGroup>
@@ -479,9 +485,6 @@
     <ClInclude Include="sources\Graphics\sprite\noise_map.h">
       <Filter>Sources\Graphics\sprite</Filter>
     </ClInclude>
-    <ClInclude Include="sources\Scenes\reflection_scene.h">
-      <Filter>Sources\Scene</Filter>
-    </ClInclude>
     <ClInclude Include="sources\Graphics\deferred\gbuffer_02.h">
       <Filter>Sources\Graphics\Deferred</Filter>
     </ClInclude>
@@ -501,6 +504,12 @@
       <Filter>Sources\ibl</Filter>
     </ClInclude>
     <ClInclude Include="sources\Scenes\ibl_scene.h">
+      <Filter>Sources\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="sources\Particles\husk_particles.h">
+      <Filter>Sources\Graphics\particles</Filter>
+    </ClInclude>
+    <ClInclude Include="sources\Scenes\particle_scene.h">
       <Filter>Sources\Scene</Filter>
     </ClInclude>
   </ItemGroup>
@@ -606,6 +615,9 @@
     </None>
     <None Include="HLSL\image_based_lighting.hlsli">
       <Filter>HLSL\ibl</Filter>
+    </None>
+    <None Include="HLSL\husk_particles.hlsli">
+      <Filter>HLSL\Particles\husk</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
@@ -821,6 +833,24 @@
     </FxCompile>
     <FxCompile Include="HLSL\tone_map_ps.hlsl">
       <Filter>HLSL\ibl</Filter>
+    </FxCompile>
+    <FxCompile Include="HLSL\husk_particles_cs.hlsl">
+      <Filter>HLSL\Particles\husk</Filter>
+    </FxCompile>
+    <FxCompile Include="HLSL\husk_particles_gs.hlsl">
+      <Filter>HLSL\Particles\husk</Filter>
+    </FxCompile>
+    <FxCompile Include="HLSL\husk_particles_ps.hlsl">
+      <Filter>HLSL\Particles\husk</Filter>
+    </FxCompile>
+    <FxCompile Include="HLSL\husk_particles_vs.hlsl">
+      <Filter>HLSL\Particles\husk</Filter>
+    </FxCompile>
+    <FxCompile Include="HLSL\hask_particles_copy_buffer_cs.hlsl">
+      <Filter>HLSL\Particles\husk</Filter>
+    </FxCompile>
+    <FxCompile Include="HLSL\accumulate_husk_particles_ps.hlsl">
+      <Filter>HLSL\Particles\husk</Filter>
     </FxCompile>
   </ItemGroup>
 </Project>

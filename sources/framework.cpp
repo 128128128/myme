@@ -10,7 +10,7 @@
 #include "Graphics/load/texture.h"
 #include "./Scenes/game_scene.h"
 #include "./Scenes/create_terrain_scene.h"
-#include "./Scenes/reflection_scene.h"
+#include "./Scenes/particle_scene.h"
 #include "./Scenes/ibl_scene.h"
 #include "./Scenes/title_scene.h"
 
@@ -270,10 +270,10 @@ bool framework::initialize()
 	immediate_context->OMSetRenderTargets(1, render_target_view.GetAddressOf(), depth_stencil_view.Get());
 	immediate_context->OMSetDepthStencilState(default_depth_stencil_state.Get(), 1);
 
-	current_scene = "ibl";
+	current_scene = "particle";
 
 	scene["create_terrain"] = std::make_unique<create_terrain_scene>();
-	scene["reflection"] = std::make_unique<reflection_scene>();
+	scene["particle"] = std::make_unique<particle_scene>();
 	scene["title"] = std::make_unique<title_scene>();
 	scene["game"] = std::make_unique<game_scene>();
 	scene["ibl"] = std::make_unique<ibl_scene>();

@@ -22,30 +22,6 @@
 //
 // }
 //
-// cbuffer SCENE_CONSTANT_BUFFER
-// {
-//
-//   struct SOMETHING
-//   {
-//       
-//       float iTime;                   // Offset:    0
-//       float triple_speed_iTime;      // Offset:    4
-//       float elapsedTime;             // Offset:    8
-//       float shadow_map_num;          // Offset:   12
-//       float4x4 mlvp[3];              // Offset:   16
-//
-//   } something;                       // Offset:    0 Size:   208 [unused]
-//   
-//   struct PLAYER
-//   {
-//       
-//       float4 position;               // Offset:  208
-//       float4 direction;              // Offset:  224
-//
-//   } player;                          // Offset:  208 Size:    32
-//
-// }
-//
 // cbuffer POST_PROCESSING_EFFECTS_CONSTANTS
 // {
 //
@@ -97,7 +73,6 @@
 // shadow_map                        texture  float4          2d             t2      1 
 // POST_PROCESSING_EFFECTS_CONSTANTS    cbuffer      NA          NA            cb0      1 
 // CAMERA_CONSTANT_BUFFER            cbuffer      NA          NA            cb1      1 
-// SCENE_CONSTANT_BUFFER             cbuffer      NA          NA            cb3      1 
 //
 //
 //
@@ -119,7 +94,6 @@
 ps_5_0
 dcl_globalFlags refactoringAllowed | skipOptimization
 dcl_constantbuffer CB1[22], immediateIndexed
-dcl_constantbuffer CB3[14], immediateIndexed
 dcl_constantbuffer CB0[9], immediateIndexed
 dcl_sampler s1, mode_default
 dcl_sampler s3, mode_comparison
@@ -628,11 +602,11 @@ if_nz r1.w
 #line 72
 endif 
 
-#line 76
+#line 75
 nop 
 mov r1.xyz, r1.xyzx
 mov r2.xyz, r2.xyzx
-mov r0.yzw, cb3[13].xxyz
+mov r0.yzw, cb1[0].xxyz
 
 #line 53 "C:\Users\2200167\Desktop\個人製作\myme03\myme\HLSL\post_processing_effects.hlsli"
 mov r0.yzw, -r0.yyzw
@@ -692,7 +666,7 @@ add r1.xyz, r1.xyzx, r2.xyzx
 mul r0.yzw, r0.yyyy, r1.xxyz
 add r0.yzw, r0.yyzw, cb0[4].xxyz  // r0.y <- <apply_fog return value>.x; r0.z <- <apply_fog return value>.y; r0.w <- <apply_fog return value>.z
 
-#line 76 "C:\Users\2200167\Desktop\個人製作\myme03\myme\HLSL\post_processing_effects_ps.hlsl"
+#line 75 "C:\Users\2200167\Desktop\個人製作\myme03\myme\HLSL\post_processing_effects_ps.hlsl"
 mov r0.yzw, r0.yyzw  // r0.y <- fragment_color.x; r0.z <- fragment_color.y; r0.w <- fragment_color.z
 
 #line 79

@@ -35,8 +35,17 @@ pbr_static_mesh::pbr_static_mesh(ID3D11Device* device, const char* filename)
 	constant_buffer = std::make_unique<Descartes::constant_buffer<shader_constants>>(device);
 }
 
-void pbr_static_mesh::render(ID3D11DeviceContext* immediate_context, const XMFLOAT4X4& world)
+void pbr_static_mesh::render(ID3D11DeviceContext* immediate_context, const XMFLOAT4X4& world, ID3D11PixelShader* replaced_pixel_shader, ID3D11VertexShader* use_vertex_shader)
 {
+	if (replaced_pixel_shader)
+	{
+		immediate_context->PSSetShader(replaced_pixel_shader, nullptr, 0);
+	}
+	if (use_vertex_shader)
+	{
+		immediate_context->VSSetShader(use_vertex_shader, nullptr, 0);
+	}
+
 	for (Descartes::substance<vertex>::mesh& mesh : substance->meshes)
 	{
 		uint32_t stride = sizeof(vertex);

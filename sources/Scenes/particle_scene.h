@@ -38,6 +38,8 @@
 #include "../Graphics/sprite/playshader.h"
 
 //----particle-----//
+#include "../Particles/husk_particles.h"
+#include "../Particles/snow_particles.h"
 
 //----IMGUI---//
 #include "../../imgui/imgui.h"
@@ -57,7 +59,7 @@ namespace descartes
 }
 
 
-class reflection_scene : public Scene
+class particle_scene : public Scene
 {
 public:
 	bool initialize(ID3D11Device* device, CONST LONG screen_width, CONST LONG screen_height);
@@ -81,12 +83,12 @@ public:
 	//objects
 	std::unique_ptr<Player> player;
 	std::unique_ptr<pbr_Stage>pbr_ship;
-	std::unique_ptr<pbr_Stage>stage;
+	//std::unique_ptr<pbr_Stage>stage;
 	//std::unique_ptr<pbr_Stage>pbr_ship_1;
 	//std::unique_ptr<Ground>ground;//factory
 	//std::unique_ptr<dynamic_mesh> test;
-	std::unique_ptr<Terrain> terrains;
-	std::unique_ptr<Knife> knife;
+	//std::unique_ptr<Terrain> terrains;
+	//std::unique_ptr<Knife> knife;
 	//std::unique_ptr<Ground>shadow_trees;
 	//std::unique_ptr<Structures> structures;
 	//std::unique_ptr<VegetationSmall> vegetation_small;
@@ -129,7 +131,7 @@ public:
 	bool freelook = true;
 
 	//particles
-	//std::unique_ptr<snow_particles> snowfall;
+	std::unique_ptr<snow_particles> snow;
 
 
 	std::unique_ptr<sprite> sky;
@@ -218,6 +220,16 @@ public:
 	};
 	std::unique_ptr<Descartes::constant_buffer<d_shadow_param>> d_shadow_constant_buffer;
 
+	struct particle_constants
+	{
+		DirectX::XMFLOAT4X4 view_projection;
+		DirectX::XMFLOAT4X4 projection;
+		DirectX::XMFLOAT4X4 view;
+		DirectX::XMFLOAT4 light_direction;
+		DirectX::XMFLOAT4 camera_position;
+	};
+	particle_constants particle_data;
+	Microsoft::WRL::ComPtr<ID3D11Buffer> particle_constant_buffers;
 
 	XMFLOAT4X4 world_transform{ 1,0,0,0,
 	0,1,0,0,
@@ -231,7 +243,12 @@ private:
 
 	bool post_blooming = false;
 	bool enable_lens_flare = false;
-	bool enable_post_effects = true;
+	bool enable_post_effects = false;
+
+	// particles
+	bool accumulate_husk_particles{ true };
+	bool integrate_particles{ false };
+	std::unique_ptr<husk_particles> particles;
 
 	shadow::CascadeShadowMapMatrix m_cascadeShadowMapMatrix;    // カスケードシャドウマップの行列を扱うオブジェクト
 
