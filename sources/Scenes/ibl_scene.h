@@ -40,7 +40,6 @@
 #include "../Particles/snow_particles.h"
 
 //----IMGUI---//
-#ifdef USE_IMGUI
 #include "../../imgui/imgui.h"
 #include "../../imgui/imgui_internal.h"
 #include "../../imgui/imgui_impl_dx11.h"
@@ -57,7 +56,6 @@ namespace descartes
 
 extern LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 extern ImWchar glyphRangesJapanese[];
-#endif
 
 struct environment_textures
 {

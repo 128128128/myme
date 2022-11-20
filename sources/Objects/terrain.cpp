@@ -114,7 +114,7 @@
 
 Terrain::Terrain(ID3D11Device* device, bool shadow_reciever)
 {
-	terrain = std::make_unique<terrain_mesh>(device, ".\\resources\\enviroments\\terrains\\stage_terrain.fbx",shadow_reciever);
+	terrain = std::make_unique<terrain_mesh>(device, ".\\resources\\enviroments\\terrains\\stage_terrain_1119.fbx",shadow_reciever);
 	vs = std::make_unique<vertex_shader<terrain_mesh::vertex>>(device, "shader//static_mesh_vs.cso");
 	ps = std::make_unique<pixel_shader>(device, "shader//terrain_ps.cso");
 

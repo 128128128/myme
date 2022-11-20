@@ -138,34 +138,34 @@ mul r1.xyz, r1.wwww, r1.xyzx  // r1.x <- N.x; r1.y <- N.y; r1.z <- N.z
 mul r1.xyz, r1.xyzx, l(0.500000, 0.500000, 0.500000, 0.000000)
 add r1.xyz, r1.xyzx, l(0.500000, 0.500000, 0.500000, 0.000000)  // r1.x <- N.x; r1.y <- N.y; r1.z <- N.z
 
-#line 48
-itof r0.xyz, l(1, 1, 1, 0)  // r0.x <- color.x; r0.y <- color.y; r0.z <- color.z
-
 #line 49
+itof r0.xyz, l(0, 0, 0, 0)  // r0.x <- nowcolor.x; r0.y <- nowcolor.y; r0.z <- nowcolor.z
+
+#line 50
 mov r0.xyz, r0.xyzx  // r0.x <- ret.Color.x; r0.y <- ret.Color.y; r0.z <- ret.Color.z
 mov r0.w, r0.w  // r0.w <- ret.Color.w
 
-#line 50
+#line 51
 mov r1.xyz, r1.xyzx  // r1.x <- ret.Normal.x; r1.y <- ret.Normal.y; r1.z <- ret.Normal.z
 mov r1.w, l(1.000000)  // r1.w <- ret.Normal.w
 
-#line 51
+#line 52
 mov r2.xyzw, v1.xyzw  // r2.x <- ret.Position.x; r2.y <- ret.Position.y; r2.z <- ret.Position.z; r2.w <- ret.Position.w
 
-#line 52
+#line 53
 mov r3.xyzw, -cb1[0].xyzw
 add r3.xyzw, r3.xyzw, v1.xyzw
 dp4 r3.x, r3.xyzw, r3.xyzw
 sqrt r3.x, r3.x  // r3.x <- dist
 
-#line 53
+#line 54
 itof r3.yzw, l(0, 0, 0, 1)  // r3.y <- ret.Depth.y; r3.z <- ret.Depth.z; r3.w <- ret.Depth.w
 mov r3.x, r3.x  // r3.x <- ret.Depth.x
 
-#line 54
+#line 55
 mov r4.xyzw, l(1.000000,0,0,0)  // r4.x <- ret.RM.x; r4.y <- ret.RM.y; r4.z <- ret.RM.z; r4.w <- ret.RM.w
 
-#line 55
+#line 56
 mov o0.xyzw, r0.xyzw
 mov o1.xyzw, r3.xyzw
 mov o2.xyzw, r1.xyzw

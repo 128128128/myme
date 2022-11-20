@@ -46,7 +46,8 @@ PS_OUT main(VS_OUT pin)
 	float3 finalcolor = diffuse;
 
 	color = float4(1, 1, 1, 1);
-	ret.Color = float4(color.rgb, alpha);
+	float3 nowcolor = float3(32/255, 178/255, 170/255);
+	ret.Color = float4(nowcolor.rgb, alpha);
 	ret.Normal = float4(N,1.0);
 	ret.Position = pin.position;
 	float dist = length(pin.position - camera_constants.position);

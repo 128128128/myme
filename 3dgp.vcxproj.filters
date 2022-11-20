@@ -306,6 +306,9 @@
     <ClCompile Include="sources\Scenes\particle_scene.cpp">
       <Filter>Sources\Scene</Filter>
     </ClCompile>
+    <ClCompile Include="sources\Graphics\sprite\title_back.cpp">
+      <Filter>Sources\Graphics\sprite</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Sources\Scenes\scene.h">
@@ -512,6 +515,9 @@
     <ClInclude Include="sources\Scenes\particle_scene.h">
       <Filter>Sources\Scene</Filter>
     </ClInclude>
+    <ClInclude Include="sources\Graphics\sprite\title_back.h">
+      <Filter>Sources\Graphics\sprite</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="HLSL\render_constants.hlsli">
@@ -618,6 +624,9 @@
     </None>
     <None Include="HLSL\husk_particles.hlsli">
       <Filter>HLSL\Particles\husk</Filter>
+    </None>
+    <None Include="HLSL\title_back.hlsli">
+      <Filter>HLSL\Sprites</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
@@ -851,6 +860,12 @@
     </FxCompile>
     <FxCompile Include="HLSL\accumulate_husk_particles_ps.hlsl">
       <Filter>HLSL\Particles\husk</Filter>
+    </FxCompile>
+    <FxCompile Include="HLSL\title_back_ps.hlsl">
+      <Filter>HLSL\Sprites</Filter>
+    </FxCompile>
+    <FxCompile Include="HLSL\title_back_vs.hlsl">
+      <Filter>HLSL\Sprites</Filter>
     </FxCompile>
   </ItemGroup>
 </Project>

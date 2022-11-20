@@ -168,7 +168,8 @@ bool game_scene::initialize(ID3D11Device* device, CONST LONG screen_width, CONST
 
 const char* game_scene::update(float& elapsed_time/*Elapsed seconds from last frame*/)
 {
-	
+	GamePad& gamePad = Input::Instance().GetGamePad();
+
 	//player->update(collision_mesh.get(),elapsed_time);
 	scene_constants_buffer->data.player_object.position = player->position;
 	scene_constants_buffer->data.player_object.direction = player->direction;
@@ -217,6 +218,8 @@ const char* game_scene::update(float& elapsed_time/*Elapsed seconds from last fr
 	if (ImGui::Button("freeLook"))
 		freelook = !freelook;
 
+	if (gamePad.GetButton() & GamePad::BTN_B)
+		return "title";
 
 	return 0;
 }

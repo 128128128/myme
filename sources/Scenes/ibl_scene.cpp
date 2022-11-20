@@ -318,7 +318,6 @@ const char* ibl_scene::update(float& elapsed_time/*Elapsed seconds from last fra
 			}
 		}
 	}
-#ifdef USE_IMGUI
 	//light direction
 	ImGui::SliderFloat4("light_direction", &scene_constants_buffer->data.directional_light.direction.x, -1.0f, 1.0f);
 	ImGui::SliderFloat4("light_color", &light_constants_buffer->data.point_light.color.x, 0,256.0f);
@@ -359,7 +358,8 @@ const char* ibl_scene::update(float& elapsed_time/*Elapsed seconds from last fra
 		freelook = !freelook;
 
 
-    #endif
+	if (gamePad.GetButton() & GamePad::BTN_B)
+		return "title";
 
 	return 0;
 }
@@ -621,7 +621,7 @@ void ibl_scene::render(ID3D11DeviceContext* immediate_context, float elapsed_tim
 		rasterizer_states[SOLID]->inactive(immediate_context);
 		
 	}
-#ifdef USE_IMGUI
+
 	//vegetation_small->DebugDrawGUI();
 	sky->DrawDebugGUI();
 	eye_space_camera->DrawDebugGUI();
@@ -636,5 +636,4 @@ void ibl_scene::render(ID3D11DeviceContext* immediate_context, float elapsed_tim
 
 	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 
-#endif
 }

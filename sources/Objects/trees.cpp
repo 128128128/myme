@@ -3,8 +3,8 @@
 
 Trees::Trees(ID3D11Device* device)
 {
-	trees = std::make_unique<static_mesh>(device, ".\\resources\\enviroments\\trees\\tree_B.fbx");
-	trunks = std::make_unique<static_mesh>(device, ".\\resources\\enviroments\\trees\\tree_T.fbx");
+	trees = std::make_unique<static_mesh>(device, ".\\resources\\enviroments\\trees\\tree_B_1119.fbx");
+	trunks = std::make_unique<static_mesh>(device, ".\\resources\\enviroments\\trees\\tree_T_1119.fbx");
 	vs = std::make_unique<vertex_shader<static_mesh::vertex>>(device, "shader//tree_branch_vs.cso");
 	trunk_vs = std::make_unique<vertex_shader<static_mesh::vertex>>(device, "shader//static_mesh_vs.cso");
 	ps = std::make_unique<pixel_shader>(device, "shader//tree_branch_ps.cso");

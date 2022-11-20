@@ -236,6 +236,7 @@
     <ClCompile Include="sources\Graphics\sprite\playshader.cpp" />
     <ClCompile Include="sources\Graphics\sprite\sprite.cpp" />
     <ClCompile Include="sources\Graphics\sprite\sprite_batch.cpp" />
+    <ClCompile Include="sources\Graphics\sprite\title_back.cpp" />
     <ClCompile Include="sources\Input\GamePad.cpp" />
     <ClCompile Include="sources\Input\Input.cpp" />
     <ClCompile Include="sources\Input\Mouse.cpp" />
@@ -306,6 +307,7 @@
     <ClInclude Include="sources\Graphics\sprite\playshader.h" />
     <ClInclude Include="sources\Graphics\sprite\sprite.h" />
     <ClInclude Include="sources\Graphics\sprite\sprite_batch.h" />
+    <ClInclude Include="sources\Graphics\sprite\title_back.h" />
     <ClInclude Include="sources\Input\GamePad.h" />
     <ClInclude Include="sources\Input\Input.h" />
     <ClInclude Include="sources\Input\Mouse.h" />
@@ -363,6 +365,7 @@
     <None Include="HLSL\sprite.hlsli" />
     <None Include="HLSL\static_mesh.hlsli" />
     <None Include="HLSL\terrain.hlsli" />
+    <None Include="HLSL\title_back.hlsli" />
     <None Include="HLSL\tone_map.hlsli" />
     <None Include="HLSL\tree_branch.hlsli" />
     <None Include="HLSL\vegetation.hlsli" />
@@ -774,6 +777,18 @@
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
     </FxCompile>
     <FxCompile Include="HLSL\terrain_vs.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+    </FxCompile>
+    <FxCompile Include="HLSL\title_back_ps.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+    </FxCompile>
+    <FxCompile Include="HLSL\title_back_vs.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>

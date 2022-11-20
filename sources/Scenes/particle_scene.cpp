@@ -187,6 +187,10 @@ const char* particle_scene::update(float& elapsed_time/*Elapsed seconds from las
 		integrate_particles = false;
 	}
 	ImGui::SliderFloat("particle_data.size", &particles->particle_data.particle_size, +0.0f, +0.05f, "%.4f");
+	GamePad& gamePad = Input::Instance().GetGamePad();
+
+	if (gamePad.GetButton() & GamePad::BTN_B)
+		return "title";
 
 	return 0;
 }

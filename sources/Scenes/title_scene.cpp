@@ -1,4 +1,5 @@
 #include "title_scene.h"
+#include "../Graphics/others/shader.h"
 #include "../Input/Mouse.h"
 
 #define screenW 1280
@@ -164,6 +165,10 @@ bool title_scene::initialize(ID3D11Device* device, const LONG screen_width, cons
 		buffer_desc.StructureByteStride = 0;
 		hr = device->CreateBuffer(&buffer_desc, nullptr, constant_buffers[0].GetAddressOf());
 		_ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
+
+		buffer_desc.ByteWidth = sizeof(shader_constants);
+		hr = device->CreateBuffer(&buffer_desc, nullptr, constant_buffers[1].GetAddressOf());
+		_ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
 	}
 	{
 		D3D11_TEXTURE2D_DESC td;
@@ -244,9 +249,13 @@ bool title_scene::initialize(ID3D11Device* device, const LONG screen_width, cons
 
 		}
 	}
-	noise = std::make_unique<noise_map>(device, "resources//sprite//noise//zatsu.png", true, true);
-	terrain_create_sp = std::make_unique<sprite>(device, "resources//sprite//title//S__15794192.jpg", true, true);
-	sample_map_sp = std::make_unique<sprite>(device, "resources//sprite//title//S__15794194.jpg", true, true);
+	back = std::make_unique<title_back>(device, "resources//sprite//noise//zatsu.png", true, true);
+	terrain_create_sp = std::make_unique<sprite>(device, "resources//sprite//title//create_terrain.png", true, true);
+	sample_scene_sp = std::make_unique<sprite>(device, "resources//sprite//title//sample_scene.png", true, true);
+	pbr_ibl_sp = std::make_unique<sprite>(device, "resources//sprite//title//pbr_ibl.png", true, true);
+    particle_sp = std::make_unique<sprite>(device, "resources//sprite//title//particle.png", true, true);
+
+	create_ps_from_cso(device, "shader//title_back_ps.cso", back_pixel_shader.GetAddressOf());
 
 	return true;
 }
@@ -267,9 +276,17 @@ const char* title_scene::update(float& elapsed_time/*Elapsed seconds from last f
 		{
 			return "create_terrain";
 		}
-		if (sample_map_sp->hit_cursor(m_pos))
+		if (sample_scene_sp->hit_cursor(m_pos))
 		{
 			return "game";
+		}
+		if (particle_sp->hit_cursor(m_pos))
+		{
+			return "particle";
+		}
+		if (pbr_ibl_sp->hit_cursor(m_pos))
+		{
+			return "ibl";
 		}
 		
 	}
@@ -305,15 +322,24 @@ void title_scene::render(ID3D11DeviceContext* immediate_context, float elapsed_t
 
 	immediate_context->OMGetRenderTargets(1, default_render_target_view.ReleaseAndGetAddressOf(), default_depth_stencil_view.ReleaseAndGetAddressOf());
 	immediate_context->OMSetRenderTargets(1, default_render_target_view.GetAddressOf(), default_depth_stencil_view.Get());
-	//noise rendering
-	noise->render(immediate_context, 0, 0, screenW, screenH, 1, 1, 1, 1, 0);
-	terrain_create_sp->render(immediate_context, 500, 200, 300, 100, 1, 1, 1, 1, 0,0,0,600,200);
-	sample_map_sp->render(immediate_context, 500, 400, 300, 100, 1, 1, 1, 1, 0,0, 0, 600, 200);
 
-	
+	time += elapsed_time;
+	shader_data.time = time;
+	immediate_context->UpdateSubresource(constant_buffers[1].Get(), 0, 0, &shader_data, 0, 0);
+	immediate_context->PSSetConstantBuffers(4, 1, constant_buffers[1].GetAddressOf());
+	//noise rendering
+	back->render(immediate_context, 0, 0, 1280, 720, 1, 1, 1, 1, 0);
+
+	terrain_create_sp->render(immediate_context, 750, 200, 300, 100, 1, 1, 1, 1, 0,0,0,600,200);
+	sample_scene_sp->render(immediate_context, 750, 400, 300, 100, 1, 1, 1, 1, 0,0, 0, 600, 200);
+	pbr_ibl_sp->render(immediate_context, 250, 200, 300, 100, 1, 1, 1, 1, 0,0, 0, 600, 200);
+	particle_sp->render(immediate_context, 250, 400, 300, 100, 1, 1, 1, 1, 0,0, 0, 600, 200);
+
+
+#ifdef USE_IMGUI
 	if (ImGui::Begin("scene", nullptr, ImGuiWindowFlags_None))
 	{
-		if (ImGui::CollapsingHeader("f_noise", ImGuiTreeNodeFlags_DefaultOpen))
+		if (ImGui::CollapsingHeader("sprite", ImGuiTreeNodeFlags_DefaultOpen))
 		{
 			//fractal
 			ImGui::Text("Scene 1(create terrain from noise)");
@@ -322,6 +348,8 @@ void title_scene::render(ID3D11DeviceContext* immediate_context, float elapsed_t
 		}
 	}
 	ImGui::End();
+#endif
+
 
 	ImGui::Render();
 	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());

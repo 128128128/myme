@@ -291,6 +291,12 @@ const char* create_terrain_scene::update(float& elapsed_time/*Elapsed seconds fr
 	ImGui::Checkbox("wireframe", &wireframe);
 	ImGui::End();
 
+
+	GamePad& gamePad = Input::Instance().GetGamePad();
+
+	if (gamePad.GetButton() & GamePad::BTN_B)
+		return "title";
+
 	return 0;
 }
 

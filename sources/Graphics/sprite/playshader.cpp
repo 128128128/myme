@@ -368,7 +368,7 @@ void playshader::DebugDrawGUI()
 
 	if (ImGui::Begin("Sky", nullptr, ImGuiWindowFlags_None))
 	{
-		//トランスフォーム
+		//transform
 		if (ImGui::CollapsingHeader("Weather", ImGuiTreeNodeFlags_DefaultOpen))
 		{
 		    //coverage 密度

@@ -37,7 +37,7 @@ public:
 	sprite& operator =(sprite&) = delete;
 
 	void render(ID3D11DeviceContext* immediate_context, float dx, float dy, float dw, float dh, float r, float g, float b, float a, float angle/*degree*/);
-	void render(ID3D11DeviceContext* immediate_context, float dx, float dy, float dw, float dh, float r, float g, float b, float a, float angle/*degree*/, float sx, float sy, float sw, float sh);
+	void render(ID3D11DeviceContext* immediate_context, float dx, float dy, float dw, float dh, float r, float g, float b, float a, float angle/*degree*/, float sx, float sy, float sw, float sh, ID3D11PixelShader* replased_pixel_shader=nullptr);
 	void render(ID3D11DeviceContext* immediate_context, float dx, float dy, float dw, float dh);
 	void textout(ID3D11DeviceContext* immediate_context, std::string s, float x, float y, float w, float h, float r, float g, float b, float a);
 

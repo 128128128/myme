@@ -3,7 +3,7 @@
 
 Water::Water(ID3D11Device* device)
 {
-	water_plane = std::make_unique<static_mesh>(device, ".\\resources\\enviroments\\water\\water.fbx");
+	water_plane = std::make_unique<static_mesh>(device, ".\\resources\\enviroments\\water\\water_1119.fbx");
 
 	vs = std::make_unique<vertex_shader<static_mesh::vertex>>(device, "shader//water_vs.cso");
 	ps = std::make_unique<pixel_shader>(device, "shader//water_ps.cso");

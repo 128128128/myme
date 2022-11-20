@@ -11,7 +11,8 @@
 
 ///---sprite----//
 #include "../Graphics/sprite/sprite.h"
-#include "../Graphics/sprite/noise_map.h"
+#include "../Graphics/sprite/title_back.h"
+
 
 //----IMGUI---//
 #include "../../imgui/imgui.h"
@@ -58,6 +59,13 @@ public:
 	};
 	scene_constants scene_data;
 
+	struct shader_constants
+	{
+		float time;
+		DirectX::XMFLOAT3 pad;
+	};
+	shader_constants shader_data;
+
 	Microsoft::WRL::ComPtr<ID3D11Buffer> constant_buffers[8];
 
 	struct spherical_coordinate_system
@@ -75,10 +83,12 @@ public:
 	spherical_coordinate_system camera_manipulator;
 
 
-protected:
-	std::unique_ptr<noise_map> noise;
+protected:	std::unique_ptr<title_back> back;
+
+	std::unique_ptr<sprite> pbr_ibl_sp;
 	std::unique_ptr<sprite> terrain_create_sp;
-	std::unique_ptr<sprite> sample_map_sp;
+	std::unique_ptr<sprite> particle_sp;
+	std::unique_ptr<sprite> sample_scene_sp;
 
 	Microsoft::WRL::ComPtr <ID3D11Texture2D> tex_noise;
 	Microsoft::WRL::ComPtr <ID3D11RenderTargetView> rtv_noise;
@@ -91,5 +101,10 @@ protected:
 	//default render target
 	Microsoft::WRL::ComPtr<ID3D11RenderTargetView> default_render_target_view;
 	Microsoft::WRL::ComPtr<ID3D11DepthStencilView> default_depth_stencil_view;
+
+	Microsoft::WRL::ComPtr<ID3D11PixelShader> back_pixel_shader;
+
+	float time = 0;
+
 
 };

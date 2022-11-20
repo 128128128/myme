@@ -1,13 +1,15 @@
-#include "sprite.h"
 #include "../../Functions/misc.h"
 
 #include <sstream>
 #include <functional>
 
+#include "../../imgui/imgui.h"
+
+#include "title_back.h"
 #include "../load/texture.h"
 #include "../others/shader.h"
 
-sprite::sprite(ID3D11Device* device, const char* filename, bool force_srgb, bool enable_caching, D3D11_FILTER sampler_filter, D3D11_TEXTURE_ADDRESS_MODE sampler_texture_address_mode, DirectX::XMFLOAT4 sampler_boarder_color)
+title_back::title_back(ID3D11Device* device, const char* filename, bool force_srgb, bool enable_caching, D3D11_FILTER sampler_filter, D3D11_TEXTURE_ADDRESS_MODE sampler_texture_address_mode, DirectX::XMFLOAT4 sampler_boarder_color)
 {
 	HRESULT hr{ S_OK };
 
@@ -33,19 +35,25 @@ sprite::sprite(ID3D11Device* device, const char* filename, bool force_srgb, bool
 	hr = device->CreateBuffer(&buffer_desc, &subresource_data, vertex_buffer.GetAddressOf());
 	_ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
 
+
 	D3D11_INPUT_ELEMENT_DESC input_element_desc[]
 	{
 		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 		{ "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 		{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 	};
-	create_vs_from_cso(device, "shader//sprite_vs.cso", vertex_shader.GetAddressOf(), input_layout.GetAddressOf(), input_element_desc, _countof(input_element_desc));
-	create_ps_from_cso(device, "shader//sprite_ps.cso", pixel_shader.GetAddressOf());
 
-	load_texture_from_file(device, filename, shader_resource_view.GetAddressOf(), force_srgb, enable_caching);
+	//shader create
+	create_vs_from_cso(device, "shader//title_back_vs.cso", vertex_shader.GetAddressOf(), input_layout.GetAddressOf(), input_element_desc, _countof(input_element_desc));
+	create_ps_from_cso(device, "shader//title_back_ps.cso", pixel_shader.GetAddressOf());
 
-	texture2d_description(shader_resource_view.Get(), texture2d_desc);
+	//load texture
+	load_texture_from_file(device, filename, shader_resource_material_noise.GetAddressOf(), force_srgb, enable_caching);
 
+	//texture description
+	texture2d_description(shader_resource_material_noise.Get(), texture2d_desc);
+
+	//sampler state setting
 	D3D11_SAMPLER_DESC sampler_desc;
 	sampler_desc.Filter = sampler_filter;
 	sampler_desc.AddressU = sampler_texture_address_mode;
@@ -91,95 +99,11 @@ sprite::sprite(ID3D11Device* device, const char* filename, bool force_srgb, bool
 	depth_stencil_desc.BackFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
 	hr = device->CreateDepthStencilState(&depth_stencil_desc, depth_stencil_state.GetAddressOf());
 	_ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
+
+
+
 }
-
-sprite::sprite(ID3D11Device* device, const char* filename, bool force_srgb, bool enable_caching, const char* ps_shader, D3D11_FILTER sampler_filter, D3D11_TEXTURE_ADDRESS_MODE sampler_texture_address_mode, DirectX::XMFLOAT4 sampler_boarder_color)
-{
-	HRESULT hr{ S_OK };
-
-	vertex vertices[]
-	{
-		{ { -1.0, +1.0, 0 }, { 1, 1, 1, 1 }, { 0, 0 } },
-		{ { +1.0, +1.0, 0 }, { 1, 1, 1, 1 }, { 1, 0 } },
-		{ { -1.0, -1.0, 0 }, { 1, 1, 1, 1 }, { 0, 1 } },
-		{ { +1.0, -1.0, 0 }, { 1, 1, 1, 1 }, { 1, 1 } },
-	};
-
-	D3D11_BUFFER_DESC buffer_desc{};
-	buffer_desc.ByteWidth = sizeof(vertices);
-	buffer_desc.Usage = D3D11_USAGE_DYNAMIC;
-	buffer_desc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-	buffer_desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-	buffer_desc.MiscFlags = 0;
-	buffer_desc.StructureByteStride = 0;
-	D3D11_SUBRESOURCE_DATA subresource_data{};
-	subresource_data.pSysMem = vertices;
-	subresource_data.SysMemPitch = 0;
-	subresource_data.SysMemSlicePitch = 0;
-	hr = device->CreateBuffer(&buffer_desc, &subresource_data, vertex_buffer.GetAddressOf());
-	_ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
-
-	D3D11_INPUT_ELEMENT_DESC input_element_desc[]
-	{
-		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-		{ "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-		{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-	};
-	create_vs_from_cso(device, "shader//sprite_vs.cso", vertex_shader.GetAddressOf(), input_layout.GetAddressOf(), input_element_desc, _countof(input_element_desc));
-	create_ps_from_cso(device, ps_shader, pixel_shader.GetAddressOf());
-
-	load_texture_from_file(device, filename, shader_resource_view.GetAddressOf(), force_srgb, enable_caching);
-
-	texture2d_description(shader_resource_view.Get(), texture2d_desc);
-
-	D3D11_SAMPLER_DESC sampler_desc;
-	sampler_desc.Filter = sampler_filter;
-	sampler_desc.AddressU = sampler_texture_address_mode;
-	sampler_desc.AddressV = sampler_texture_address_mode;
-	sampler_desc.AddressW = sampler_texture_address_mode;
-	sampler_desc.MipLODBias = 0;
-	sampler_desc.MaxAnisotropy = 16;
-	sampler_desc.ComparisonFunc = D3D11_COMPARISON_ALWAYS;
-	memcpy(sampler_desc.BorderColor, &sampler_boarder_color, sizeof(DirectX::XMFLOAT4));
-	sampler_desc.MinLOD = 0;
-	sampler_desc.MaxLOD = D3D11_FLOAT32_MAX;
-	hr = device->CreateSamplerState(&sampler_desc, sampler_state.GetAddressOf());
-	_ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
-
-	D3D11_RASTERIZER_DESC rasterizer_desc = {};
-	rasterizer_desc.FillMode = D3D11_FILL_SOLID;
-	rasterizer_desc.CullMode = D3D11_CULL_NONE;
-	rasterizer_desc.FrontCounterClockwise = FALSE;
-	rasterizer_desc.DepthBias = 0;
-	rasterizer_desc.DepthBiasClamp = 0;
-	rasterizer_desc.SlopeScaledDepthBias = 0;
-	rasterizer_desc.DepthClipEnable = FALSE;
-	rasterizer_desc.ScissorEnable = FALSE;
-	rasterizer_desc.MultisampleEnable = FALSE;
-	rasterizer_desc.AntialiasedLineEnable = FALSE;
-	hr = device->CreateRasterizerState(&rasterizer_desc, rasterizer_state.GetAddressOf());
-	_ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
-
-	D3D11_DEPTH_STENCIL_DESC depth_stencil_desc;
-	depth_stencil_desc.DepthEnable = FALSE;
-	depth_stencil_desc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
-	depth_stencil_desc.DepthFunc = D3D11_COMPARISON_ALWAYS;
-	depth_stencil_desc.StencilEnable = FALSE;
-	depth_stencil_desc.StencilReadMask = 0xFF;
-	depth_stencil_desc.StencilWriteMask = 0xFF;
-	depth_stencil_desc.FrontFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
-	depth_stencil_desc.FrontFace.StencilDepthFailOp = D3D11_STENCIL_OP_INCR;
-	depth_stencil_desc.FrontFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
-	depth_stencil_desc.FrontFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
-	depth_stencil_desc.BackFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
-	depth_stencil_desc.BackFace.StencilDepthFailOp = D3D11_STENCIL_OP_DECR;
-	depth_stencil_desc.BackFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
-	depth_stencil_desc.BackFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
-	hr = device->CreateDepthStencilState(&depth_stencil_desc, depth_stencil_state.GetAddressOf());
-	_ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
-}
-
-void sprite::render(ID3D11DeviceContext* immediate_context,
+void title_back::render(ID3D11DeviceContext* immediate_context,
 	float dx, float dy, float dw, float dh,
 	float r, float g, float b, float a,
 	float angle/*degree*/)
@@ -187,19 +111,16 @@ void sprite::render(ID3D11DeviceContext* immediate_context,
 	render(immediate_context, dx, dy, dw, dh, r, g, b, a, angle, 0.0f, 0.0f, static_cast<float>(texture2d_desc.Width), static_cast<float>(texture2d_desc.Height));
 }
 
-void sprite::render(ID3D11DeviceContext* immediate_context,
+void title_back::render(ID3D11DeviceContext* immediate_context,
 	float dx, float dy, float dw, float dh,
 	float r, float g, float b, float a,
 	float angle/*degree*/,
-	float sx, float sy, float sw, float sh, ID3D11PixelShader* replased_pixel_shader)
+	float sx, float sy, float sw, float sh)
 	// dx, dy : sprite's left-top corner in screen space 
 	// dw, dh :size of sprite in screen space 
 	// angle : rotation angle (Rotation centre is sprite's centre), unit is degree
 	// r, g, b : color
 {
-	min_position = { dx,dy };
-	max_position = { dx + dw,dy + dh };
-
 	D3D11_VIEWPORT viewport{};
 	UINT num_viewports{ 1 };
 	immediate_context->RSGetViewports(&num_viewports, &viewport);
@@ -328,37 +249,36 @@ void sprite::render(ID3D11DeviceContext* immediate_context,
 
 	immediate_context->Unmap(vertex_buffer.Get(), 0);
 
+	
 	UINT stride{ sizeof(vertex) };
 	UINT offset{ 0 };
 	immediate_context->IASetVertexBuffers(0, 1, vertex_buffer.GetAddressOf(), &stride, &offset);
+	immediate_context->PSSetConstantBuffers(4, 1, forplay_buffer.GetAddressOf());
+	immediate_context->VSSetConstantBuffers(4, 1, forplay_buffer.GetAddressOf());
 
 	immediate_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
 
 	immediate_context->IASetInputLayout(input_layout.Get());
 
 	immediate_context->VSSetShader(vertex_shader.Get(), nullptr, 0);
-
-	if (replased_pixel_shader)
-		immediate_context->PSSetShader(replased_pixel_shader, nullptr, 0);
-	else
 	immediate_context->PSSetShader(pixel_shader.Get(), nullptr, 0);
 
-	immediate_context->PSSetShaderResources(0, 1, shader_resource_view.GetAddressOf());
+	immediate_context->PSSetShaderResources(0, 1, shader_resource_material_noise.GetAddressOf());
 	Microsoft::WRL::ComPtr<ID3D11RasterizerState> default_rasterizer_state;
-	
-		immediate_context->RSGetState(default_rasterizer_state.ReleaseAndGetAddressOf());
-		immediate_context->RSSetState(rasterizer_state.Get());
-	
+
+	immediate_context->RSGetState(default_rasterizer_state.ReleaseAndGetAddressOf());
+	immediate_context->RSSetState(rasterizer_state.Get());
+
 	Microsoft::WRL::ComPtr<ID3D11DepthStencilState> default_depth_stencil_state;
-	
-		immediate_context->OMGetDepthStencilState(default_depth_stencil_state.ReleaseAndGetAddressOf(), 0);
-		immediate_context->OMSetDepthStencilState(depth_stencil_state.Get(), 1);
-	
+
+	immediate_context->OMGetDepthStencilState(default_depth_stencil_state.ReleaseAndGetAddressOf(), 0);
+	immediate_context->OMSetDepthStencilState(depth_stencil_state.Get(), 1);
+
 	Microsoft::WRL::ComPtr<ID3D11SamplerState> default_sampler_state;
-	
-		immediate_context->PSGetSamplers(0, 1, default_sampler_state.ReleaseAndGetAddressOf());
-		immediate_context->PSSetSamplers(0, 1, sampler_state.GetAddressOf());
-	
+
+	immediate_context->PSGetSamplers(0, 1, default_sampler_state.ReleaseAndGetAddressOf());
+	immediate_context->PSSetSamplers(0, 1, sampler_state.GetAddressOf());
+
 
 	immediate_context->Draw(4, 0);
 
@@ -367,7 +287,9 @@ void sprite::render(ID3D11DeviceContext* immediate_context,
 	immediate_context->PSSetShader(0, 0, 0);
 
 	ID3D11ShaderResourceView* null_shader_resource_view = 0;
+	ID3D11ShaderResourceView* null_shader_resource_view1 = 0;
 	immediate_context->PSSetShaderResources(0, 1, &null_shader_resource_view);
+	immediate_context->PSSetShaderResources(1, 1, &null_shader_resource_view1);
 
 	if (default_rasterizer_state)
 	{
@@ -382,13 +304,13 @@ void sprite::render(ID3D11DeviceContext* immediate_context,
 		immediate_context->PSSetSamplers(0, 1, default_sampler_state.GetAddressOf());
 	}
 }
-void sprite::render(ID3D11DeviceContext* immediate_context, float dx, float dy, float dw, float dh)
+void title_back::render(ID3D11DeviceContext* immediate_context, float dx, float dy, float dw, float dh)
 {
-	render(immediate_context, dx, dy, dw, dh, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 
+	render(immediate_context, dx, dy, dw, dh, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f,
 		0.0f, 0.0f, static_cast<float>(texture2d_desc.Width), static_cast<float>(texture2d_desc.Height));
 }
 
-void sprite::textout(ID3D11DeviceContext* immediate_context, std::string s, float x, float y, float w, float h, float r, float g, float b, float a)
+void title_back::textout(ID3D11DeviceContext* immediate_context, std::string s, float x, float y, float w, float h, float r, float g, float b, float a)
 {
 	float sw = static_cast<float>(texture2d_desc.Width / 16);
 	float sh = static_cast<float>(texture2d_desc.Height / 16);
@@ -400,11 +322,14 @@ void sprite::textout(ID3D11DeviceContext* immediate_context, std::string s, floa
 	}
 }
 
-bool sprite::hit_cursor(DirectX::XMFLOAT2 cursor_pos, DirectX::XMFLOAT2 differential)
+void title_back::DebugDrawGUI()
 {
-	//differential:·•ª@–{—ˆ‚Ì‰æ‘œ‚©‚ç”»’è‚Ì”ÍˆÍ‚ðŠg‘åk¬‚·‚é‚Æ‚«‚Ì‚»‚Ì’l
-	if (cursor_pos.x > min_position.x && cursor_pos.y < max_position.y && cursor_pos.x < max_position.x && cursor_pos.y > min_position.y)
-		return true;
+	ImGui::SetNextWindowPos(ImVec2(10, 10), ImGuiCond_FirstUseEver);
+	ImGui::SetNextWindowSize(ImVec2(300, 300), ImGuiCond_FirstUseEver);
 
-	return false;
+	if (ImGui::Begin("back", nullptr, ImGuiWindowFlags_None))
+	{
+		
+	}
+	ImGui::End();
 }

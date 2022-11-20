@@ -65,6 +65,7 @@ float4 main(PS_IN pin) : SV_TARGET
    //light += emissive;
 
    light= (normal.w <= 0) ? float3(1, 1, 1) : light + emissive;
-   //float4 c=env_map.Sample(sampler_states[LINEAR], pin.texcoord);
-    return float4(light.rgb, 1.0);
+   float4 c=env_map.Sample(sampler_states[LINEAR], pin.texcoord);
+    //return float4(light.rgb, 1.0);
+    return float4(c.rgb, 1.0);
 }
