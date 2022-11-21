@@ -93,6 +93,7 @@ float v_sheen(float NoL, float NoV, float sheen_roughness)
 
 	return clamp(1.0 / ((1.0 + lambda_sheen(NoV, alpha) + lambda_sheen(NoL, alpha)) * (4.0 * NoV * NoL)), 0.0, 1.0);
 }
+//brdf_specular_sheen : ブラフ・スペキュラー・シーン
 float3 brdf_specular_sheen(float3 sheen_color, float sheen_roughness, float NoL, float NoV, float NoH)
 {
 	float sheen_distribution = d_charlie(sheen_roughness, NoH);

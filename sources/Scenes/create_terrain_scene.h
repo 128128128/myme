@@ -72,6 +72,7 @@ public:
 		float theta = DirectX::XMConvertToRadians(20);  /// Theta is the angle around the x axis (latitude angle counterclockwise), values range from 0 to PI.
 		float phi = DirectX::XMConvertToRadians(0);    /// Phi is the angle around the y axis (longitude angle counterclockwise), values range from 0 to 2PI.
 
+		//cartesian...íºåç¿ïWÇ÷	
 		DirectX::XMFLOAT4 to_cartesian()
 		{
 			theta = min(DirectX::XMConvertToRadians(+89), max(DirectX::XMConvertToRadians(-89), theta));

@@ -67,26 +67,26 @@ void camera::freelook_update(float elapsedTime, DirectX::XMFLOAT4 pos)
 		AxisRight = DirectX::XMLoadFloat3(&axisRight);
 
 		//---------------------------------
-		// 移動処理
+		// moving
 		//---------------------------------
 		if (gamePad.GetAxisLX() > 0.2f || (gamePad.GetButton() & GamePad::KEY_D))
 		{
-			//右へ
+			//right
 			NPos += Right * cameraSpeed * elapsedTime;
 		}
 		if (gamePad.GetAxisLX() < -0.2f || (gamePad.GetButton() & GamePad::KEY_A))
 		{
-			//左へ
+			//left
 			NPos += -Right * cameraSpeed * elapsedTime;
 		}
 		if (gamePad.GetAxisLY() > 0.2f || (gamePad.GetButton() & GamePad::KEY_W))
 		{
-			//前へ
+			//forward
 			NPos += Forward * cameraSpeed * elapsedTime;
 		}
 		if (gamePad.GetAxisLY() < -0.2f || (gamePad.GetButton() & GamePad::KEY_S))
 		{
-			//後ろへ
+			//back
 			NPos += -Forward * cameraSpeed * elapsedTime;
 		}
 
@@ -97,13 +97,13 @@ void camera::freelook_update(float elapsedTime, DirectX::XMFLOAT4 pos)
 		int subY = mouse.GetPositionY() - mouse.GetOldPositionY();
 
 		//---------------------------------
-		//カメラの向き変更処理
+		//camera direction
 		//---------------------------------
 		if (mouse.GetButton() & Mouse::BTN_RIGHT) {
 			//if (gamePad.GetAxisRX() > 0.2f || (gamePad.GetButton() & GamePad::KEY_L))
 		if (subX > 0)
 		{
-			//右へ
+			//right
 			DirectX::XMVECTOR Q = DirectX::XMQuaternionRotationAxis(AxisUp, cameraAngleSpeed);
 			DirectX::XMVECTOR OQ = DirectX::XMQuaternionMultiply(Orientation, Q);
 			Orientation = DirectX::XMQuaternionSlerp(Orientation, OQ, 0.1f);
@@ -111,7 +111,7 @@ void camera::freelook_update(float elapsedTime, DirectX::XMFLOAT4 pos)
 		//if (gamePad.GetAxisRX() < -0.2f || (gamePad.GetButton() & GamePad::KEY_J))
 		if (subX < 0)
 		{
-			//左へ
+			//left
 			DirectX::XMVECTOR Q = DirectX::XMQuaternionRotationAxis(AxisUp, -cameraAngleSpeed);
 			DirectX::XMVECTOR OQ = DirectX::XMQuaternionMultiply(Orientation, Q);
 			Orientation = DirectX::XMQuaternionSlerp(Orientation, OQ, 0.1f);
@@ -119,7 +119,7 @@ void camera::freelook_update(float elapsedTime, DirectX::XMFLOAT4 pos)
 		//if (gamePad.GetAxisRY() > 0.2f || (gamePad.GetButton() & GamePad::KEY_I))
 		if (subY < 0)
 		{
-			//上へ
+			//up
 			DirectX::XMVECTOR Q = DirectX::XMQuaternionRotationAxis(AxisRight, -cameraAngleSpeed);
 			DirectX::XMVECTOR OQ = DirectX::XMQuaternionMultiply(Orientation, Q);
 			Orientation = DirectX::XMQuaternionSlerp(Orientation, OQ, 0.1f);
@@ -127,7 +127,7 @@ void camera::freelook_update(float elapsedTime, DirectX::XMFLOAT4 pos)
 		//if (gamePad.GetAxisRY() < -0.2f || (gamePad.GetButton() & GamePad::KEY_K))
 		if (subY > 0)
 		{
-			//下へ
+			//down
 			DirectX::XMVECTOR Q = DirectX::XMQuaternionRotationAxis(AxisRight, cameraAngleSpeed);
 			DirectX::XMVECTOR OQ = DirectX::XMQuaternionMultiply(Orientation, Q);
 			Orientation = DirectX::XMQuaternionSlerp(Orientation, OQ, 0.1f);
@@ -149,6 +149,7 @@ void camera::freelook_update(float elapsedTime, DirectX::XMFLOAT4 pos)
 	
 }
 
+//update
 	void camera::update(XMFLOAT4 target_position, float elapsed_time)
 	{
 		Mouse& mouse = Input::Instance().GetMouse();
@@ -197,6 +198,7 @@ void camera::freelook_update(float elapsedTime, DirectX::XMFLOAT4 pos)
 	
 }
 
+//first person update
 void camera::firstperson_update(float elapsedTime,DirectX::XMFLOAT4 pos)
 {
 	Mouse& mouse = Input::Instance().GetMouse();
@@ -208,6 +210,7 @@ void camera::firstperson_update(float elapsedTime,DirectX::XMFLOAT4 pos)
 	DirectX::XMFLOAT4X4 m4x4 = {};
 	DirectX::XMStoreFloat4x4(&m4x4, m);
 
+	//Extract all direction vectors from a rotation matrix
 	//回転行列から全方向ベクトルを取り出す
 	DirectX::XMVECTOR Right = { m4x4._11, m4x4._12, m4x4._13 };
 	DirectX::XMVECTOR Up = { m4x4._21, m4x4._22, m4x4._23 };
@@ -231,13 +234,13 @@ void camera::firstperson_update(float elapsedTime,DirectX::XMFLOAT4 pos)
 	int subY  = mouse.GetPositionY() - mouse.GetOldPositionY();
 
 	//---------------------------------
-	//カメラの向き変更処理
+	//camera direction
 	//---------------------------------
 	if (mouse.GetButton() & Mouse::BTN_RIGHT) {
 		//if (gamePad.GetAxisRX() > 0.2f || (gamePad.GetButton() & GamePad::KEY_L))
 		if (subX > 0)
 		{
-			//右へ
+			//right
 			DirectX::XMVECTOR Q = DirectX::XMQuaternionRotationAxis(AxisUp, cameraAngleSpeed);
 			DirectX::XMVECTOR OQ = DirectX::XMQuaternionMultiply(Orientation, Q);
 			Orientation = DirectX::XMQuaternionSlerp(Orientation, OQ, 0.1f);
@@ -245,7 +248,7 @@ void camera::firstperson_update(float elapsedTime,DirectX::XMFLOAT4 pos)
 		//if (gamePad.GetAxisRX() < -0.2f || (gamePad.GetButton() & GamePad::KEY_J))
 		if (subX < 0)
 		{
-			//左へ
+			//left
 			DirectX::XMVECTOR Q = DirectX::XMQuaternionRotationAxis(AxisUp, -cameraAngleSpeed);
 			DirectX::XMVECTOR OQ = DirectX::XMQuaternionMultiply(Orientation, Q);
 			Orientation = DirectX::XMQuaternionSlerp(Orientation, OQ, 0.1f);
@@ -253,7 +256,7 @@ void camera::firstperson_update(float elapsedTime,DirectX::XMFLOAT4 pos)
 		//if (gamePad.GetAxisRY() > 0.2f || (gamePad.GetButton() & GamePad::KEY_I))
 		if (subY < 0)
 		{
-			//上へ
+			//up
 			DirectX::XMVECTOR Q = DirectX::XMQuaternionRotationAxis(AxisRight, -cameraAngleSpeed);
 			DirectX::XMVECTOR OQ = DirectX::XMQuaternionMultiply(Orientation, Q);
 			Orientation = DirectX::XMQuaternionSlerp(Orientation, OQ, 0.1f);
@@ -261,7 +264,7 @@ void camera::firstperson_update(float elapsedTime,DirectX::XMFLOAT4 pos)
 		//if (gamePad.GetAxisRY() < -0.2f || (gamePad.GetButton() & GamePad::KEY_K))
 		if (subY > 0)
 		{
-			//下へ
+			//down
 			DirectX::XMVECTOR Q = DirectX::XMQuaternionRotationAxis(AxisRight, cameraAngleSpeed);
 			DirectX::XMVECTOR OQ = DirectX::XMQuaternionMultiply(Orientation, Q);
 			Orientation = DirectX::XMQuaternionSlerp(Orientation, OQ, 0.1f);
@@ -290,11 +293,13 @@ void camera::set_view(const DirectX::XMFLOAT4& eye, const DirectX::XMFLOAT4& foc
 	DirectX::XMMATRIX View = DirectX::XMMatrixLookAtLH(Eye, Focus, Up);
 	DirectX::XMStoreFloat4x4(&camera_constants_buffer->data.view, View);
 
+	// Inverse the view and convert it back to a world matrix
 	//ビューを逆行列化し、ワールド行列に戻す
 	DirectX::XMMATRIX World = DirectX::XMMatrixInverse(nullptr, View);
 	DirectX::XMFLOAT4X4 world;
 	DirectX::XMStoreFloat4x4(&world, World);
 
+	//Take out the camera direction
 	//カメラの方向を取り出す
 	this->right.x = world._11;
 	this->right.y = world._12;
@@ -317,6 +322,7 @@ void camera::set_view(const DirectX::XMFLOAT4& eye, const DirectX::XMFLOAT4& foc
 	this->focus = focus;
 }
 
+//debug imgui
 void camera::DrawDebugGUI()
 {
 	ImGui::SetNextWindowPos(ImVec2(10, 10), ImGuiCond_FirstUseEver);

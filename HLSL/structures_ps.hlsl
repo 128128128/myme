@@ -11,7 +11,7 @@ SamplerState point_sampler_state : register(s0);
 SamplerState linear_sampler_state : register(s1);
 SamplerState anisotropic_sampler_state : register(s2);
 
-// MRTo—Íî•ñ
+// MRT
 struct PS_OUT {
 	float4 Color : SV_TARGET0;
 	float4 Depth : SV_TARGET1;
@@ -22,7 +22,7 @@ struct PS_OUT {
 
 PS_OUT main(VS_OUT pin)
 {
-	//MRTo—Í
+	//MRT
 	PS_OUT ret;
 
 	float4 color = diffuse_map.Sample(anisotropic_sampler_state, pin.texcoord);

@@ -1,4 +1,4 @@
-
+//dynamic vs
 #include "dynamic_mesh.hlsli"
 #include "scene_constants.hlsli"
 
@@ -17,6 +17,7 @@ VS_OUT main(VS_IN vin)
 	VS_OUT vout;
 	vout.sv_position = mul(vin.position, mul(world, camera_constants.view_projection));
 
+	// multi world
 	vout.position = mul(vin.position, world);
 	vin.normal.w = 0;
 	vout.normal = normalize(mul(vin.normal, world));

@@ -11,6 +11,7 @@ float4 main(GS_OUT pin) : SV_TARGET
 	float4 color2 = color_map2.Sample(sampler_states[ANISOTROPIC_WRAP], pin.texcoord);
 	float4 noise = noise_map.Sample(sampler_states[ANISOTROPIC_WRAP], pin.texcoord);
 
+	//mix texture
 	float4 color = lerp(color2, color1, noise*primitive_data.mix_rate);
 
 	float3 L = -scene_data.light_direction.xyz;

@@ -25,7 +25,7 @@ float4 main(VS_OUT pin) : SV_TARGET
 	normal = (normal * 2.0) - 1.0;
 	normal.w = 0;
 	N = normalize((normal.x * T) + (normal.y * B) + (normal.z * N));
-
+	N = N * 0.5 + 0.5;//0~1
 	float3 L = normalize(-light_direction.direction.xyz);
 	float3 diffuse = color.rgb * max(0, dot(N, L)*0.5+0.5);
 

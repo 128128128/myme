@@ -20,7 +20,7 @@ float4 main(PS_IN pin) : SV_TARGET
 
 	float3 L = light_direction.direction.xyz;
 
-	float3 N = tex.xyz * 2.0 - 1.0;
+	float3 N = tex.xyz * 2.0 - 1.0;//-1~1
 	
 	float3 C = light_direction.color.rgb * 2;
 	L = normalize(L);

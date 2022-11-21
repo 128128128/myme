@@ -1,5 +1,5 @@
 
-
+//scene something constants
 struct SOMETHING
 {
 	float iTime;
@@ -7,7 +7,6 @@ struct SOMETHING
 	float elapsedTime;
 	float shadow_map_num;
 	float4x4 mlvp[1][3];
-
 };
 
 struct PLAYER
@@ -16,6 +15,7 @@ struct PLAYER
 	float4 direction;
 };
 
+//point light constants
 struct POINT_LIGHT
 {
 	float4 color;
@@ -23,6 +23,7 @@ struct POINT_LIGHT
 	float range;
 };
 
+//spot constants buffer
 struct SPOT_LIGHT
 {
 	float3 position;
@@ -40,6 +41,7 @@ struct HEMISPHERE_LIGHT
 	float4 ground_normal;
 };
 
+//camera constants buffer
 struct CAMERA_CONSTANTS
 {
 	float4 position;
@@ -51,6 +53,7 @@ struct CAMERA_CONSTANTS
 	row_major float4x4 inverse_view_projection;
 };
 
+//light constants buffer
 struct LIGHT_CONSTANTS
 {
 	float4 direction;

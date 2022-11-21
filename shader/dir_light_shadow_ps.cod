@@ -16,11 +16,11 @@
 //
 // Name                                 Type  Format         Dim      HLSL Bind  Count
 // ------------------------------ ---------- ------- ----------- -------------- ------
-// DecalSampler                      sampler      NA          NA             s0      1 
-// ShadowSampler                     sampler      NA          NA            s14      1 
-// DiffuseTexture                    texture  float4          2d             t0      1 
-// PositionTexture                   texture  float4          2d             t2      1 
-// ShadowMap                         texture  float4          2d            t14      1 
+// decal_sampler                     sampler      NA          NA             s0      1 
+// shadow_sampler                    sampler      NA          NA            s14      1 
+// diffuse_texture                   texture  float4          2d             t0      1 
+// position_texture                  texture  float4          2d             t2      1 
+// shadow_map                        texture  float4          2d            t14      1 
 // cb_shadoow_map                    cbuffer      NA          NA           cb10      1 
 //
 //

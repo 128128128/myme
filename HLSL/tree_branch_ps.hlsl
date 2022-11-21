@@ -31,7 +31,7 @@ PS_OUT main(VS_OUT pin) :SV_TARGET0
 	float3 ase_world_pos = pin.position.xyz;
 	float temp_output_60_0 = ((wind_speed * 0.05) * something.triple_speed_iTime);
 	float2 append_result_249 = (float2(wind_direction.x, wind_direction.z));
-	float3 wind_vectors_99 = windVectors.SampleLevel(anisotropic_sampler_state, wind_amplitude_multiplier * wind_amplitude * (ase_world_pos.xz *1) + temp_output_60_0 * append_result_249, 0.0);
+	float3 wind_vectors_99 = wind_vectors.SampleLevel(anisotropic_sampler_state, wind_amplitude_multiplier * wind_amplitude * (ase_world_pos.xz *1) + temp_output_60_0 * append_result_249, 0.0);
 	wind_vectors_99 = wind_vectors_99 * 2.0 - 1.0;
 	float debug = 0.0;
 	

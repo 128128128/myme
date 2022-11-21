@@ -50,18 +50,12 @@
 extern LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 extern ImWchar glyphRangesJapanese[];
 
-namespace descartes
-{
-	namespace collision
-	{
-		class mesh;
-	}
-}
 
 
 class particle_scene : public Scene
 {
 public:
+	//function
 	bool initialize(ID3D11Device* device, CONST LONG screen_width, CONST LONG screen_height);
 	const char* update(float& elapsed_time/*Elapsed seconds from last frame*/);
 	void render(ID3D11DeviceContext* immediate_context, float elapsed_time/*Elapsed seconds from last frame*/);
@@ -83,20 +77,6 @@ public:
 	//objects
 	std::unique_ptr<Player> player;
 	std::unique_ptr<pbr_Stage>pbr_ship;
-	//std::unique_ptr<pbr_Stage>stage;
-	//std::unique_ptr<pbr_Stage>pbr_ship_1;
-	//std::unique_ptr<Ground>ground;//factory
-	//std::unique_ptr<dynamic_mesh> test;
-	//std::unique_ptr<Terrain> terrains;
-	//std::unique_ptr<Knife> knife;
-	//std::unique_ptr<Ground>shadow_trees;
-	//std::unique_ptr<Structures> structures;
-	//std::unique_ptr<VegetationSmall> vegetation_small;
-
-
-	//std::unique_ptr<Descartes::collision::mesh> collision_mesh;
-	//scenery[s]
-	//std::unique_ptr<skydome> sky;
 
 	//framebuffers
 	std::unique_ptr<Descartes::framebuffer> shadowmap;
@@ -132,9 +112,10 @@ public:
 
 	//particles
 	std::unique_ptr<snow_particles> snow;
-
-
+	//sky sprite
 	std::unique_ptr<sprite> sky;
+
+	//scene constants structure
 	struct scene_constants
 	{
 		//directional
@@ -160,6 +141,7 @@ public:
 	};
 	std::unique_ptr<Descartes::constant_buffer<scene_constants>> scene_constants_buffer;
 
+	//light constant structure
 	struct light_constants
 	{
 		//point light
@@ -241,6 +223,7 @@ private:
 	float time = 0;
 	float triple_speed_time = 0;
 
+	//post effect
 	bool post_blooming = false;
 	bool enable_lens_flare = false;
 	bool enable_post_effects = false;
@@ -250,6 +233,5 @@ private:
 	bool integrate_particles{ false };
 	std::unique_ptr<husk_particles> particles;
 
-	shadow::CascadeShadowMapMatrix m_cascadeShadowMapMatrix;    // カスケードシャドウマップの行列を扱うオブジェクト
 
 };

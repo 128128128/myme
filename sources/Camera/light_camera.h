@@ -10,354 +10,355 @@
 class light_camera {
 public:
 	/// <summary>
-	/// 射影行列の更新方法。
+	/// Method of updating the projection matrix.
 	/// </summary>
-	enum EnUpdateProjMatrixFunc {
-		enUpdateProjMatrixFunc_Perspective,		//透視射影行列。遠近法が効いた絵を作りたいならこっち。
-		enUpdateProjMatrixFunc_Ortho,			//平行投影。２Ｄ的な表現がしたいならこっち。
+	enum en_update_proj_matrix_func {
+		enUpdateProjMatrixFunc_Perspective,		// perspective projection matrix.
+	                                                                        //If you want to make a picture with perspective, this is the way to go.
+		enUpdateProjMatrixFunc_Ortho,			//Parallel projection;
+	                                                                //if you want 2D expression, this is the way to go.
 	};
 	/// <summary>
-	/// ビュー行列、プロジェクション行列を更新する。
+	/// Update view and projection matrices.
 	/// </summary>
-	void Update();
+	void update();
 	/// <summary>
+	///	Rotate the camera with the gazing point as the origin.
 	/// 注視点を原点としてカメラを回転させる。
 	/// </summary>
-	/// <param name="qRot">回転させるクォータニオン</param>
-	void RotateOriginTarget(const Quaternion& qRot);
+	/// <param name="qRot">Rotating quaternion</param>
+	void rotate_origin_target(const Quaternion& qRot);
 
 	/// <summary>
-	/// カメラを動かす。
+	/// move camera
 	/// </summary>
-	/// <param name="move">動かす量</param>
-	void Move(const Vector3& move)
+	/// <param name="move">move param</param>
+	void move(const Vector3& move)
 	{
-		m_position += move;
-		m_target += move;
-		m_isDirty = true;
+		position += move;
+		target += move;
+		is_dirty = true;
 	}
 	/// <summary>
-	/// 注視点を動かす。
+	/// move target
 	/// </summary>
-	/// <param name="move">移動量</param>
-	void MoveTarget(const Vector3& move)
+	/// <param name="move">Amount of movement</param>
+	void move_target(const Vector3& move)
 	{
-		m_target += move;
-		m_isDirty = true;
+		target += move;
+		is_dirty = true;
 	}
 	/// <summary>
-	/// 視点を動かす。
+	/// Move the viewpoint.
 	/// </summary>
 	/// <param name="move"></param>
-	void MovePosition(const Vector3& move)
+	void move_position(const Vector3& move)
 	{
-		m_position += move;
-		m_isDirty = true;
+		position += move;
+		is_dirty = true;
 	}
 	/// <summary>
-	/// カメラの前方方向に移動。
+	///Move to the forward of the camera.
 	/// </summary>
 	/// <param name="moveForward"></param>
-	void MoveForward(float moveForward)
+	void move_forward(float moveForward)
 	{
-		Move(m_forward * moveForward);
+		move(forward * moveForward);
 	}
 	/// <summary>
-	/// カメラの右方向に移動。
+	/// Move to the right of the camera.
 	/// </summary>
 	/// <param name="moveRight"></param>
-	void MoveRight(float moveRight)
+	void move_right(float moveRight)
 	{
-		Move(m_right * moveRight);
+		move(right * moveRight);
 	}
 	/// <summary>
-	/// カメラの上方向に移動。
+	/// Move to the up of the camera.
 	/// </summary>
 	/// <param name="moveUp"></param>
-	void MoveUp(float moveUp)
+	void move_up(float moveUp)
 	{
-		Move(m_up * moveUp);
+		move(up * moveUp);
 	}
 	/// <summary>
-	/// カメラの座標を設定する。
+	/// set position
 	/// </summary>
-	void SetPosition(const Vector3& pos)
+	void set_position(const Vector3& pos)
 	{
-		m_position = pos;
-		m_isDirty = true;
+		position = pos;
+		is_dirty = true;
 	}
-	void SetPosition(float x, float y, float z)
+	void set_position(float x, float y, float z)
 	{
-		SetPosition({ x, y, z });
+		set_position({ x, y, z });
 	}
 	/// <summary>
-	/// カメラの座標を取得。
+	/// get pos
 	/// </summary>
-	const Vector3& GetPosition() const
+	const Vector3& get_position() const
 	{
-		return m_position;
+		return position;
 	}
 	/// <summary>
-	/// 注視点を設定。
+	/// set target
 	/// </summary>
-	void SetTarget(float x, float y, float z)
+	void set_target(float x, float y, float z)
 	{
-		SetTarget({ x, y, z });
+		set_target({ x, y, z });
 	}
-	void SetTarget(const Vector3& target)
+	void set_target(const Vector3& ftarget)
 	{
-		m_target = target;
-		m_isDirty = true;
+		target = ftarget;
+		is_dirty = true;
 	}
 	/// <summary>
-	/// 注視点を取得。
+	/// get target
 	/// </summary>
-	const Vector3& GetTarget() const
+	const Vector3& get_target() const
 	{
-		return m_target;
+		return target;
 	}
 	/// <summary>
-	/// カメラの上方向を設定。
+	/// set up
 	/// </summary>
-	void SetUp(const Vector3& up)
+	void set_up(const Vector3& fup)
 	{
-		m_up = up;
-		m_up.Normalize();
+		up = fup;
+		up.normalize();
 	}
-	void SetUp(float x, float y, float z)
+	void set_up(float x, float y, float z)
 	{
-		SetUp({ x, y, z });
+		set_up({ x, y, z });
 	}
 	/// <summary>
-	/// カメラの上方向を取得。
+	/// get up
 	/// </summary>
-	const Vector3& GetUp() const
+	const Vector3& get_up() const
 	{
-		return m_up;
+		return up;
 	}
 
 	/// <summary>
-	/// ビュー行列の逆行列を取得。
+	/// get inverse matrix
 	/// </summary>
-	const Matrix& GetViewMatrixInv()
+	const Matrix& get_view_matrix_inv()
 	{
-		if (m_isDirty) {
-			//更新する必要がある。
-			Update();
+		if (is_dirty) {
+			//need this
+			update();
 		}
-		return m_viewMatrixInv;
+		return view_matrix_inv;
 	}
 	/// <summary>
-	/// ビュー行列を取得。
+	///get view matrix
 	/// </summary>
-	const Matrix& GetViewMatrix()
+	const Matrix& get_view_matrix()
 	{
-		if (m_isDirty) {
-			//更新する必要がある。
-			Update();
+		if (is_dirty) {
+			//need update
+			update();
 		}
-		return m_viewMatrix;
+		return view_matrix;
 	}
 	/// <summary>
-	/// プロジェクション行列を取得。
+	/// get projection matrix
 	/// </summary>
-	const Matrix& GetProjectionMatrix()
+	const Matrix& get_projection_matrix()
 	{
-		if (m_isDirty) {
-			//更新する必要がある。
-			Update();
+		if (is_dirty) {
+			update();
 		}
-		return m_projectionMatrix;
+		return projection_matrix;
 	}
 	/// <summary>
-	/// ビュー×プロジェクション行列を取得。
+	/// get view projection
 	/// </summary>
-	const Matrix& GetViewProjectionMatrix()
+	const Matrix& get_view_projection_matrix()
 	{
-		if (m_isDirty) {
-			//更新する必要がある。
-			Update();
+		if (is_dirty) {
+			//need update
+			update();
 		}
-		return m_viewProjectionMatrix;
+		return view_projection_matrix;
 	}
 	/// <summary>
-	/// カメラの回転行列を取得。
+	/// get camera rotation
 	/// </summary>
-	const Matrix& GetCameraRotation()
+	const Matrix& get_camera_rotation()
 	{
-		if (m_isDirty) {
-			//更新する必要がある。
-			Update();
+		if (is_dirty) {
+			update();
 		}
-		return m_cameraRotation;
+		return camera_rotation;
 	}
 	/// <summary>
-	/// 遠平面までの距離を設定。
+	/// Set the distance to the far plane.
 	/// </summary>
-	void SetFar(float fFar)
+	void set_far(float fFar)
 	{
-		m_far = fFar;
-		m_isDirty = true;
+		far = fFar;
+		is_dirty = true;
 	}
 	/// <summary>
-	/// 近平面までの距離を設定。
+	/// Set the distance to the near plane.
 	/// </summary>
-	void SetNear(float fNear)
+	void set_near(float fNear)
 	{
-		m_near = fNear;
-		m_isDirty = true;
+		near = fNear;
+		is_dirty = true;
 	}
 	/// <summary>
-	/// 遠平面までの距離を取得。
+	/// get the distance to the far plane.
 	/// </summary>
-	float GetFar() const
+	float get_far() const
 	{
-		return m_far;
+		return far;
 	}
 	/// <summary>
-	/// 近平面までの距離を取得。
+	/// get the distance to the near plane.
 	/// </summary>
-	float GetNear() const
+	float get_near() const
 	{
-		return m_near;
+		return near;
 	}
 	/// <summary>
-	/// 平行投影の幅を設定。
+	/// Set the width of the parallel projection.
 	/// </summary>
 	/// <remarks>
 	/// SetUpdateProjMatrixFuncでenUpdateProjMatrixFunc_Orthoが設定されているときに使用される。
 	/// </remarks>
-	void SetWidth(float w)
+	void set_width(float w)
 	{
-		m_width = w;
-		m_isDirty = true;
+		width = w;
+		is_dirty = true;
 	}
 	/// <summary>
-	/// 平行投影の高さを設定。
+	/// Set the hieght of the parallel projection.
 	/// </summary>
 	/// <remarks>
 	/// SetUpdateProjMatrixFuncでenUpdateProjMatrixFunc_Orthoが設定されているときに使用される。
 	/// </remarks>
-	void SetHeight(float h)
+	void set_height(float h)
 	{
-		m_height = h;
-		m_isDirty = true;
+		height = h;
+		is_dirty = true;
 	}
 	/// <summary>
-	/// 平行投影の幅を取得。
+	/// get the width of the parallel projection.
 	/// </summary>
-	float GetWidth() const
+	float get_width() const
 	{
-		return m_width;
+		return width;
 	}
 	/// <summary>
-	/// 平行投影の高さを取得。
+	/// get the height of the parallel projection.
 	/// </summary>
-	float GetHeight() const
+	float get_height() const
 	{
-		return m_height;
+		return height;
 	}
 	/// <summary>
-	/// 平行投影の高さを設定。
+	/// Set parallel projection height.
 	/// </summary>
 	/// <remarks>
 	/// SetUpdateProjMatrixFuncでenUpdateProjMatrixFunc_Orthoが設定されているときに使用される。
 	/// </remarks>
-	void SetUpdateProjMatrixFunc(EnUpdateProjMatrixFunc func)
+	void set_update_proj_matrix_func(en_update_proj_matrix_func func)
 	{
 		m_updateProjMatrixFunc = func;
-		m_isDirty = true;
+		is_dirty = true;
 	}
 	/// <summary>
-	/// 画角を設定。
+	/// set view angle
 	/// </summary>
 	/// <remarks>
 	/// SetUpdateProjMatrixFuncでenUpdateProjMatrixFunc_Perspectiveが設定されているときに使用される。
 	/// </remarks>
-	/// <param name="viewAngle">画角。単位ラジアン</param>
-	void SetViewAngle(float viewAngle)
+	/// <param name="viewAngle">view angle。単位ラジアン</param>
+	void set_view_angle(float viewAngle)
 	{
-		m_viewAngle = viewAngle;
-		m_isDirty = true;
+		view_angle = viewAngle;
+		is_dirty = true;
 	}
 	/// <summary>
-	/// 画角を取得。
+	/// get angle
 	/// </summary>
-	/// <returns>画角。単位ラジアン</returns>
-	float GetViewAngle() const
+	/// <returns>view angle。unit radian</returns>
+	float get_view_angle() const
 	{
-		return m_viewAngle;
+		return view_angle;
 	}
 	/// <summary>
-	/// 注視点と視点の距離を取得。
+	/// get the distance between the gazing point and the viewpoint.
 	/// </summary>
 	/// <returns></returns>
-	float GetTargetToPositionLength() const
+	float get_target_to_position_length() const
 	{
-		return m_targetToPositionLen;
+		return target_to_position_len;
 	}
 	/// <summary>
-	/// カメラの前方向を取得。
+	/// get the camera's forward direction.
 	/// </summary>
-	const Vector3& GetForward() const
+	const Vector3& get_forward() const
 	{
-		return m_forward;
+		return forward;
 	}
 	/// <summary>
-	/// カメラの右方向を取得。
+	/// get the camera's right direction.
 	/// </summary>
 
-	const Vector3& GetRight() const
+	const Vector3& get_right() const
 	{
-		return m_right;
+		return right;
 	}
 	/// <summary>
-	/// アスペクト比を取得。
+	/// get aspect
 	/// </summary>
-	float GetAspect() const
+	float get_aspect() const
 	{
-		return m_aspect;
+		return aspect;
 	}
 	/// <summary>
-	/// カメラのコピーを作成。
+	/// create camera copy
 	/// </summary>
 	/// <param name="dst"></param>
-	void CopyTo(light_camera& dst)
+	void copy_to(light_camera& dst)
 	{
 		memcpy(&dst, this, sizeof(dst));
-		m_isDirty = true;
+		is_dirty = true;
 	}
 	/// <summary>
-	/// ワールド座標からスクリーン座標を計算する。
+	/// Calculate screen coordinates from world coordinates.
 	/// </summary>
 	/// <remarks>
 	/// 計算されるスクリーン座標は画面の中心を{0,0}、左上を{画面の幅*-0.5,画面の高さ*-0.5}
-	/// 右下を{ 画面の幅 * 0.5,画面の高さ * 0.5 }とする座標系です。
+	/// 右下を{ 画面の幅 * 0.5,画面の高さ * 0.5 }とする座標系。
 	/// </remarks>
-	/// <param name="screenPos">スクリーン座標の格納先</param>
-	/// <param name="worldPos">ワールド座標</param>
-	void CalcScreenPositionFromWorldPosition(Vector2& screenPos, const Vector3& worldPos) const;
+	/// <param name="screenPos">Where screen coordinates are stored : スクリーン座標の格納先</param>
+	/// <param name="worldPos">world position : ワールド座標</param>
+	void calc_screen_position_from_world_position(Vector2& screenPos, const Vector3& worldPos) const;
 
 protected:
-	float		m_targetToPositionLen = 1.0f;			//注視点と視点まで距離。
-	Vector3		m_position = { 0.0f, 0.0f, 1.0f };		//カメラ位置。
-	Vector3		m_up = g_vec3Up;						//カメラの上方向。
-	Vector3		m_target;								//カメラの中止点。
-	Matrix		m_viewMatrix;							//ビュー行列。
-	Matrix		m_projectionMatrix;						//プロジェクション行列。
-	Matrix		m_viewProjectionMatrix;					//ビュープロジェクション行列。
-	Matrix		m_viewMatrixInv;						//ビュー行列の逆行列。
-	Matrix		m_cameraRotation;						//カメラの回転行列。
-	Vector3		m_forward = g_vec3Front;				//カメラの前方。
-	Vector3		m_right = g_vec3Right;					//カメラの右。
-	float		m_near = 1.0f;							//近平面。
-	float		m_far = 5000.0f;						//遠平面。
-	float		m_viewAngle = math::deg_to_rad(60.0f);	//画角(ラジアン)。
-	float		m_aspect = 1.0f;						//アスペクト比。
-	float		m_width = 1280.0f;						//平行投影行列を作成するときに使用される幅。
-	float		m_height = 720.0f;						//平行投影行列を作成するときに使用される高さ。
-	EnUpdateProjMatrixFunc m_updateProjMatrixFunc = enUpdateProjMatrixFunc_Perspective;	//プロジェクション行列の更新の仕方。
-	bool		m_isNeedUpdateProjectionMatrix = true;
-	bool		m_isDirty = false;						//ダーティフラグ。
+	float		target_to_position_len = 1.0f;			//注視点と視点まで距離 : Distance to gazing point and viewpoint.
+	Vector3		position = { 0.0f, 0.0f, 1.0f };		//camera position : カメラ位置。
+	Vector3		up = g_vec3Up;						//dir up : カメラの上方向。
+	Vector3		target;								//taget  : カメラの中止点。
+	Matrix		view_matrix;							//view matrix : ビュー行列。
+	Matrix		projection_matrix;						//projection matrix : プロジェクション行列。
+	Matrix		view_projection_matrix;					//view projection matrix : ビュープロジェクション行列。
+	Matrix		view_matrix_inv;						//inverse view matrix : ビュー行列の逆行列。
+	Matrix		camera_rotation;						//rotation matrix : カメラの回転行列。
+	Vector3		forward = g_vec3Front;				//dir forward : カメラの前方。
+	Vector3		right = g_vec3Right;					//dir right : カメラの右。
+	float		near = 1.0f;							//near plane
+	float		far = 5000.0f;						//far plane : 遠平面。
+	float		view_angle = math::deg_to_rad(60.0f);	//view angle(radian) :  画角(ラジアン)。
+	float		aspect = 1.0f;						//Aspect ratio
+	float		width = 1280.0f;						//Width used when creating the parallel projection matrix.: 平行投影行列を作成するときに使用される幅。
+	float		height = 720.0f;						//Height used when creating the parallel projection matrix. : 平行投影行列を作成するときに使用される高さ。
+	en_update_proj_matrix_func m_updateProjMatrixFunc = enUpdateProjMatrixFunc_Perspective;	//How to update the projection matrix.
+	bool		is_need_update_projection_matrix = true;
+	bool		is_dirty = false;						//Dirty Flag.
 };
 

@@ -66,6 +66,7 @@ struct husk_particle
 };
 AppendStructuredBuffer<husk_particle> husk_particle_buffer : register(u1);
 
+// Calculate Fresnel (use Schlick approximate)
 float3 fresnel_schlick(float NoL, float3 F0)
 {
 	return F0 + (1.0 - F0) * pow(1.0 - NoL, 5.0);

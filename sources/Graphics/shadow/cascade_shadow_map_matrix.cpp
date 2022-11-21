@@ -147,26 +147,26 @@
             float distLig = cam_far * 0.1f;
             lightPos = lightDirection * -distLig;    // ライトまでの距離は外から指定できるようにする
             lightPos.vec = XMFLOAT3{ cam_position.x,cam_position.y,cam_position.z };
-            lightCamera.SetPosition(lightPos);
-            lightCamera.SetTarget(0.0f, 0.0f, 0.0f);
+            lightCamera.set_position(lightPos);
+            lightCamera.set_target(0.0f, 0.0f, 0.0f);
             // 上方向を設定
             if (fabsf(lightDirection.y) > 0.9999f)
             {
                 // ほぼ真上、真下を向いている
-                lightCamera.SetUp(g_vec3AxisX);
+                lightCamera.set_up(g_vec3AxisX);
             }
             else
             {
-                lightCamera.SetUp(g_vec3AxisY);
+                lightCamera.set_up(g_vec3AxisY);
             }
-            lightCamera.SetUpdateProjMatrixFunc(light_camera::enUpdateProjMatrixFunc_Ortho);
-            lightCamera.SetWidth(5000.0f);
-            lightCamera.SetHeight(5000.0f);
-            lightCamera.SetNear(1.0f);
-            lightCamera.SetFar(cam_far);
-            lightCamera.Update();
+            lightCamera.set_update_proj_matrix_func(light_camera::enUpdateProjMatrixFunc_Ortho);
+            lightCamera.set_width(5000.0f);
+            lightCamera.set_height(5000.0f);
+            lightCamera.set_near(1.0f);
+            lightCamera.set_far(cam_far);
+            lightCamera.update();
 
-            const auto& lvpMatrix = lightCamera.GetViewProjectionMatrix();
+            const auto& lvpMatrix = lightCamera.get_view_projection_matrix();
 
             // カメラのファークリップから計算するようにする
             // 分割エリアの最大深度値を定義する
@@ -201,16 +201,16 @@
             {
                 // エリアを内包する視錐台の8頂点を求める
                 // エリアの近平面の中心からの上面、下面までの距離を求める
-                float nearY = tanf(lightCamera.GetViewAngle() * 0.5f) * nearDepth;
+                float nearY = tanf(lightCamera.get_view_angle() * 0.5f) * nearDepth;
 
                 // エリアの近平面の中心からの右面、左面までの距離を求める
-                float nearX = nearY * lightCamera.GetAspect();
+                float nearX = nearY * lightCamera.get_aspect();
 
                 // エリアの遠平面の中心からの上面、下面までの距離を求める
-                float farY = tanf(lightCamera.GetViewAngle() * 0.5f) * cascadeAreaTbl[areaNo];
+                float farY = tanf(lightCamera.get_view_angle() * 0.5f) * cascadeAreaTbl[areaNo];
 
                 // エリアの遠平面の中心からの右面、左面までの距離を求める
-                float farX = farY * lightCamera.GetAspect();
+                float farX = farY * lightCamera.get_aspect();
 
                 Vector3 camera_pos;
                 camera_pos.vec = XMFLOAT3{ cam_position.x,cam_position.y, cam_position.z };

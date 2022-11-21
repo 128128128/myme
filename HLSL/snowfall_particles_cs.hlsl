@@ -42,6 +42,7 @@ void main(uint3 dtid : SV_DISPATCHTHREADID)
 		p.velocity.z = snoise(p.position.zyx * frac(time) * 10.0) * amplitude;
 		p.position += p.velocity * elapsed_time;
 
+	    //when out of area
 		if (p.position.y < current_eye_position.y - snowfall_area_height * 0.5)
 		{
 			p.position.y += snowfall_area_height;

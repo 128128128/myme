@@ -35,7 +35,7 @@ DS_OUT main(HS_CONSTANT_DATA_OUTPUT input, float3 domain : SV_DomainLocation, co
 	altitude += heightmap.Load(int3(u - offset * aspect_ratio, v - offset, 0)).x;
 	altitude /= 9.0;
 #endif
-	output.position.y = altitude;
+	output.position.y = altitude;//altitude...çÇìx
 
 	return output;
 }

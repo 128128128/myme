@@ -6,6 +6,7 @@ bool create_terrain_scene::initialize(ID3D11Device* device, const LONG screen_wi
 {
 	HRESULT hr{ S_OK };
 
+	//sampler setting
 	D3D11_SAMPLER_DESC sampler_desc[]{
 		{D3D11_FILTER_MIN_MAG_MIP_POINT/*Filter*/, D3D11_TEXTURE_ADDRESS_WRAP/*AddressU*/, D3D11_TEXTURE_ADDRESS_WRAP/*AddressV*/, D3D11_TEXTURE_ADDRESS_WRAP/*AddressW*/, 0.0f/*MipLODBias*/, 0/*MaxAnisotropy*/, D3D11_COMPARISON_NEVER/*ComparisonFunc*/, {0, 0, 0, 0}/*BorderColor[4]*/, 0.0f/*MinLOD*/, D3D11_FLOAT32_MAX/*MaxLOD*/},
 		{D3D11_FILTER_MIN_MAG_MIP_LINEAR/*Filter*/, D3D11_TEXTURE_ADDRESS_WRAP/*AddressU*/, D3D11_TEXTURE_ADDRESS_WRAP/*AddressV*/, D3D11_TEXTURE_ADDRESS_WRAP/*AddressW*/, 0.0f/*MipLODBias*/, 0/*MaxAnisotropy*/, D3D11_COMPARISON_NEVER/*ComparisonFunc*/, {0, 0, 0, 0}/*BorderColor[4]*/, 0.0f/*MinLOD*/, D3D11_FLOAT32_MAX/*MaxLOD*/},
@@ -26,6 +27,7 @@ bool create_terrain_scene::initialize(ID3D11Device* device, const LONG screen_wi
 		_ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
 	}
 
+	//depth setting
 	D3D11_DEPTH_STENCIL_DESC depth_stencil_desc{};
 	depth_stencil_desc.DepthEnable = TRUE;
 	depth_stencil_desc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
@@ -113,6 +115,7 @@ bool create_terrain_scene::initialize(ID3D11Device* device, const LONG screen_wi
 	_ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
     }
 
+	//rasterizer
 	{
 		D3D11_RASTERIZER_DESC rasterizer_desc{};
 		rasterizer_desc.FillMode = D3D11_FILL_SOLID;
@@ -153,6 +156,7 @@ bool create_terrain_scene::initialize(ID3D11Device* device, const LONG screen_wi
 		hr = device->CreateRasterizerState(&rasterizer_desc, rasterizer_states[static_cast<size_t>(RASTER_STATE::WIREFRAME_CULL_NONE)].GetAddressOf());
 		_ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
 	}
+	//constant buffer
 	{
 		D3D11_BUFFER_DESC buffer_desc{};
 		buffer_desc.ByteWidth = sizeof(scene_constants);

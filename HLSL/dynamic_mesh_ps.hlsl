@@ -18,16 +18,8 @@ float4 main(VS_OUT pin) : SV_TARGET
 	float alpha = color.a;
 	float3 N = normalize(pin.normal.xyz);
 
-	//float3 T = normalize(pin.tangent.xyz);
-	//float sigma = pin.tangent.w;
-	//T = normalize(T - N*dot(N, T));
-	//float3 B = normalize(cross(N, T) * sigma);
-	//float4 normal = texture_maps[3].Sample(sampler_states[LINEAR], pin.texcoord);
-	//normal = (normal * 2.0) - 1.0;
-	//N = normalize((normal.x * T) + (normal.y * B) + (normal.z * N));
-
-
 	float3 L = normalize(-light_direction.direction.xyz);
+	//half
 	float3 diffuse = color.rgb * max(0, dot(N, L)*0.5+0.5);
 	float3 E = normalize(camera_constants.position.xyz - pin.position.xyz);
 	float3 specular = pow(max(0, dot(N, normalize(E + L))), 128);

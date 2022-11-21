@@ -88,8 +88,7 @@ private:
 
 	DirectX::XMFLOAT2 mouseVec{ 0,0 };
 
-	float rollSpeedX{ 20 };
-	float rollSpeedY{ 20 };
+
 	float minAngle{ DirectX::XMConvertToRadians(-85) };
 	float maxAngle{ DirectX::XMConvertToRadians(85) };
 };

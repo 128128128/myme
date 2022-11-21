@@ -2,63 +2,63 @@
 
 
 
-void light_camera::Update()
+void light_camera::update()
 {
-	//アスペクト比を計算する。
-	m_aspect = 1280.0f / 720.0f;
-	if (m_isNeedUpdateProjectionMatrix) {
+	// Calculate the aspect ratio.。
+	aspect = 1280.0f / 720.0f;
+	if (is_need_update_projection_matrix) {
 		if (m_updateProjMatrixFunc == enUpdateProjMatrixFunc_Perspective) {
-			//透視変換行列を計算。
-			m_projectionMatrix.MakeProjectionMatrix(
-				m_viewAngle,
-				m_aspect,
-				m_near,
-				m_far
+			// Compute the perspective transformation matrix.
+			projection_matrix.MakeProjectionMatrix(
+				view_angle,
+				aspect,
+				near,
+				far
 			);
 		}
 		else {
-			//平行投影行列を計算。
-			m_projectionMatrix.MakeOrthoProjectionMatrix(m_width, m_height, m_near, m_far);
+			// Compute the parallel projection matrix.
+			projection_matrix.MakeOrthoProjectionMatrix(width, height, near, far);
 		}
 	}
-	//ビュー行列の算出
-	m_viewMatrix.MakeLookAt(m_position, m_target, m_up);
-	//ビュープロジェクション行列の作成。
-	m_viewProjectionMatrix = m_viewMatrix * m_projectionMatrix;
-	//ビュー行列の逆行列を計算。
-	m_viewMatrixInv.Inverse(m_viewMatrix);
+	//Calculation of view matrix
+	view_matrix.MakeLookAt(position, target, up);
+	// Creation of view projection matrices.
+	view_projection_matrix = view_matrix * projection_matrix;
+	// Compute the inverse of the view matrix.
+	view_matrix_inv.Inverse(view_matrix);
 
-	m_forward.Set(m_viewMatrixInv.m[2][0], m_viewMatrixInv.m[2][1], m_viewMatrixInv.m[2][2]);
-	m_right.Set(m_viewMatrixInv.m[0][0], m_viewMatrixInv.m[0][1], m_viewMatrixInv.m[0][2]);
-	//カメラの回転行列を取得。
-	m_cameraRotation = m_viewMatrixInv;
-	m_cameraRotation.m[3][0] = 0.0f;
-	m_cameraRotation.m[3][1] = 0.0f;
-	m_cameraRotation.m[3][2] = 0.0f;
-	m_cameraRotation.m[3][3] = 1.0f;
+	forward.set(view_matrix_inv.m[2][0], view_matrix_inv.m[2][1], view_matrix_inv.m[2][2]);
+	right.set(view_matrix_inv.m[0][0], view_matrix_inv.m[0][1], view_matrix_inv.m[0][2]);
+	//Get the rotation matrix of the camera.
+	camera_rotation = view_matrix_inv;
+	camera_rotation.m[3][0] = 0.0f;
+	camera_rotation.m[3][1] = 0.0f;
+	camera_rotation.m[3][2] = 0.0f;
+	camera_rotation.m[3][3] = 1.0f;
 
 	Vector3 toPos;
-	toPos.Subtract(m_position, m_target);
-	m_targetToPositionLen = toPos.Length();
+	toPos.subtract(position, target);
+	target_to_position_len = toPos.length();
 
-	m_isDirty = false;
+	is_dirty = false;
 }
-void light_camera::CalcScreenPositionFromWorldPosition(Vector2& screenPos, const Vector3& worldPos) const
+void light_camera::calc_screen_position_from_world_position(Vector2& screenPos, const Vector3& worldPos) const
 {
 	float half_w = 1280.0f * 0.5f;
 	float half_h = 720.0f * 0.5f;
 	Vector4 _screenPos;
-	_screenPos.Set(worldPos.x, worldPos.y, worldPos.z, 1.0f);
-	m_viewProjectionMatrix.Apply(_screenPos);
+	_screenPos.set(worldPos.x, worldPos.y, worldPos.z, 1.0f);
+	view_projection_matrix.Apply(_screenPos);
 	screenPos.x = (_screenPos.x / _screenPos.w) * half_w;
 	screenPos.y = (_screenPos.y / _screenPos.w) * half_h;
 }
-void light_camera::RotateOriginTarget(const Quaternion& qRot)
+void light_camera::rotate_origin_target(const Quaternion& qRot)
 {
-	Vector3 cameraPos = m_position;
-	Vector3 cameraTarget = m_target;
+	Vector3 cameraPos = position;
+	Vector3 cameraTarget = target;
 	Vector3 toPos = cameraPos - cameraTarget;
-	qRot.Apply(toPos);
-	m_position = m_target + toPos;
-	m_isDirty = true;
+	qRot.apply(toPos);
+	position = target + toPos;
+	is_dirty = true;
 }

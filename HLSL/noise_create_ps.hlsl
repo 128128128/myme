@@ -27,6 +27,7 @@ float2 r(float2 n)
 {
     return float2(r(n.x * 23.62 - 300.0 + n.y * 34.35), r(n.x * 45.13 + 256.0 + n.y * 38.89));
 }
+//worley noise//https://www.bing.com/videos/search?q=worley+noise&&view=detail&mid=47DF2307BBA5D4E9568247DF2307BBA5D4E95682&&FORM=VRDGAR&ru=%2Fvideos%2Fsearch%3Fq%3Dworley%2Bnoise%26FORM%3DHDRSC4
 float worley(float2 n, float s)
 {
     float dis = 2.0;
@@ -54,6 +55,8 @@ float3 hash33(float3 p3)
     p3 += dot(p3, p3.yxz + 19.19);
     return -1.0 + 2.0 * frac(float3((p3.x + p3.y) * p3.z, (p3.x + p3.z) * p3.y, (p3.y + p3.z) * p3.x));
 }
+
+//perin noise
 float perlin_noise(float3 p)
 {
     float3 pi = floor(p);

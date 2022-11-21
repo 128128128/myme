@@ -44,94 +44,38 @@
 // SV_TARGET                0   xyzw        0   TARGET   float   xyzw
 //
 ps_5_0
-dcl_globalFlags refactoringAllowed | skipOptimization
+dcl_globalFlags refactoringAllowed
 dcl_constantbuffer CB2[2], immediateIndexed
 dcl_sampler s2, mode_default
 dcl_resource_texture2d (float,float,float,float) t1
 dcl_resource_texture2d (float,float,float,float) t2
 dcl_input_ps linear v1.xy
 dcl_output o0.xyzw
-dcl_temps 4
-//
-// Initial variable locations:
-//   v0.x <- pin.position.x; v0.y <- pin.position.y; v0.z <- pin.position.z; v0.w <- pin.position.w; 
-//   v1.x <- pin.texcoord.x; v1.y <- pin.texcoord.y; 
-//   o0.x <- <main return value>.x; o0.y <- <main return value>.y; o0.z <- <main return value>.z; o0.w <- <main return value>.w
-//
-#line 180 "C:\Users\2200167\Desktop\個人製作\myme03\myme\HLSL\dir_light_ps.hlsl"
-sample_indexable(texture2d)(float,float,float,float) r0.xyzw, v1.xyxx, t1.xyzw, s2  // r0.x <- tex.x; r0.y <- tex.y; r0.z <- tex.z; r0.w <- tex.w
-
-#line 183
-mov r1.xyz, cb2[0].xyzx  // r1.x <- PLightPos.x; r1.y <- PLightPos.y; r1.z <- PLightPos.z
-
-#line 184
-sample_indexable(texture2d)(float,float,float,float) r2.xyz, v1.xyxx, t2.xyzw, s2
-mov r2.xyz, r2.xyzx  // r2.x <- P.x; r2.y <- P.y; r2.z <- P.z
-
-#line 185
-mov r1.xyz, -r1.xyzx
-add r1.xyz, r1.xyzx, r2.xyzx  // r1.x <- PLightDir.x; r1.y <- PLightDir.y; r1.z <- PLightDir.z
-
-#line 187
-ge r1.w, cb2[0].w, l(0.010000)
-movc r1.w, r1.w, l(1.000000), l(0)  // r1.w <- lighttype
-
-#line 190
-mov r2.xyz, -cb2[0].xyzx
-add r2.xyz, r1.xyzx, r2.xyzx
-mul r2.xyz, r1.wwww, r2.xyzx
-add r2.xyz, r2.xyzx, cb2[0].xyzx  // r2.x <- dir.x; r2.y <- dir.y; r2.z <- dir.z
-
-#line 193
-lt r1.w, cb2[0].w, l(0.001000)
-dp3 r1.x, r1.xyzx, r1.xyzx
-sqrt r1.x, r1.x
-div r1.x, r1.x, cb2[0].w
-mov r1.x, -r1.x
-add r1.x, r1.x, l(1.000000)
-movc r1.x, r1.w, l(1.000000), r1.x  // r1.x <- attenuation
-
-#line 196
-max r1.x, r1.x, l(0.000000)
-min r1.x, r1.x, l(1.000000)  // r1.x <- attenuation
-
-#line 198
-mov r2.xyz, r2.xyzx  // r2.x <- L.x; r2.y <- L.y; r2.z <- L.z
-
-#line 199
-mov r1.yzw, cb2[1].xxyz  // r1.y <- C.x; r1.z <- C.y; r1.w <- C.z
-
-#line 200
-mul r1.xyz, r1.xxxx, r1.yzwy  // r1.x <- C.x; r1.y <- C.y; r1.z <- C.z
-
-#line 201
-mul r0.xyz, r0.xyzx, l(2.000000, 2.000000, 2.000000, 0.000000)
-mov r3.xyz, l(-1.000000,-1.000000,-1.000000,-0.000000)
-add r0.xyz, r0.xyzx, r3.xyzx  // r0.x <- N.x; r0.y <- N.y; r0.z <- N.z
-
-#line 202
-dp3 r1.w, r2.xyzx, r2.xyzx
+dcl_temps 2
+ge r0.x, cb2[0].w, l(0.010000)
+and r0.x, r0.x, l(0x3f800000)
+sample_indexable(texture2d)(float,float,float,float) r0.yzw, v1.xyxx, t2.wxyz, s2
+add r0.yzw, r0.yyzw, -cb2[0].xxyz
+add r1.xyz, r0.yzwy, -cb2[0].xyzx
+dp3 r0.y, r0.yzwy, r0.yzwy
+sqrt r0.y, r0.y
+div r0.y, r0.y, cb2[0].w
+add_sat r0.y, -r0.y, l(1.000000)
+mad r0.xzw, r0.xxxx, r1.xxyz, cb2[0].xxyz
+dp3 r1.x, r0.xzwx, r0.xzwx
+rsq r1.x, r1.x
+mul r0.xzw, r0.xxzw, r1.xxxx
+sample_indexable(texture2d)(float,float,float,float) r1.xyzw, v1.xyxx, t1.xyzw, s2
+mad r1.xyz, r1.xyzx, l(2.000000, 2.000000, 2.000000, 0.000000), l(-1.000000, -1.000000, -1.000000, 0.000000)
+mov o0.w, r1.w
+dp3 r1.w, r1.xyzx, r1.xyzx
 rsq r1.w, r1.w
-mul r2.xyz, r1.wwww, r2.xyzx
-
-#line 203
-dp3 r1.w, r0.xyzx, r0.xyzx
-rsq r1.w, r1.w
-mul r0.xyz, r0.xyzx, r1.wwww
-
-#line 205
-dp3 r0.x, r0.xyzx, r2.xyzx
-mov r0.x, -r0.x  // r0.x <- i
-
-#line 206
-max r0.x, r0.x, l(0.000000)
-min r0.x, r0.x, l(1.000000)  // r0.x <- i
-
-#line 207
-mul r0.xyz, r0.xxxx, r1.xyzx  // r0.x <- tex.x; r0.y <- tex.y; r0.z <- tex.z
-
-#line 208
-mov o0.xyz, r0.xyzx
-mov o0.w, r0.w
+mul r1.xyz, r1.wwww, r1.xyzx
+dp3 r0.x, r1.xyzx, r0.xzwx
+mov_sat r0.x, -r0.x
+lt r0.z, cb2[0].w, l(0.001000)
+movc r0.y, r0.z, l(1.000000), r0.y
+mul r0.yzw, r0.yyyy, cb2[1].xxyz
+mul o0.xyz, r0.xxxx, r0.yzwy
 ret 
-// Approximately 41 instruction slots used
+// Approximately 26 instruction slots used

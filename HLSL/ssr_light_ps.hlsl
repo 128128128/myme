@@ -1,3 +1,4 @@
+//未完//Todo
 #include "pbr_common.hlsli"
 //texture
 Texture2D albedo_texture : register(t0);
@@ -11,7 +12,7 @@ Texture2D env_texture : register(t15);
 
 SamplerComparisonState comparison_sampler_state : register(s4);
 
-//1026 SSR
+//SSR
 // 映りこむ画面テクスチャのUVを返す
 // P : 座標　R:視線の反射
 float2 SSR(float3 P, float3 R)
@@ -20,7 +21,7 @@ float2 SSR(float3 P, float3 R)
     R = normalize(R);
     // ちょっとずつ進める
     R *= 0.3; //0.1 = 一回で進める距離
-    [loop] //Loopのままで良いよ。
+    [loop] //Loopのまま
     for (int i = 0; i < 100; i++) {
         P += R; //進める
         // 何かにぶつかった？
@@ -28,9 +29,9 @@ float2 SSR(float3 P, float3 R)
         float DistP = length(P - camera_constants.position);
         // レンダリング結果の距離で比較
         // Pのスクリーン座標 → UV → Depthから距離取得
-        float4 ScreenP = mul(float4(P, 1.0), camera_constants.view_projection);
+        float4 screenP = mul(float4(P, 1.0), camera_constants.view_projection);
         // スクリーン座標(-1 <--> 1) → UV(0<-->1)
-        float2 Puv = (ScreenP.xy / ScreenP.w) * 0.5 + 0.5;
+        float2 Puv = (screenP.xy / screenP.w) * 0.5 + 0.5;
         Puv.y = 1.0 - Puv.y; //Y反転
         // 画面外判定
         if (Puv.x < 0) return -1;

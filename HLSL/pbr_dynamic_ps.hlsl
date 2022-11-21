@@ -16,7 +16,7 @@ Texture2D emissive_map : register(t5);
 //pbr metallic
 Texture2D metallic_map : register(t6);
 
-static const int NUM_DIRECTIONAL_LIGHT = 1; // ディレクションライトの本数
+static const int NUM_DIRECTIONAL_LIGHT = 1; // number of dir light
 
 float3 GetNormal(float3 normal, float3 tangent, float3 biNormal, float2 uv)
 {
@@ -185,7 +185,7 @@ float3 GetNormal(float3 normal, float3 tangent, float3 biNormal, float2 uv)
 
 float4 main(VS_OUT pin) : SV_TARGET
 {
-	// 法線を計算
+	// Calculate normals
      //float3 N = GetNormal(pin.normal.xyz, pin.tangent.xyz, pin.binormal, pin.texcoord);
      float3 N = normalize(pin.normal.xyz);
      float3 T = float3(1.0001, 0, 0);
@@ -199,50 +199,61 @@ float4 main(VS_OUT pin) : SV_TARGET
 	float4 albedo_color = diffuse_map.Sample(sampler_states[ANISOTROPIC], pin.texcoord);
 
     float alpha = albedo_color.w;
-	// スペキュラカラーはアルベドカラーと同じにする
+	// Specular color should be the same as albedo color
 	float3 spec_color = albedo_color;
 
-	// 金属度
+	// metallic
 	float metallic = metallic_map.Sample(sampler_states[POINT], pin.texcoord).r;
     metallic *= metallic_param;
-	// 滑らかさ
+	// smoothness
 	float smooth = metallic_map.Sample(sampler_states[POINT], pin.texcoord).a;
     smooth *= smooth_param;
-	// 視線に向かって伸びるベクトルを計算する
+	// Calculate the vector extending toward the line of sight
 	float3 toEye = normalize(camera_constants.position.xyz - pin.position.xyz);
 
     float3 lig = 0;
     for (int ligNo = 0; ligNo < NUM_DIRECTIONAL_LIGHT; ligNo++)
     {
+        // Implement a simple Disney-based diffuse reflection.
+       // Compute diffuse reflections taking into account Fresnel reflections
         // シンプルなディズニーベースの拡散反射を実装する。
         // フレネル反射を考慮した拡散反射を計算
         float diffuseFromFresnel = CalcDiffuseFromFresnel(
             N, -light_direction.direction[ligNo], toEye);
 
+        // Find the normalized Lambert diffuse reflection
         // 正規化Lambert拡散反射を求める
         float NdotL = saturate(dot(N, -light_direction.direction[ligNo]));
         float3 lambertDiffuse = light_direction.color[ligNo] * NdotL / PI;
 
+        // Calculate the final diffuse reflected light
         // 最終的な拡散反射光を計算する
         float3 L = normalize(-light_direction.direction.xyz);
         float3 diffuse = albedo_color * diffuseFromFresnel * lambertDiffuse;
         diffuse = albedo_color.rgb * max(0, dot(N, L) * 0.5 + 0.5);
-        
+
+        // Calculate specular reflectance using the Cook-Torrance model
+       // Calculate specular reflectance using the Cook-Torrance model
         // Cook-Torranceモデルを利用した鏡面反射率を計算する
         // Cook-Torranceモデルの鏡面反射率を計算する
         float3 spec = CookTorranceSpecular(
             -light_direction.direction[ligNo], toEye, N, smooth)
             * light_direction.color[ligNo];
 
+        // If metallicity is high, specular reflection is specular color, if low, white
+         // specular color strength is treated as specular reflectance
         // 金属度が高ければ、鏡面反射はスペキュラカラー、低ければ白
         // スペキュラカラーの強さを鏡面反射率として扱う
         spec *= lerp(float3(1.0f, 1.0f, 1.0f), spec_color, metallic);
 
+        // Use smoothness to combine diffuse and specular reflections
+        // the higher the smoothness, the weaker the diffuse reflection
         // 滑らかさを使って、拡散反射光と鏡面反射光を合成する
         // 滑らかさが高ければ、拡散反射は弱くなる
         lig += diffuse * (1.0f - smooth) + spec;
     }
 
+    // Raise the bottom line with ambient light
     // 環境光による底上げ
     float ambientLight = float3(1, 1, 1);
     lig += ambientLight * albedo_color;

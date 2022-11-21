@@ -28,26 +28,14 @@
 // SV_TARGET                0   xyzw        0   TARGET   float   xyzw
 //
 ps_5_0
-dcl_globalFlags refactoringAllowed | skipOptimization
+dcl_globalFlags refactoringAllowed
 dcl_sampler s1, mode_default
 dcl_resource_texture2d (float,float,float,float) t15
 dcl_input_ps linear v1.xy
 dcl_output o0.xyzw
 dcl_temps 1
-//
-// Initial variable locations:
-//   v0.x <- pin.position.x; v0.y <- pin.position.y; v0.z <- pin.position.z; v0.w <- pin.position.w; 
-//   v1.x <- pin.texcoord.x; v1.y <- pin.texcoord.y; 
-//   v2.x <- pin.normal.x; v2.y <- pin.normal.y; v2.z <- pin.normal.z; 
-//   v3.x <- pin.worldpos.x; v3.y <- pin.worldpos.y; v3.z <- pin.worldpos.z; 
-//   o0.x <- <main return value>.x; o0.y <- <main return value>.y; o0.z <- <main return value>.z; o0.w <- <main return value>.w
-//
-#line 68 "C:\Users\2200167\Desktop\個人製作\myme03\myme\HLSL\environment_light_ps.hlsl"
 sample_indexable(texture2d)(float,float,float,float) r0.xyz, v1.xyxx, t15.xyzw, s1
-mov r0.xyz, r0.xyzx  // r0.x <- c.x; r0.y <- c.y; r0.z <- c.z
-
-#line 70
 mov o0.xyz, r0.xyzx
 mov o0.w, l(1.000000)
 ret 
-// Approximately 5 instruction slots used
+// Approximately 4 instruction slots used

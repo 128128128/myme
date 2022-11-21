@@ -40,27 +40,16 @@ bool particle_scene::initialize(ID3D11Device* device, CONST LONG screen_width, C
 	if (!player)
 	{
 		player = std::make_unique<Player>();
-		// player->player=std::make_unique<dynamic_mesh>(device, ".\\resources\\nico.fbx");
 		player->player = std::make_unique<dynamic_mesh>(device, ".\\resources\\rock_girl\\rock_girl.fbx", true);
-		//player->player= std::make_unique<pbr_dynamic_mesh>(device, ".\\resources\\objects\\chest\\chest1.fbx", ".\\resources\\objects\\chest\\WoodChest_Wood_Chest_MetallicSmoothness.png");
 		pbr_ship = std::make_unique<pbr_Stage>(device);
 		pbr_ship->mesh= std::make_unique<pbr_static_mesh>(device, ".\\resources\\Jummo\\Jummo.fbx");
 		pbr_ship->SetPosition({ 0.0f, 0.0f, 0.0f ,0.0f });
-		//ground = std::make_unique<Ground>();
-		//ground->mesh = std::make_unique<static_mesh>(device, ".\\resources\\sphere.fbx");
 		
 		//particle
 		particles = std::make_unique<husk_particles>(device);
-
-		//stage = std::make_unique<pbr_Stage>(device);
-		//stage->mesh = std::make_unique<pbr_static_mesh>(device, ".\\resources\\create_terrain\\.grid.fbx");
-		//stage->SetScale({1000.0f, 1000.0f, 1000.0f});
-		//pbr_ship_1 = std::make_unique<pbr_Stage>(device);
-		//pbr_ship_1->position.z += 5.5f;
-		//pbr_ship->position.z -= 5.5f;
 	}
 
-
+	//camera initiallize
 	if (!eye_space_camera)
 	{
 		eye_space_camera = std::make_unique<camera>(device);
@@ -73,6 +62,7 @@ bool particle_scene::initialize(ID3D11Device* device, CONST LONG screen_width, C
 		light_space_camera = std::make_unique<camera>(device);
 	}
 
+	//render targets
 	framebuffers[0] = std::make_unique<Descartes::framebuffer>(device, screen_width, screen_height, DXGI_FORMAT_R16G16B16A16_FLOAT, DXGI_FORMAT_R24G8_TYPELESS);
 	framebuffers[1] = std::make_unique<Descartes::framebuffer>(device, screen_width, screen_height, DXGI_FORMAT_R16G16B16A16_FLOAT, DXGI_FORMAT_R24G8_TYPELESS);
 	framebuffers[2] = std::make_unique<Descartes::framebuffer>(device, screen_width, screen_height, DXGI_FORMAT_R16G16B16A16_FLOAT, DXGI_FORMAT_UNKNOWN);
@@ -139,13 +129,8 @@ const char* particle_scene::update(float& elapsed_time/*Elapsed seconds from las
 	scene_constants_buffer->data.player_object.direction = player->direction;
 
 	pbr_ship->update(elapsed_time);
-	//stage->update(elapsed_time);
-	//pbr_ship_1->update(elapsed_time);
-	//ground->update(elapsed_time);
-	//terrains->update(elapsed_time);
-	//knife->update(elapsed_time);
-	//sky->update(elapsed_time);
 
+	//free camera
 	if (freelook)
 	{
 		eye_space_camera->freelook_update(elapsed_time, DirectX::XMFLOAT4(player->position.x, player->position.y + 2.0f, player->position.z + player->direction.z * 0.1f, 0));
@@ -155,46 +140,53 @@ const char* particle_scene::update(float& elapsed_time/*Elapsed seconds from las
 		//eye_space_camera->update(player->position, elapsed_time);
 		eye_space_camera->firstperson_update(elapsed_time, DirectX::XMFLOAT4(player->position.x, player->position.y + 2.0f, player->position.z + player->direction.z * 0.1f, 0));
 	}
+
+	//moving particles constants buffer update
 	if (integrate_particles) {
 		const float distance{ 30 };
-		particles->particle_data.target_location.x = pbr_ship->position.x+pbr_ship->direction.x*distance;
-		particles->particle_data.target_location.y = pbr_ship->position.y+pbr_ship->direction.y*distance;
-		particles->particle_data.target_location.z = pbr_ship->position.z+pbr_ship->direction.z*distance;
+		particles->particle_data.target_location.x = pbr_ship->position.x + pbr_ship->direction.x * distance;
+		particles->particle_data.target_location.y = pbr_ship->position.y + pbr_ship->direction.y * distance;
+		particles->particle_data.target_location.z = pbr_ship->position.z + pbr_ship->direction.z * distance;
 		particles->particle_data.emitter_location = pbr_ship->position;
 		particles->particle_data.elapsed_time = elapsed_time;
 	}
 
-	//light direction
-	ImGui::SliderFloat4("light_direction", &scene_constants_buffer->data.directional_light.direction.x, -1.0f, 1.0f);
-	ImGui::SliderFloat4("light_color", &light_constants_buffer->data.point_light.color.x, 0, 256.0f);
-
-	//posteffects
-	ImGui::Checkbox("enable_post_effects", &enable_post_effects);
-	ImGui::Checkbox("post_blooming", &post_blooming);
-	ImGui::Checkbox("lens_flare", &enable_lens_flare);
-
-	//camera
-	if (ImGui::Button("freeLook"))
-		freelook = !freelook;
-
-	ImGui::Text("accumulated husk particle count %d", particles->particle_data.particle_count);
-	if (ImGui::Checkbox("integrate_particles", &integrate_particles))
+	//IMGUI
 	{
-		accumulate_husk_particles = false;
+		//light direction
+		ImGui::SliderFloat4("light_direction", &scene_constants_buffer->data.directional_light.direction.x, -1.0f, 1.0f);
+		ImGui::SliderFloat4("light_color", &light_constants_buffer->data.point_light.color.x, 0, 256.0f);
+
+		//posteffects
+		ImGui::Checkbox("enable_post_effects", &enable_post_effects);
+		ImGui::Checkbox("post_blooming", &post_blooming);
+		ImGui::Checkbox("lens_flare", &enable_lens_flare);
+
+		//camera
+		if (ImGui::Button("freeLook"))
+			freelook = !freelook;
+
+		ImGui::Text("accumulated husk particle count %d", particles->particle_data.particle_count);
+		if (ImGui::Checkbox("integrate_particles", &integrate_particles))
+		{
+			accumulate_husk_particles = false;
+		}
+		if (ImGui::Checkbox("accumulate_husk_particles", &accumulate_husk_particles))
+		{
+			integrate_particles = false;
+		}
+		ImGui::SliderFloat("particle_data.size", &particles->particle_data.particle_size, +0.0f, +0.05f, "%.4f");
 	}
-	if (ImGui::Checkbox("accumulate_husk_particles", &accumulate_husk_particles))
-	{
-		integrate_particles = false;
-	}
-	ImGui::SliderFloat("particle_data.size", &particles->particle_data.particle_size, +0.0f, +0.05f, "%.4f");
+
 	GamePad& gamePad = Input::Instance().GetGamePad();
-
+	//to title
 	if (gamePad.GetButton() & GamePad::BTN_B)
 		return "title";
 
 	return 0;
 }
 
+//renderer
 void particle_scene::render(ID3D11DeviceContext* immediate_context, float elapsed_time/*Elapsed seconds from last frame*/)
 {
 	rasterizer_states[SOLID]->active(immediate_context);
@@ -214,7 +206,7 @@ void particle_scene::render(ID3D11DeviceContext* immediate_context, float elapse
 	float aspect_ratio{ viewport.Width / viewport.Height };
 
 
-
+	//scene constants update
 	time += elapsed_time;
 	triple_speed_time += elapsed_time * 3.0f;
 	scene_constants_buffer->data.directional_light.iTime = time;
@@ -224,7 +216,7 @@ void particle_scene::render(ID3D11DeviceContext* immediate_context, float elapse
 	//immediate_context->GSGetConstantBuffers(2, 1, scene_constants_buffer->buffer_object.GetAddressOf());
 	scene_constants_buffer->active(immediate_context, 2, true, true);
 
-	//particles
+	//move particles
 	if (integrate_particles)
 	{
 		particles->integrate(immediate_context, elapsed_time);
@@ -232,10 +224,12 @@ void particle_scene::render(ID3D11DeviceContext* immediate_context, float elapse
 	snow->integrate(immediate_context, XMFLOAT3(pbr_ship->position.x, pbr_ship->position.y, pbr_ship->position.z), eye_space_camera->view(), eye_space_camera->view_projection(), elapsed_time, time);
 	
 
+	//render target clear active
 	//screen->active(immediate_context);
 	framebuffers[0]->clear(immediate_context,1,1,1,1);
 	framebuffers[0]->active(immediate_context);
 
+	//camera constants update
 	eye_space_camera->aspect_ratio = aspect_ratio;
 	eye_space_camera->active(immediate_context, 1, true, true, false, false);
 
@@ -264,37 +258,12 @@ void particle_scene::render(ID3D11DeviceContext* immediate_context, float elapse
 		//sky
 		sky->render(immediate_context, 0, 0, 1280, 720, 1, 1, 1, 1, 0);
 
-		//static_mesh_vs->active(immediate_context);
-		//pbr_dynamic_mesh_ps->active(immediate_context);
-		//stage->render(immediate_context);
-		//pbr_ship->render(immediate_context);
-		//static_mesh_vs->inactive(immediate_context);
-		//pbr_dynamic_mesh_ps->inactive(immediate_context);
-
-		//pbr
-		/*pbr_dynamic_mesh_ps->active(immediate_context);
-		pbr_static_mesh_vs->active(immediate_context);
-		pbr_ship->render(immediate_context);
-		pbr_static_mesh_vs->inactive(immediate_context);
-		pbr_dynamic_mesh_ps->inactive(immediate_context);*/
-
-		//staticmesh render
-		//static_mesh_vs->active(immediate_context);
-		//static_mesh_ps->active(immediate_context);
-		//knife->render(immediate_context);
-		//pbr_ship->render(immediate_context);
-		//ground->render(immediate_context);
-		//static_mesh_ps->inactive(immediate_context);
-		//static_mesh_vs->inactive(immediate_context);
-
+		
 		if (!integrate_particles)
 		{
 			blend_states[NONE]->active(immediate_context);
 			depth_stencil_states[ZT_OFF_ZW_OFF]->active(immediate_context);
 			particles->accumulate_husk_particles(immediate_context, [&](ID3D11PixelShader* accumulate_husk_particles_ps) {
-				//static_mesh_vs->active(immediate_context);
-				//ground->render(immediate_context, accumulate_husk_particles_ps);
-				//static_mesh_vs->inactive(immediate_context);
 				pbr_static_mesh_vs->active(immediate_context);
 				pbr_ship->render(immediate_context,accumulate_husk_particles_ps);
 				pbr_static_mesh_vs->inactive(immediate_context);
@@ -359,22 +328,16 @@ void particle_scene::render(ID3D11DeviceContext* immediate_context, float elapse
 		snow->render(immediate_context);
 		depth_stencil_states[ZT_ON_ZW_OFF]->inactive(immediate_context);
 		depth_stencil_states[ZT_ON_ZW_ON]->active(immediate_context);
-
-		//terrain renderer
-		//terrains->render(immediate_context, view_frustum);
-		//structures->render(immediate_context,view_frustum);
-		//vegetation_small->render(immediate_context);
-
-			//sprite
-
+			
 		//screen->inactive(immediate_context);
 
+		//render target inactive
 		framebuffers[0]->inactive(immediate_context);
 
+		//bool post effects
 		if (enable_post_effects)
 		{
-			//rasterizer->blit(immediate_context, framebuffers[0]->render_target_shader_resource_view.Get(), 0, 0, 1680, 715);
-
+			
 			if (post_blooming)
 			{
 				//post effects (shadow, fog and bokeh)
@@ -426,23 +389,13 @@ void particle_scene::render(ID3D11DeviceContext* immediate_context, float elapse
 		sampler_states[ANISOTROPIC]->inactive(immediate_context);
 	}
 
-	//terrains->DebugDrawGUI();
-	//knife->DebugDrawGUI();
-	//water->DebugDrawGUI();
-	//structures->DebugDrawGUI();
-	//vegetation_small->DebugDrawGUI();
-	//sky->DrawDebugGUI();
-	eye_space_camera->DrawDebugGUI();
-	//light_space_camera->DrawDebugGUI();
-	//ground->DebugDrawGUI();
-	//player->DebugDrawGUI();
-	post_effects->DrawDebugGUI();
-	bloom_effect->DrawDebugGUI();
-	//shadowmap_df->DebugDrawGUI();
-	//screen->DebugDrawGUI();
-	//pbr_ship_1->DebugDrawGUI();
-	pbr_ship->DebugDrawGUI();
-	//stage->DebugDrawGUI();
+	//IMGUI
+	{
+		eye_space_camera->DrawDebugGUI();
+		post_effects->DrawDebugGUI();
+		bloom_effect->DrawDebugGUI();
+		pbr_ship->DebugDrawGUI();
+	}
 	ImGui::Render();
 
 	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());

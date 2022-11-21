@@ -49,18 +49,18 @@ float4 main(PS_IN pin) : SV_TARGET
     m0 += light.rgb * 0.05;
     color.rgb = lerp(m0, m1, metallic);
 
-    //フレネル反射
-    //視線
+    //Fresnel reflection
+    //gaze
     float4 P = position_map.Sample(sampler_states[ANISOTROPIC], pin.texcoord);
     float3 E = P.xyz - camera_constants.position.xyz;
     E = normalize(E);
-    //法線
+    //normal
     float3 N = normal_map.Sample(sampler_states[ANISOTROPIC], pin.texcoord);
     float NoLight = 1.0 - length(N);
     NoLight = step(0.9, NoLight);
     N = N * 2.0 - 1.0; //0<-->1 -1<-->+1
     N = normalize(N);
-    // 内積で視線と法線の向き合い具合
+    //Line of sight and normal orientation with inner product : 内積で視線と法線の向き合い具合
     float d = dot(-E, N);
     float fresnel = saturate(1.0 - d) * 0.6;
     fresnel = pow(fresnel, 6.0);

@@ -13,8 +13,7 @@ HS_CONSTANT_DATA_OUTPUT patch_constant_function(InputPatch<VS_CONTROL_POINT_OUTP
     const float subdivision_factor = saturate((tesselation_max_distance - distance) / tesselation_max_distance);
     const float subdivision = tesselation_max_subdivision * subdivision_factor + 1.0;
 #else
-    const float subdivision = tesselation_max_subdivision;
-    //const float subdivision = 16;
+    const float subdivision = tesselation_max_subdivision;//...Number of divisions : •ªŠ„”
 #endif
     output.tess_factor[0] = subdivision;
     output.tess_factor[1] = subdivision;

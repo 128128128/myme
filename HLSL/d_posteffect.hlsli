@@ -7,13 +7,13 @@ struct VS_OUT
 struct FOG_BUFFER
 {
 	float3 color;
-	float highlight_intensity;
-	float3 highlight_color;
-	float highlight_power;
-	float global_density;
-	float height_falloff;
-	float start_depth;
-	float start_height;
+	float highlight_intensity;//ハイライト強度
+	float3 highlight_color;//...ハイライトカラー
+	float highlight_power;//ハイライト強さ
+	float global_density;//密度
+	float height_falloff;//ハイライト落ちる場所
+	float start_depth;//開始深度
+	float start_height;//開始高度
 };
 
 cbuffer posteffect_buffer : register(b9)
@@ -39,8 +39,8 @@ float3 apply_fog(float3 default_color, float3 pixel_position/*world space*/, flo
 	eye_to_pixel_distance = max(0, eye_to_pixel_distance - fog.start_depth);
 
 	//float fog_height_density_at_view = exp(-fog.height_falloff * eye_position.y);
-	float fog_height_density_at_view = exp(-fog.height_falloff * -fog.start_height);
-	float fog_intensity = eye_to_pixel_distance * fog_height_density_at_view;
+	float fog_height_density_at_view = exp(-fog.height_falloff * -fog.start_height); //霧の高さ密度
+	float fog_intensity = eye_to_pixel_distance * fog_height_density_at_view;//霧の強さ
 
 	const float threshold = 0.01;
 	if (eye_to_pixel.y > threshold)
@@ -52,7 +52,7 @@ float3 apply_fog(float3 default_color, float3 pixel_position/*world space*/, flo
 	//Combine both factors to get the final factor
 	float fog_final_factor = exp(-fog.global_density * fog_intensity);
 
-	//fogと太陽あり
+	//case of having fog & sun
 	//Find the sum highlight and use it to blend the fog color
 	//const float distance_to_sun = 0; //TODO://太陽までの距離
 	//float sun_highlight_factor = saturate(dot(normalize(eye_to_pixel), normalize((-light_direction.direction.xyz * distance_to_sun) - eye_position)));

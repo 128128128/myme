@@ -16,19 +16,20 @@ float4 main(PS_IN pin) : SV_TARGET
 {
     float4 normal = normal_map.Sample(sampler_states[LINEAR], pin.texcoord);
     float3 emissive = emissive_map.Sample(sampler_states[LINEAR], pin.texcoord).rgb;
-    //上向き具合＝法線のY
+    //state of elevation＝normal's Y
     float3 N = normalize(normal.xyz * 2.0 - 1.0);
 
-    //視線の反射
+    //Gaze Reflection
     float4 P = position_map.Sample(sampler_states[LINEAR], pin.texcoord);
     float3 E = P.xyz - camera_constants.position.xyz;
     float3 R = reflect(normalize(E), N);
      //float3 R = reflect(N, normalize(E));
-    float3 Dir = R;
-    Dir.y = 0; //高さ無効
-    Dir = normalize(Dir);
+    float3 dir = R;
+    dir.y = 0; //Height invalid
+    dir = normalize(dir);
     float2 uv;
-    uv.x = Dir.x;
+    uv.x = dir.x;
+    //Eliminate angle distortion
     //角度のひずみを無くす //処理速度と相談 acosが重い
     //-1<--->+1 が0<--->1.0
     ///uv.x = acos(uv.x) / 3.141593;
@@ -40,9 +41,9 @@ float4 main(PS_IN pin) : SV_TARGET
     uv.y = -uv.y;
     uv = uv * 0.5 + 0.5;
 
-    //東西調整
+    //East-West Coordination : 東西調整
     uv.x *= 0.5;
-    //南北調整
+    //north-south adjustment : 南北調整
    if (R.z > 0)
     {
        uv.x = 1 - uv.x;
@@ -58,10 +59,10 @@ float4 main(PS_IN pin) : SV_TARGET
     //1-	1   0.55   0.28     0.19  0.0
     float level = pow(Roughness, 5.0);
     //level *= 11;
-    //ミップマップを利用してぼかし
+    //Blur using mipmap
     float3 light = env_map.SampleLevel(sampler_states[LINEAR], uv, level);
     
-    //エミッシブマップ適用
+    //emissive
    //light += emissive;
 
    light= (normal.w <= 0) ? float3(1, 1, 1) : light + emissive;

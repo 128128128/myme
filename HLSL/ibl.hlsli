@@ -9,11 +9,11 @@ Texture2D metallic_map : register(t6);
 
 cbuffer IBL_CONSTANT_BUFFER:register(b5)
 {
-    int image_based_lighting;
+    int image_based_lighting;//bool ibl
 	float pure_white;
-	float emissive_intensity;
-    float roughness_factor;
-	float metallic_factor;
+	float emissive_intensity;//emissive‚Ì‹­‚³
+    float roughness_factor;//roughness‚Ì‹­‚³
+	float metallic_factor;//metallic‚Ì‹­‚³
 	float emissive_factor;
 	float occlusion_factor;
 	float occlusion_strength;

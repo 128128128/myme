@@ -36,10 +36,10 @@ const Quaternion Quaternion::Identity = { 0.0f,  0.0f, 0.0f, 1.0f };
 /*!
 *@brief	fromベクトルからtoベクトルに回転させるクォータニオンを作成。
 */
-void Quaternion::SetRotation(Vector3 from, Vector3 to)
+void Quaternion::set_rotation(Vector3 from, Vector3 to)
 {
-from.Normalize();
-	to.Normalize();
+from.normalize();
+	to.normalize();
 	auto t = ::Dot(from, to);
 	Vector3 rotAxis;
 	if (t > 0.998f) {
@@ -59,6 +59,6 @@ from.Normalize();
 	else {
 		rotAxis = Cross(from, to);
 	}
-	rotAxis.Normalize();
-	SetRotation(rotAxis, acosf(t));
+	rotAxis.normalize();
+	set_rotation(rotAxis, acosf(t));
 }

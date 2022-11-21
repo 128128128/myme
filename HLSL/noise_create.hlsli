@@ -8,8 +8,8 @@ struct VS_OUT
 cbuffer cb_noise:register(b4)
 {
 	float cb_kind_of_noise;
-	float cb_octaves;
-	float cb_amplitude;
+	float cb_octaves;//...octaves : ƒmƒCƒY‚ğd‚Ë‚é”
+	float cb_amplitude;//...amplitude : U‚ê•
 	float cb_param;
 	float2 cb_mat0;
 	float2 cb_mat1;

@@ -29,7 +29,7 @@ void main(uint3 dtid : SV_DISPATCHTHREADID)
 			p.age = 0;
 			completed_particle_buffer.IncrementCounter();
 			break;
-		case 1:
+		case 1://Moves in the normal direction
 			p.velocity += husk_particle_buffer[id].normal * 1.0 * delta_time;
 			p.position += p.velocity * delta_time;
 			if (p.age > 3.0)
@@ -38,7 +38,7 @@ void main(uint3 dtid : SV_DISPATCHTHREADID)
 				completed_particle_buffer.IncrementCounter();
 			}
 			break;
-		case 2:
+		case 2://rotation attack
 			float3 v = normalize(target_location.xyz - emitter_location.xyz);
 			float3 z = target_location.xyz - p.position;
 			float3 x = normalize(dot(v, z) * v - z);
@@ -55,7 +55,7 @@ void main(uint3 dtid : SV_DISPATCHTHREADID)
 				completed_particle_buffer.IncrementCounter();
 			}
 			break;
-		case 3:
+		case 3://bursting to round
 			const float force = 1.0 * snoise(p.position * 0.054);
 			float3 acceleration = normalize(target_location.xyz - p.position) * force - p.velocity * 0.02;
 			p.velocity += acceleration * delta_time;
@@ -69,7 +69,7 @@ void main(uint3 dtid : SV_DISPATCHTHREADID)
 				completed_particle_buffer.IncrementCounter();
 			}
 			break;
-		case 4:
+		case 4://to default position 
 			float3 d = husk_particle_buffer[id].position - p.position;
 			p.velocity = normalize(d) * lerp(0.5, 1.2, length(d));
 			p.position += p.velocity * delta_time;

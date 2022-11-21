@@ -180,30 +180,30 @@ float4 main(VS_OUT pin) : SV_TARGET
     float4 tex = normal_texture.Sample(sampler_states[ANISOTROPIC], pin.texcoord); // *input.Color;
 
     //point light
-    float3 PLightPos = light_direction.direction.xyz;
+    float3 p_light_pos = light_direction.direction.xyz;
     float4 P = position_texture.Sample(sampler_states[ANISOTROPIC], pin.texcoord);
-    float3 PLightDir = P.xyz - PLightPos;
-    // ライトタイプ判定(0:平行光 1:点光源)
+    float3 p_light_dir = P.xyz - p_light_pos;
+    // judge light type(0:dir light...平行光 1:point light...点光源)
     float lighttype = step(0.01, light_direction.direction.w);
     // 方向決定(平行光:w=0.0 点光源:w>0)
     //float3 dir = LightDir.w < 0.001 ? LightDir.xyz : PLightDir;
     float3 dir = lerp(
-        light_direction.direction.xyz, PLightDir, lighttype);
-    //減衰
+        light_direction.direction.xyz, p_light_dir, lighttype);
+    //attenuation...減衰
     float attenuation = light_direction.direction.w < 0.001 ?
         1.0 :
-        1.0 - (length(PLightDir) / light_direction.direction.w);
+        1.0 - (length(p_light_dir) / light_direction.direction.w);
     attenuation = saturate(attenuation); //0.0<--->1.0
-    // ライト計算
-    float3 L = dir; //方向
-    float3 C = light_direction.color.rgb; //カラー
-    C *= attenuation; // 減衰
-    float3 N = tex * 2.0 - 1.0; //法線
+    // lighting
+    float3 L = dir; //direction
+    float3 C = light_direction.color.rgb; //color
+    C *= attenuation; // attenuation
+    float3 N = tex * 2.0 - 1.0; //normal
     L = normalize(L);
     N = normalize(N);
-    // 当たり具合 = -cos = -内積
+    // degree of hit = -cos = -inner product
     float i = -dot(N, L);
     i = saturate(i); // 0.0～1.0
-    tex.rgb = C * i; // ライトカラー決定
+    tex.rgb = C * i; // deside color
     return tex;
 }

@@ -12,6 +12,7 @@ float max3(float3 v)
 	return max(max(v.x, v.y), v.z);
 }
 
+//sampler
 #define POINT_WRAP 0
 #define LINEAR_WRAP 1
 #define ANISOTROPIC_WRAP 2
