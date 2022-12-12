@@ -1,7 +1,9 @@
+#pragma once
+
 #include "objects.h"
 #include "../Graphics/others/shader.h"
 
-class Water : public Objects
+class Water_franel : public Objects
 {
 public:
 	XMFLOAT4 position = XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f);
@@ -10,8 +12,8 @@ public:
 	XMFLOAT3 scale = XMFLOAT3(1.0f, 1.0f, 1.0f);
 
 public:
-	Water(ID3D11Device* device);
-	~Water() = default;
+	Water_franel(ID3D11Device* device);
+	~Water_franel() = default;
 
 	void update(float elapsed_time)override;
 
@@ -43,8 +45,5 @@ private:
 	std::unique_ptr<vertex_shader<static_mesh::vertex>>vs;
 	std::unique_ptr<pixel_shader> ps;
 
-	//shader resource
-	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> sky_map;
-	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> sea_normal_map;
-};
 
+};

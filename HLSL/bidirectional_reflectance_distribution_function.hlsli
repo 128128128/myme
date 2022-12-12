@@ -14,12 +14,17 @@ float3 f_schlick(float3 f0, float3 f90, float VoH)
 	return f0 + (f90 - f0) * pow(clamp(1.0 - VoH, 0.0, 1.0), 5.0);
 }
 // Smith Joint GGX
+// マイクロファセット同士が光の反射経路を遮蔽することにより、失われてしまう光の反射成分（減衰）を考慮する関数
 // Note: Vis = G / (4 * NoL * NoV)
 // see Eric Heitz. 2014. Understanding the Masking-Shadowing Function in Microfacet-Based BRDFs. Journal of Computer Graphics Techniques, 3
 // see Real-Time Rendering. Page 331 to 336.
 // see https://google.github.io/filament/Filament.md.html#materialsystem/specularbrdf/geometricshadowing(specularg)
+//NoL..dot normal vec* light vec
+//NoV...dot normal vec*view vec
 float v_ggx(float NoL, float NoV, float alpha_roughness)
 {
+	//convert to material roughness by squaring the perceptual roughness.
+    //知覚的粗さを二乗して物質的粗さに変換する
 	float alpha_roughness_sq = alpha_roughness * alpha_roughness;
 
 	float ggxv = NoL * sqrt(NoV * NoV * (1.0 - alpha_roughness_sq) + alpha_roughness_sq);
@@ -29,9 +34,11 @@ float v_ggx(float NoL, float NoV, float alpha_roughness)
 	return (ggx > 0.0) ? 0.5 / ggx : 0.0;
 }
 // The following equation(s) model the distribution of microfacet normals across the area being drawn (aka D())
+// //物体表面のミクロレベルの各微小平面の法線がどれくらい指定の方向を向いているか、という法線の分布を表す関数
 // Implementation from "Average Irregularity Representation of a Roughened Surface for Ray Reflection" by T. S. Trowbridge, and K. P. Reitz
 // Follows the distribution function recommended in the SIGGRAPH 2013 course notes from EPIC Games [1], Equation 3.
-float d_ggx(float NoH, float alpha_roughness)
+//GGX(Trowbridge-Retiz)
+float d_ggx(float NoH/*ライトベクトルと視線ベクトルを足して正規化したベクトルと法線の内積*/, float alpha_roughness)
 {
 	float alpha_roughness_sq = alpha_roughness * alpha_roughness;
 	float f = (NoH * NoH) * (alpha_roughness_sq - 1.0) + 1.0;
@@ -39,11 +46,15 @@ float d_ggx(float NoH, float alpha_roughness)
 }
 
 //  https://github.com/KhronosGroup/glTF/tree/master/specification/2.0#acknowledgments AppendixB
+//VoH...dot half vec*view vec
+//NoL..dot normal vec* light vec
+//NoV...dot normal vec*view vec
+//NoH...dot normal vec*half vec
 float3 brdf_specular_ggx(float3 f0, float3 f90, float alpha_roughness, float specular_weight, float VoH, float NoL, float NoV, float NoH)
 {
-	float3 F = f_schlick(f0, f90, VoH);
-	float Vis = v_ggx(NoL, NoV, alpha_roughness);
-	float D = d_ggx(NoH, alpha_roughness);
+	float3 F = f_schlick(f0, f90, VoH);//フラネル
+	float Vis = v_ggx(NoL, NoV, alpha_roughness);//幾何学的減衰
+	float D = d_ggx(NoH, alpha_roughness);//マイクロファセット法線分布関数
 
 	return specular_weight * F * Vis * D;
 }
@@ -120,13 +131,15 @@ float3 ibl_radiance_ggx(float3 N, float3 V, float roughness, float3 f0, float sp
 	return specular_weight * specular_light * fss_ess;
 }
 // specularWeight is introduced with KHR_materials_specular
+//ibl lambert
 float3 ibl_radiance_lambertian(float3 N, float3 V, float roughness, float3 diffuse_color, float3 f0, float specular_weight)
 {
 	float NoV = clamp(dot(N, V), 0.0, 1.0);
 	
 	float2 brdf_sample_point = clamp(float2(NoV, roughness), 0.0, 1.0);
+	//brdf...双方向反射率分布関数と呼ばれ、ある特定の角度から光を入射した時の反射光の角度分布特性を表す
 	float2 f_ab = sample_lut_ggx(brdf_sample_point).rg;
-
+	//Projection of the surrounding environment reflected by the normal//法線で反射した周囲環境を投影
 	float3 irradiance = sample_diffuse_iem(N).rgb;
 	
     // see https://bruop.github.io/ibl/#single_scattering_results at Single Scattering Results

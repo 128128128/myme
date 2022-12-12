@@ -605,7 +605,7 @@ void gbuffer::lightning(ID3D11DeviceContext* immediate_context)
 	immediate_context->PSSetShaderResources(5, 1, srv_light.GetAddressOf());
 
 	composite_ps->active(immediate_context);
-	immediate_context->DrawIndexed(4, 0, 0);
+immediate_context->DrawIndexed(4, 0, 0);
 	composite_ps->inactive(immediate_context);
 }
 

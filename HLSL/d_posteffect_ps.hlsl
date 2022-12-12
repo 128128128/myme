@@ -148,7 +148,6 @@ float outline(float2 uv) {
 
 float4 main(VS_OUT pin) : SV_TARGET0{
 	float4 tex = diffuse_texture.Sample(sampler_states[0], pin.texcoord);
-
 	//float4 depth = depth_texture.Sample(sampler_states[0], input.tex);
 
 	float4 color = tex;

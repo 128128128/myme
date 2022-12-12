@@ -69,7 +69,7 @@
 // SV_TARGET                4   xyzw        4   TARGET   float   xyzw
 //
 ps_5_0
-dcl_globalFlags refactoringAllowed
+dcl_globalFlags refactoringAllowed | skipOptimization
 dcl_constantbuffer CB4[2], immediateIndexed
 dcl_constantbuffer CB3[1], immediateIndexed
 dcl_input_ps_siv linear noperspective v0.xy, position
@@ -78,315 +78,1190 @@ dcl_output o1.xyzw
 dcl_output o2.xyzw
 dcl_output o3.xyzw
 dcl_output o4.xyzw
-dcl_temps 10
-mad r0.xy, v0.xyxx, l(1.000000, -0.001389, 0.000000, 0.000000), l(0.000000, 1.000000, 0.000000, 0.000000)
-mad r0.xy, r0.xyxx, l(0.001563, 2.000000, 0.000000, 0.000000), l(-1.000000, -1.000000, 0.000000, 0.000000)
-mad r0.yzw, r0.yyyy, l(0.000000, 0.000000, 1.000000, 0.600000), l(0.000000, 0.000000, 0.600000, -1.000000)
-mad r0.xyz, r0.xxxx, l(-1.777778, 0.000000, 0.000000, 0.000000), r0.yzwy
-dp3 r0.w, r0.xyzx, r0.xyzx
-rsq r0.w, r0.w
-mul r0.xyz, r0.wwww, r0.xyzx
-lt r1.x, l(0.000000), cb4[0].w
-mul r1.yz, cb4[0].yyxy, l(0.000000, 0.002269, -0.006807, 0.000000)
-sincos r2.x, r3.x, r1.y
-mov r4.x, -r2.x
-mov r4.y, r3.x
-dp2 r3.y, r4.yxyy, r0.yzyy
-mov r4.z, r2.x
-dp2 r0.w, r4.zyzz, r0.yzyy
-sincos r2.x, r4.x, r1.z
-mov r5.x, -r2.x
-mov r5.y, r4.x
-dp2 r3.x, r5.yxyy, r0.xwxx
-mov r5.z, r2.x
-dp2 r3.z, r5.zyzz, r0.xwxx
-movc r0.xyz, r1.xxxx, r3.xyzx, r0.xyzx
-mul r0.w, cb3[0].x, l(0.050000)
-sincos r0.w, null, r0.w
-mov r1.x, |r0.w|
-mov r1.y, l(-1.000000)
-dp2 r0.w, r1.xyxx, r1.xyxx
-rsq r0.w, r0.w
-mul r1.xy, r0.wwww, r1.xyxx
-dp2 r0.w, r0.yzyy, r1.xyxx
-max r0.w, r0.w, l(0.000000)
-add r1.x, -r0.y, l(1.000000)
-mad r1.xyz, r1.xxxx, l(0.300000, 0.500000, 0.400000, 0.000000), l(0.000000, 0.100000, 0.400000, 0.000000)
-log r0.w, r0.w
-mul r2.xy, r0.wwww, l(1500.000000, 10.000000, 0.000000, 0.000000)
-exp r2.xy, r2.xyxx
-mul r2.xy, r2.xyxx, l(5.000000, 0.600000, 0.000000, 0.000000)
-min r2.xy, r2.xyxx, l(1.000000, 1.000000, 0.000000, 0.000000)
-mad r1.xyz, r2.xxxx, l(1.000000, 0.700000, 0.550000, 0.000000), r1.xyzx
-mad r1.xyz, r2.yyyy, l(1.000000, 0.700000, 0.550000, 0.000000), r1.xyzx
-mul r0.w, r0.y, l(-451.000000)
-mad r0.w, -r0.w, r0.w, l(203401.000000)
-add r0.w, -r0.w, l(250000.000000)
-sqrt r0.w, r0.w
-mad r1.w, r0.y, l(-451.000000), -r0.w
-mad r0.w, r0.y, l(-451.000000), r0.w
-lt r2.x, r1.w, l(0.000000)
-movc r0.w, r2.x, r0.w, r1.w
-ge r1.w, l(100000008.000000), r0.w
-mad r2.xyz, r0.xyzx, r0.wwww, l(0.000000, 1.000000, 0.000000, 0.000000)
-and r2.xyz, r1.wwww, r2.xyzx
-div r0.xyz, r0.xyzx, r0.yyyy
-mul r3.z, cb4[1].z, -cb3[0].x
-add r0.w, -cb4[1].x, l(1.000000)
-mov r3.xy, l(0,0,0,0)
-mov r4.xyz, r2.xyzx
-mov r5.xyz, l(0,0,0,0)
-mov r1.w, l(1.000000)
-mov r2.w, l(0)
-mov r3.w, l(0)
+dcl_temps 11
+//
+// Initial variable locations:
+//   v0.x <- pin.position.x; v0.y <- pin.position.y; v0.z <- pin.position.z; v0.w <- pin.position.w; 
+//   v1.x <- pin.color.x; v1.y <- pin.color.y; v1.z <- pin.color.z; v1.w <- pin.color.w; 
+//   v2.x <- pin.texcoord.x; v2.y <- pin.texcoord.y; 
+//   o4.x <- <main return value>.RM.x; o4.y <- <main return value>.RM.y; o4.z <- <main return value>.RM.z; o4.w <- <main return value>.RM.w; 
+//   o3.x <- <main return value>.Position.x; o3.y <- <main return value>.Position.y; o3.z <- <main return value>.Position.z; o3.w <- <main return value>.Position.w; 
+//   o2.x <- <main return value>.Normal.x; o2.y <- <main return value>.Normal.y; o2.z <- <main return value>.Normal.z; o2.w <- <main return value>.Normal.w; 
+//   o1.x <- <main return value>.Depth.x; o1.y <- <main return value>.Depth.y; o1.z <- <main return value>.Depth.z; o1.w <- <main return value>.Depth.w; 
+//   o0.x <- <main return value>.Color.x; o0.y <- <main return value>.Color.y; o0.z <- <main return value>.Color.z; o0.w <- <main return value>.Color.w
+//
+#line 120 "C:\Users\2200167\Desktop\個人製作\myme03\myme\HLSL\playshader_ps.hlsl"
+mov r0.xyzw, l(0,0,0,100000008.000000)  // r0.x <- no_hit.origin.x; r0.y <- no_hit.origin.y; r0.z <- no_hit.origin.z; r0.w <- no_hit.t
+
+#line 580
+mov r1.xyz, l(1.000000,0.700000,0.550000,0)  // r1.x <- sun_color.x; r1.y <- sun_color.y; r1.z <- sun_color.z
+
+#line 583
+itof r2.xyz, l(0, -450, 0, 0)  // r2.x <- atmosphere.origin.x; r2.y <- atmosphere.origin.y; r2.z <- atmosphere.origin.z
+
+#line 747
+itof r3.xy, l(1280, 720, 0, 0)  // r3.x <- iResolution.x; r3.y <- iResolution.y
+
+#line 749
+div r4.x, r3.x, r3.y  // r4.x <- aspect_ratio.x
+itof r4.y, l(1)  // r4.y <- aspect_ratio.y
+
+#line 752
+mov r1.w, l(1.000000)  // r1.w <- fov
+
+#line 754
+div r3.xz, v0.xxyx, r3.xxyx  // r3.x <- point_ndc.x; r3.z <- point_ndc.y
+
+#line 756
+mov r2.w, -r3.z
+add r3.y, r2.w, l(1.000000)  // r3.y <- point_ndc.y
+
+#line 758
+mul r3.zw, r3.xxxy, l(0.000000, 0.000000, 2.000000, 2.000000)
+mov r4.zw, l(-0.000000,-0.000000,-1.000000,-1.000000)
+add r3.zw, r3.zzzw, r4.zzzw
+mul r3.zw, r4.xxxy, r3.zzzw
+mul r3.zw, r1.wwww, r3.zzzw  // r3.z <- point_cam.x; r3.w <- point_cam.y
+
+#line 771
+itof r4.xz, l(0, 0, 0, 0)  // r4.x <- eye.x; r4.z <- eye.z
+mov r4.y, l(1.000000)
+mov r4.xyz, r4.xyzx  // r4.y <- eye.y
+
+#line 772
+itof r5.xz, l(0, 0, -1, 0)  // r5.x <- look_at.x; r5.z <- look_at.z
+mov r5.y, l(1.600000)  // r5.y <- look_at.y
+
+#line 773
+nop 
+mov r4.xyz, r4.xyzx
+mov r5.xyz, r5.xyzx
+
+#line 152
+mov r6.xyz, -r4.xyzx
+add r5.xyz, r5.xyzx, r6.xyzx  // r5.x <- fwd.x; r5.y <- fwd.y; r5.z <- fwd.z
+
+#line 153
+nop 
+
+#line 155
+itof r6.xyz, l(0, 0, 1, 0)  // r6.x <- up.z; r6.y <- up.x; r6.z <- up.y
+
+#line 156
+mul r7.xyz, r5.zxyz, r6.zxyz
+mul r6.xyz, r5.yzxy, r6.xyzx
+mov r6.xyz, -r6.xyzx
+add r6.xyz, r6.xyzx, r7.xyzx  // r6.x <- right.x; r6.y <- right.y; r6.z <- right.z
+
+#line 157
+mul r7.xyz, r5.yzxy, r6.zxyz
+mul r8.xyz, r5.zxyz, r6.yzxy
+mov r8.xyz, -r8.xyzx
+add r7.xyz, r7.xyzx, r8.xyzx  // r7.x <- up.x; r7.y <- up.y; r7.z <- up.z
+
+#line 159
+mul r7.xyz, r3.wwww, r7.xyzx
+add r5.xyz, r5.xyzx, r7.xyzx
+mul r6.xyz, r3.zzzz, r6.xyzx
+add r5.xyz, r5.xyzx, r6.xyzx
+dp3 r1.w, r5.xyzx, r5.xyzx
+rsq r1.w, r1.w
+mul r5.xyz, r1.wwww, r5.xyzx  // r5.x <- r.direction.x; r5.y <- r.direction.y; r5.z <- r.direction.z
+
+#line 163
+mov r5.xyz, r5.xyzx  // r5.x <- <get_primary_ray return value>.direction.x; r5.y <- <get_primary_ray return value>.direction.y; r5.z <- <get_primary_ray return value>.direction.z
+
+#line 773
+mov r5.xyz, r5.xyzx  // r5.x <- eye_ray.direction.x; r5.y <- eye_ray.direction.y; r5.z <- eye_ray.direction.z
+
+#line 775
+itof r1.w, l(0)
+lt r1.w, r1.w, cb4[0].w
+if_nz r1.w
+
+#line 776
+  nop 
+  mov r1.w, cb4[0].y
+  mul r1.w, r1.w, l(0.130000)
+
+#line 169
+  mul r1.w, r1.w, l(0.017453)  // r1.w <- angle
+
+#line 170
+  sincos r6.z, null, r1.w  // r6.z <- _sin
+
+#line 171
+  sincos null, r6.xw, r1.wwww  // r6.w <- _cos
+
+#line 172
+  mov r6.y, -r6.z  // r6.y <- <rotate_2d return value>._m01
+  mov r6.xw, r6.xxxw  // r6.x <- <rotate_2d return value>._m00; r6.w <- <rotate_2d return value>._m11
+  mov r6.z, r6.z  // r6.z <- <rotate_2d return value>._m10
+
+#line 776
+  dp2 r7.y, r6.xyxx, r5.yzyy  // r7.y <- eye_ray.direction.y
+  dp2 r5.w, r6.zwzz, r5.yzyy  // r5.w <- eye_ray.direction.z
+
+#line 777
+  nop 
+  mov r1.w, -cb4[0].x
+  mul r1.w, r1.w, l(0.390000)
+
+#line 169
+  mul r1.w, r1.w, l(0.017453)  // r1.w <- angle
+
+#line 170
+  sincos r6.z, null, r1.w
+
+#line 171
+  sincos null, r6.xw, r1.wwww
+
+#line 172
+  mov r6.y, -r6.z
+  mov r6.xw, r6.xxxw
+  mov r6.z, r6.z
+
+#line 777
+  dp2 r7.x, r6.xyxx, r5.xwxx  // r7.x <- eye_ray.direction.x
+  dp2 r7.z, r6.zwzz, r5.xwxx  // r7.z <- eye_ray.direction.z
+
+#line 778
+  mov r5.xyz, r7.xyzx  // r5.x <- eye_ray.direction.x; r5.y <- eye_ray.direction.y; r5.z <- eye_ray.direction.z
+endif 
+
+#line 790
+nop 
+
+#line 597
+mov r5.xyz, r5.xyzx  // r5.x <- rd.x; r5.y <- rd.y; r5.z <- rd.z
+
+#line 599
+mul r1.w, cb3[0].x, l(0.050000)
+sincos r1.w, null, r1.w
+mov r2.w, -r1.w
+max r6.y, r1.w, r2.w
+itof r6.xz, l(0, 0, -1, 0)
+dp3 r1.w, r6.xyzx, r6.xyzx
+rsq r1.w, r1.w
+mul r6.xyz, r1.wwww, r6.xyzx  // r6.x <- sun_dir.x; r6.y <- sun_dir.y; r6.z <- sun_dir.z
+
+#line 600
+dp3 r1.w, r5.xyzx, r6.xyzx
+max r1.w, r1.w, l(0.000000)  // r1.w <- sun_amount
+
+#line 603
+mov r2.w, -r5.y
+add r2.w, r2.w, l(1.000000)
+mov r6.xyz, l(-0.000000,-0.100000,-0.400000,-0.000000)
+add r6.xyz, r6.xyzx, l(0.300000, 0.600000, 0.800000, 0.000000)
+mul r6.xyz, r2.wwww, r6.xyzx
+add r6.xyz, r6.xyzx, l(0.000000, 0.100000, 0.400000, 0.000000)  // r6.x <- sky_color.x; r6.y <- sky_color.y; r6.z <- sky_color.z
+
+#line 604
+log r2.w, r1.w
+mul r2.w, r2.w, l(1500.000000)
+exp r2.w, r2.w
+mul r2.w, r2.w, l(5.000000)
+min r2.w, r2.w, l(1.000000)
+mul r7.xyz, r1.xyzx, r2.wwww
+add r6.xyz, r6.xyzx, r7.xyzx
+
+#line 605
+log r1.w, r1.w
+mul r1.w, r1.w, l(10.000000)
+exp r1.w, r1.w
+mul r1.w, r1.w, l(0.600000)
+min r1.w, r1.w, l(1.000000)
+mul r1.xyz, r1.wwww, r1.xyzx
+add r1.xyz, r1.xyzx, r6.xyzx  // r1.x <- sky_color.x; r1.y <- sky_color.y; r1.z <- sky_color.z
+
+#line 607
+mov r1.xyz, r1.xyzx  // r1.x <- <render_sky_color return value>.x; r1.y <- <render_sky_color return value>.y; r1.z <- <render_sky_color return value>.z
+
+#line 790
+mov r1.xyz, r1.xyzx  // r1.x <- sky.x; r1.y <- sky.y; r1.z <- sky.z
+
+#line 791
+nop 
+
+#line 657
+mov r0.xyzw, r0.xyzw  // r0.x <- hit.origin.x; r0.y <- hit.origin.y; r0.z <- hit.origin.z; r0.w <- hit.t
+
+#line 658
+nop 
+mov r0.xyzw, r0.xyzw
+
+#line 250
+mov r6.xyz, -r4.xyzx
+add r2.xyz, r2.xyzx, r6.xyzx  // r2.x <- rc.x; r2.y <- rc.y; r2.z <- rc.z
+
+#line 251
+mul r1.w, l(500.000000), l(500.000000)  // r1.w <- radius2
+
+#line 252
+dp3 r2.w, r2.xyzx, r5.xyzx  // r2.w <- tca
+
+#line 255
+dp3 r2.x, r2.xyzx, r2.xyzx
+mul r2.y, r2.w, r2.w
+mov r2.y, -r2.y
+add r2.x, r2.y, r2.x  // r2.x <- d2
+
+#line 259
+mov r2.x, -r2.x
+add r1.w, r1.w, r2.x
+sqrt r1.w, r1.w  // r1.w <- thc
+
+#line 260
+mov r2.x, -r1.w
+add r2.x, r2.x, r2.w  // r2.x <- t0
+
+#line 261
+add r1.w, r1.w, r2.w  // r1.w <- t1
+
+#line 263
+lt r2.y, r2.x, l(0.000000)
+if_nz r2.y
+  mov r2.x, r1.w
+endif 
+
+#line 264
+lt r0.w, r0.w, r2.x
+
+#line 267
+if_z r0.w
+  mul r2.xyz, r2.xxxx, r5.xyzx
+  add r0.xyz, r2.xyzx, r4.xyzx  // r0.x <- impact.x; r0.y <- impact.y; r0.z <- impact.z
+
+#line 271
+  mov r0.xyz, r0.xyzx  // r0.x <- hit.origin.x; r0.y <- hit.origin.y; r0.z <- hit.origin.z
+
+#line 272
+endif 
+
+#line 658
+mov r0.xyz, r0.xyzx  // r0.x <- hit.origin.x; r0.y <- hit.origin.y; r0.z <- hit.origin.z
+
+#line 664
+mov r0.w, l(25)  // r0.w <- steps
+
+#line 665
+mov r1.w, l(0.600000)  // r1.w <- march_step
+
+#line 667
+div r2.xyz, r5.xyzx, r5.yyyy
+mul r2.xyz, r1.wwww, r2.xyzx  // r2.x <- dir_step.x; r2.y <- dir_step.y; r2.z <- dir_step.z
+
+#line 668
+mov r0.xyz, r0.xyzx  // r0.x <- pos.x; r0.y <- pos.y; r0.z <- pos.z
+
+#line 671
+mov r2.w, l(1.000000)  // r2.w <- T
+
+#line 672
+itof r4.xyz, l(0, 0, 0, 0)  // r4.x <- C.x; r4.y <- C.y; r4.z <- C.z
+
+#line 673
+mov r3.z, l(0)  // r3.z <- alpha
+
+#line 675
+mov r3.w, l(0)  // r3.w <- i
+mov r5.xyz, r0.xyzx  // r5.x <- pos.x; r5.y <- pos.y; r5.z <- pos.z
+mov r6.xyz, r4.xyzx  // r6.x <- C.x; r6.y <- C.y; r6.z <- C.z
+mov r4.w, r2.w  // r4.w <- T
+mov r6.w, r3.z  // r6.w <- alpha
+mov r5.w, r3.w  // r5.w <- i
 loop 
-  ige r4.w, r3.w, l(25)
-  breakc_nz r4.w
-  mad r6.xyz, r4.xyzx, l(0.021224, 0.021224, 0.021224, 0.000000), r3.xyzx
-  round_ni r7.xyz, r6.xyzx
-  frc r8.xyz, r6.xyzx
-  mul r9.xyz, r8.xyzx, r8.xyzx
-  mad r8.xyz, -r8.xyzx, l(2.000000, 2.000000, 2.000000, 0.000000), l(3.000000, 3.000000, 3.000000, 0.000000)
-  mul r8.xyz, r8.xyzx, r9.xyzx
-  mad r4.w, r7.y, l(157.000000), r7.x
-  mad r4.w, r7.z, l(113.000000), r4.w
-  sincos r5.w, null, r4.w
-  mul r5.w, r5.w, l(753.545288)
-  frc r5.w, r5.w
-  add r7.xyzw, r4.wwww, l(1.000000, 157.000000, 158.000000, 113.000000)
-  sincos r7.xyzw, null, r7.xyzw
-  mul r7.xyzw, r7.xyzw, l(753.545288, 753.545288, 753.545288, 753.545288)
-  frc r7.xyzw, r7.xyzw
-  add r6.w, -r5.w, r7.x
-  mad r5.w, r8.x, r6.w, r5.w
-  add r6.w, -r7.y, r7.z
-  mad r6.w, r8.x, r6.w, r7.y
-  add r6.w, -r5.w, r6.w
-  mad r5.w, r8.y, r6.w, r5.w
-  add r7.xyz, r4.wwww, l(114.000000, 270.000000, 271.000000, 0.000000)
-  sincos r7.xyz, null, r7.xyzx
-  mul r7.xyz, r7.xyzx, l(753.545288, 753.545288, 753.545288, 0.000000)
-  frc r7.xyz, r7.xyzx
-  add r4.w, -r7.w, r7.x
-  mad r4.w, r8.x, r4.w, r7.w
-  add r6.w, -r7.y, r7.z
-  mad r6.w, r8.x, r6.w, r7.y
-  add r6.w, -r4.w, r6.w
-  mad r4.w, r8.y, r6.w, r4.w
-  add r4.w, -r5.w, r4.w
-  mad r4.w, r8.z, r4.w, r5.w
-  mul r7.xyz, r6.xyzx, l(2.764340, 2.764340, 2.764340, 0.000000)
-  round_ni r8.xyz, r7.xyzx
-  frc r7.xyz, r7.xyzx
-  mul r9.xyz, r7.xyzx, r7.xyzx
-  mad r7.xyz, -r7.xyzx, l(2.000000, 2.000000, 2.000000, 0.000000), l(3.000000, 3.000000, 3.000000, 0.000000)
-  mul r7.xyz, r7.xyzx, r9.xyzx
-  mad r5.w, r8.y, l(157.000000), r8.x
-  mad r5.w, r8.z, l(113.000000), r5.w
-  sincos r6.w, null, r5.w
-  mul r6.w, r6.w, l(753.545288)
-  frc r6.w, r6.w
-  add r8.xyzw, r5.wwww, l(1.000000, 157.000000, 158.000000, 113.000000)
-  sincos r8.xyzw, null, r8.xyzw
-  mul r8.xyzw, r8.xyzw, l(753.545288, 753.545288, 753.545288, 753.545288)
-  frc r8.xyzw, r8.xyzw
-  add r7.w, -r6.w, r8.x
-  mad r6.w, r7.x, r7.w, r6.w
-  add r7.w, -r8.y, r8.z
-  mad r7.w, r7.x, r7.w, r8.y
-  add r7.w, -r6.w, r7.w
-  mad r6.w, r7.y, r7.w, r6.w
-  add r8.xyz, r5.wwww, l(114.000000, 270.000000, 271.000000, 0.000000)
-  sincos r8.xyz, null, r8.xyzx
-  mul r8.xyz, r8.xyzx, l(753.545288, 753.545288, 753.545288, 0.000000)
-  frc r8.xyz, r8.xyzx
-  add r5.w, -r8.w, r8.x
-  mad r5.w, r7.x, r5.w, r8.w
-  add r7.w, -r8.y, r8.z
-  mad r7.x, r7.x, r7.w, r8.y
-  add r7.x, -r5.w, r7.x
-  mad r5.w, r7.y, r7.x, r5.w
-  add r5.w, -r6.w, r5.w
-  mad r5.w, r7.z, r5.w, r6.w
-  mul r5.w, r5.w, l(0.255849)
-  mad r4.w, r4.w, l(0.517497), r5.w
-  mul r7.xyz, r6.xyzx, l(7.641575, 7.641575, 7.641575, 0.000000)
-  round_ni r8.xyz, r7.xyzx
-  frc r7.xyz, r7.xyzx
-  mul r9.xyz, r7.xyzx, r7.xyzx
-  mad r7.xyz, -r7.xyzx, l(2.000000, 2.000000, 2.000000, 0.000000), l(3.000000, 3.000000, 3.000000, 0.000000)
-  mul r7.xyz, r7.xyzx, r9.xyzx
-  mad r5.w, r8.y, l(157.000000), r8.x
-  mad r5.w, r8.z, l(113.000000), r5.w
-  sincos r6.w, null, r5.w
-  mul r6.xyzw, r6.xyzw, l(21.123911, 21.123911, 21.123911, 753.545288)
-  frc r6.w, r6.w
-  add r8.xyzw, r5.wwww, l(1.000000, 157.000000, 158.000000, 113.000000)
-  sincos r8.xyzw, null, r8.xyzw
-  mul r8.xyzw, r8.xyzw, l(753.545288, 753.545288, 753.545288, 753.545288)
-  frc r8.xyzw, r8.xyzw
-  add r7.w, -r6.w, r8.x
-  mad r6.w, r7.x, r7.w, r6.w
-  add r7.w, -r8.y, r8.z
-  mad r7.w, r7.x, r7.w, r8.y
-  add r7.w, -r6.w, r7.w
-  mad r6.w, r7.y, r7.w, r6.w
-  add r8.xyz, r5.wwww, l(114.000000, 270.000000, 271.000000, 0.000000)
-  sincos r8.xyz, null, r8.xyzx
-  mul r8.xyz, r8.xyzx, l(753.545288, 753.545288, 753.545288, 0.000000)
-  frc r8.xyz, r8.xyzx
-  add r5.w, -r8.w, r8.x
-  mad r5.w, r7.x, r5.w, r8.w
-  add r7.w, -r8.y, r8.z
-  mad r7.x, r7.x, r7.w, r8.y
-  add r7.x, -r5.w, r7.x
-  mad r5.w, r7.y, r7.x, r5.w
-  add r5.w, -r6.w, r5.w
-  mad r5.w, r7.z, r5.w, r6.w
-  mad r4.w, r5.w, l(0.125276), r4.w
-  round_ni r7.xyz, r6.xyzx
-  frc r6.xyz, r6.xyzx
-  mul r8.xyz, r6.xyzx, r6.xyzx
-  mad r6.xyz, -r6.xyzx, l(2.000000, 2.000000, 2.000000, 0.000000), l(3.000000, 3.000000, 3.000000, 0.000000)
-  mul r6.xyz, r6.xyzx, r8.xyzx
-  mad r5.w, r7.y, l(157.000000), r7.x
-  mad r5.w, r7.z, l(113.000000), r5.w
-  sincos r6.w, null, r5.w
-  mul r6.w, r6.w, l(753.545288)
-  frc r6.w, r6.w
-  add r7.xyzw, r5.wwww, l(1.000000, 157.000000, 158.000000, 113.000000)
-  sincos r7.xyzw, null, r7.xyzw
-  mul r7.xyzw, r7.xyzw, l(753.545288, 753.545288, 753.545288, 753.545288)
-  frc r7.xyzw, r7.xyzw
-  add r7.x, -r6.w, r7.x
-  mad r6.w, r6.x, r7.x, r6.w
-  add r7.x, -r7.y, r7.z
-  mad r7.x, r6.x, r7.x, r7.y
-  add r7.x, -r6.w, r7.x
-  mad r6.w, r6.y, r7.x, r6.w
-  add r7.xyz, r5.wwww, l(114.000000, 270.000000, 271.000000, 0.000000)
-  sincos r7.xyz, null, r7.xyzx
-  mul r7.xyz, r7.xyzx, l(753.545288, 753.545288, 753.545288, 0.000000)
-  frc r7.xyz, r7.xyzx
-  add r5.w, -r7.w, r7.x
-  mad r5.w, r6.x, r5.w, r7.w
-  add r7.x, -r7.y, r7.z
-  mad r6.x, r6.x, r7.x, r7.y
-  add r6.x, -r5.w, r6.x
-  mad r5.w, r6.y, r6.x, r5.w
-  add r5.w, -r6.w, r5.w
-  mad r5.w, r6.z, r5.w, r6.w
-  mad r4.w, r5.w, l(0.062559), r4.w
-  add r5.w, -r0.w, r4.w
-  mul_sat r5.w, r5.w, l(20.000000)
-  mad r6.x, r5.w, l(-2.000000), l(3.000000)
-  mul r5.w, r5.w, r5.w
-  mul r5.w, r5.w, r6.x
-  mul_sat r4.w, r4.w, r5.w
-  mul r5.w, r4.w, l(-0.892213)
-  exp r5.w, r5.w
-  mul r1.w, r1.w, r5.w
-  lt r6.x, r1.w, l(0.010000)
-  if_nz r6.x
+  ilt r7.x, r5.w, r0.w
+  breakc_z r7.x
+
+#line 676
+  itof r7.x, r5.w
+  itof r7.y, r0.w
+  div r7.x, r7.x, r7.y  // r7.x <- h
+
+#line 678
+  nop 
+  mov r7.y, -cb3[0].x
+  mul r8.z, r7.y, cb4[1].z
+
+#line 617
+  mul r7.yzw, r5.xxyz, l(0.000000, 0.021224, 0.021224, 0.021224)
+  itof r8.xy, l(0, 0, 0, 0)
+  add r7.yzw, r8.xxyz, r7.yyzw  // r7.y <- p.x; r7.z <- p.y; r7.w <- p.z
+
+#line 618
+  nop 
+
+#line 577
+  nop 
+
+#line 565
+  mov r7.yzw, r7.yyzw  // r7.y <- p.x; r7.z <- p.y; r7.w <- p.z
+
+#line 566
+  nop 
+
+#line 312
+  round_ni r8.xyz, r7.yzwy  // r8.x <- p.x; r8.y <- p.y; r8.z <- p.z
+
+#line 313
+  frc r9.xyz, r7.yzwy  // r9.x <- f.x; r9.y <- f.y; r9.z <- f.z
+
+#line 314
+  mul r10.xyz, r9.xyzx, r9.xyzx
+  mul r9.xyz, r9.xyzx, l(2.000000, 2.000000, 2.000000, 0.000000)
+  mov r9.xyz, -r9.xyzx
+  add r9.xyz, r9.xyzx, l(3.000000, 3.000000, 3.000000, 0.000000)
+  mul r9.xyz, r9.xyzx, r10.xyzx  // r9.x <- f.x; r9.y <- f.y; r9.z <- f.z
+
+#line 317
+  mul r8.y, r8.y, l(157.000000)
+  add r8.x, r8.y, r8.x
+  mul r8.y, r8.z, l(113.000000)
+  add r8.x, r8.y, r8.x  // r8.x <- n
+
+#line 318
+  nop 
+  add r8.y, r8.x, l(0.000000)
+
+#line 306
+  sincos r8.y, null, r8.y
+  mul r8.y, r8.y, l(753.545288)
+  frc r8.y, r8.y  // r8.y <- <hash return value>
+
+#line 318
+  nop 
+  add r8.z, r8.x, l(1.000000)
+
+#line 306
+  sincos r8.z, null, r8.z
+  mul r8.z, r8.z, l(753.545288)
+  frc r8.z, r8.z  // r8.z <- <hash return value>
+
+#line 318
+  mov r8.w, -r8.y
+  add r8.z, r8.w, r8.z
+  mul r8.z, r8.z, r9.x
+  add r8.y, r8.z, r8.y
+  nop 
+  add r8.z, r8.x, l(157.000000)
+
+#line 306
+  sincos r8.z, null, r8.z
+  mul r8.z, r8.z, l(753.545288)
+  frc r8.z, r8.z  // r8.z <- <hash return value>
+
+#line 318
+  nop 
+  add r8.w, r8.x, l(158.000000)
+
+#line 306
+  sincos r8.w, null, r8.w
+  mul r8.w, r8.w, l(753.545288)
+  frc r8.w, r8.w  // r8.w <- <hash return value>
+
+#line 318
+  mov r9.w, -r8.z
+  add r8.w, r8.w, r9.w
+  mul r8.w, r8.w, r9.x
+  add r8.z, r8.w, r8.z
+  mov r8.w, -r8.y
+  add r8.z, r8.w, r8.z
+  mul r8.z, r8.z, r9.y
+  add r8.y, r8.z, r8.y
+  nop 
+  add r8.z, r8.x, l(113.000000)
+
+#line 306
+  sincos r8.z, null, r8.z
+  mul r8.z, r8.z, l(753.545288)
+  frc r8.z, r8.z  // r8.z <- <hash return value>
+
+#line 318
+  nop 
+  add r8.w, r8.x, l(114.000000)
+
+#line 306
+  sincos r8.w, null, r8.w
+  mul r8.w, r8.w, l(753.545288)
+  frc r8.w, r8.w  // r8.w <- <hash return value>
+
+#line 318
+  mov r9.w, -r8.z
+  add r8.w, r8.w, r9.w
+  mul r8.w, r8.w, r9.x
+  add r8.z, r8.w, r8.z
+  nop 
+  add r8.w, r8.x, l(270.000000)
+
+#line 306
+  sincos r8.w, null, r8.w
+  mul r8.w, r8.w, l(753.545288)
+  frc r8.w, r8.w  // r8.w <- <hash return value>
+
+#line 318
+  nop 
+  add r8.x, r8.x, l(271.000000)
+
+#line 306
+  sincos r8.x, null, r8.x
+  mul r8.x, r8.x, l(753.545288)
+  frc r8.x, r8.x  // r8.x <- <hash return value>
+
+#line 318
+  mov r9.w, -r8.w
+  add r8.x, r8.x, r9.w
+  mul r8.x, r8.x, r9.x
+  add r8.x, r8.x, r8.w
+  mov r8.w, -r8.z
+  add r8.x, r8.w, r8.x
+  mul r8.x, r8.x, r9.y
+  add r8.x, r8.x, r8.z
+  mov r8.z, -r8.y
+  add r8.x, r8.z, r8.x
+  mul r8.x, r8.x, r9.z
+  add r8.x, r8.x, r8.y  // r8.x <- <noise_iq return value>
+
+#line 566
+  mul r8.x, r8.x, l(0.517497)  // r8.x <- t
+
+#line 567
+  mul r7.yzw, r7.yyzw, l(0.000000, 2.764340, 2.764340, 2.764340)
+
+#line 568
+  nop 
+
+#line 312
+  round_ni r8.yzw, r7.yyzw  // r8.y <- p.x; r8.z <- p.y; r8.w <- p.z
+
+#line 313
+  frc r9.xyz, r7.yzwy
+
+#line 314
+  mul r10.xyz, r9.xyzx, r9.xyzx
+  mul r9.xyz, r9.xyzx, l(2.000000, 2.000000, 2.000000, 0.000000)
+  mov r9.xyz, -r9.xyzx
+  add r9.xyz, r9.xyzx, l(3.000000, 3.000000, 3.000000, 0.000000)
+  mul r9.xyz, r9.xyzx, r10.xyzx  // r9.x <- f.x; r9.y <- f.y; r9.z <- f.z
+
+#line 317
+  mul r8.z, r8.z, l(157.000000)
+  add r8.y, r8.z, r8.y
+  mul r8.z, r8.w, l(113.000000)
+  add r8.y, r8.z, r8.y  // r8.y <- n
+
+#line 318
+  nop 
+  add r8.z, r8.y, l(0.000000)
+
+#line 306
+  sincos r8.z, null, r8.z
+  mul r8.z, r8.z, l(753.545288)
+  frc r8.z, r8.z  // r8.z <- <hash return value>
+
+#line 318
+  nop 
+  add r8.w, r8.y, l(1.000000)
+
+#line 306
+  sincos r8.w, null, r8.w
+  mul r8.w, r8.w, l(753.545288)
+  frc r8.w, r8.w  // r8.w <- <hash return value>
+
+#line 318
+  mov r9.w, -r8.z
+  add r8.w, r8.w, r9.w
+  mul r8.w, r8.w, r9.x
+  add r8.z, r8.w, r8.z
+  nop 
+  add r8.w, r8.y, l(157.000000)
+
+#line 306
+  sincos r8.w, null, r8.w
+  mul r8.w, r8.w, l(753.545288)
+  frc r8.w, r8.w  // r8.w <- <hash return value>
+
+#line 318
+  nop 
+  add r9.w, r8.y, l(158.000000)
+
+#line 306
+  sincos r9.w, null, r9.w
+  mul r9.w, r9.w, l(753.545288)
+  frc r9.w, r9.w  // r9.w <- <hash return value>
+
+#line 318
+  mov r10.x, -r8.w
+  add r9.w, r9.w, r10.x
+  mul r9.w, r9.w, r9.x
+  add r8.w, r8.w, r9.w
+  mov r9.w, -r8.z
+  add r8.w, r8.w, r9.w
+  mul r8.w, r8.w, r9.y
+  add r8.z, r8.w, r8.z
+  nop 
+  add r8.w, r8.y, l(113.000000)
+
+#line 306
+  sincos r8.w, null, r8.w
+  mul r8.w, r8.w, l(753.545288)
+  frc r8.w, r8.w  // r8.w <- <hash return value>
+
+#line 318
+  nop 
+  add r9.w, r8.y, l(114.000000)
+
+#line 306
+  sincos r9.w, null, r9.w
+  mul r9.w, r9.w, l(753.545288)
+  frc r9.w, r9.w  // r9.w <- <hash return value>
+
+#line 318
+  mov r10.x, -r8.w
+  add r9.w, r9.w, r10.x
+  mul r9.w, r9.w, r9.x
+  add r8.w, r8.w, r9.w
+  nop 
+  add r9.w, r8.y, l(270.000000)
+
+#line 306
+  sincos r9.w, null, r9.w
+  mul r9.w, r9.w, l(753.545288)
+  frc r9.w, r9.w  // r9.w <- <hash return value>
+
+#line 318
+  nop 
+  add r8.y, r8.y, l(271.000000)
+
+#line 306
+  sincos r8.y, null, r8.y
+  mul r8.y, r8.y, l(753.545288)
+  frc r8.y, r8.y  // r8.y <- <hash return value>
+
+#line 318
+  mov r10.x, -r9.w
+  add r8.y, r8.y, r10.x
+  mul r8.y, r8.y, r9.x
+  add r8.y, r8.y, r9.w
+  mov r9.x, -r8.w
+  add r8.y, r8.y, r9.x
+  mul r8.y, r8.y, r9.y
+  add r8.y, r8.y, r8.w
+  mov r8.w, -r8.z
+  add r8.y, r8.w, r8.y
+  mul r8.y, r8.y, r9.z
+  add r8.y, r8.y, r8.z  // r8.y <- <noise_iq return value>
+
+#line 568
+  mul r8.y, r8.y, l(0.255849)
+  add r8.x, r8.y, r8.x
+  mul r7.yzw, r7.yyzw, l(0.000000, 2.764340, 2.764340, 2.764340)
+
+#line 569
+  nop 
+
+#line 312
+  round_ni r8.yzw, r7.yyzw  // r8.y <- p.x; r8.z <- p.y; r8.w <- p.z
+
+#line 313
+  frc r9.xyz, r7.yzwy  // r9.x <- f.x
+
+#line 314
+  mul r10.xyz, r9.xyzx, r9.xyzx
+  mul r9.xyz, r9.xyzx, l(2.000000, 2.000000, 2.000000, 0.000000)
+  mov r9.xyz, -r9.xyzx
+  add r9.xyz, r9.xyzx, l(3.000000, 3.000000, 3.000000, 0.000000)
+  mul r9.xyz, r9.xyzx, r10.xyzx  // r9.x <- f.x; r9.y <- f.y; r9.z <- f.z
+
+#line 317
+  mul r8.z, r8.z, l(157.000000)
+  add r8.y, r8.z, r8.y
+  mul r8.z, r8.w, l(113.000000)
+  add r8.y, r8.z, r8.y  // r8.y <- n
+
+#line 318
+  nop 
+  add r8.z, r8.y, l(0.000000)
+
+#line 306
+  sincos r8.z, null, r8.z
+  mul r8.z, r8.z, l(753.545288)
+  frc r8.z, r8.z  // r8.z <- <hash return value>
+
+#line 318
+  nop 
+  add r8.w, r8.y, l(1.000000)
+
+#line 306
+  sincos r8.w, null, r8.w
+  mul r8.w, r8.w, l(753.545288)
+  frc r8.w, r8.w  // r8.w <- <hash return value>
+
+#line 318
+  mov r9.w, -r8.z
+  add r8.w, r8.w, r9.w
+  mul r8.w, r8.w, r9.x
+  add r8.z, r8.w, r8.z
+  nop 
+  add r8.w, r8.y, l(157.000000)
+
+#line 306
+  sincos r8.w, null, r8.w
+  mul r8.w, r8.w, l(753.545288)
+  frc r8.w, r8.w  // r8.w <- <hash return value>
+
+#line 318
+  nop 
+  add r9.w, r8.y, l(158.000000)
+
+#line 306
+  sincos r9.w, null, r9.w
+  mul r9.w, r9.w, l(753.545288)
+  frc r9.w, r9.w  // r9.w <- <hash return value>
+
+#line 318
+  mov r10.x, -r8.w
+  add r9.w, r9.w, r10.x
+  mul r9.w, r9.w, r9.x
+  add r8.w, r8.w, r9.w
+  mov r9.w, -r8.z
+  add r8.w, r8.w, r9.w
+  mul r8.w, r8.w, r9.y
+  add r8.z, r8.w, r8.z
+  nop 
+  add r8.w, r8.y, l(113.000000)
+
+#line 306
+  sincos r8.w, null, r8.w
+  mul r8.w, r8.w, l(753.545288)
+  frc r8.w, r8.w  // r8.w <- <hash return value>
+
+#line 318
+  nop 
+  add r9.w, r8.y, l(114.000000)
+
+#line 306
+  sincos r9.w, null, r9.w
+  mul r9.w, r9.w, l(753.545288)
+  frc r9.w, r9.w  // r9.w <- <hash return value>
+
+#line 318
+  mov r10.x, -r8.w
+  add r9.w, r9.w, r10.x
+  mul r9.w, r9.w, r9.x
+  add r8.w, r8.w, r9.w
+  nop 
+  add r9.w, r8.y, l(270.000000)
+
+#line 306
+  sincos r9.w, null, r9.w
+  mul r9.w, r9.w, l(753.545288)
+  frc r9.w, r9.w  // r9.w <- <hash return value>
+
+#line 318
+  nop 
+  add r8.y, r8.y, l(271.000000)
+
+#line 306
+  sincos r8.y, null, r8.y
+  mul r8.y, r8.y, l(753.545288)
+  frc r8.y, r8.y  // r8.y <- <hash return value>
+
+#line 318
+  mov r10.x, -r9.w
+  add r8.y, r8.y, r10.x
+  mul r8.y, r8.y, r9.x
+  add r8.y, r8.y, r9.w
+  mov r9.x, -r8.w
+  add r8.y, r8.y, r9.x
+  mul r8.y, r8.y, r9.y
+  add r8.y, r8.y, r8.w
+  mov r8.w, -r8.z
+  add r8.y, r8.w, r8.y
+  mul r8.y, r8.y, r9.z
+  add r8.y, r8.y, r8.z  // r8.y <- <noise_iq return value>
+
+#line 569
+  mul r8.y, r8.y, l(0.125276)
+  add r8.x, r8.y, r8.x
+  mul r7.yzw, r7.yyzw, l(0.000000, 2.764340, 2.764340, 2.764340)
+
+#line 570
+  nop 
+
+#line 312
+  round_ni r8.yzw, r7.yyzw  // r8.y <- p.x; r8.z <- p.y; r8.w <- p.z
+
+#line 313
+  frc r7.yzw, r7.yyzw  // r7.y <- f.x; r7.z <- f.y; r7.w <- f.z
+
+#line 314
+  mul r9.xyz, r7.yzwy, r7.yzwy
+  mul r7.yzw, r7.yyzw, l(0.000000, 2.000000, 2.000000, 2.000000)
+  mov r7.yzw, -r7.yyzw
+  add r7.yzw, r7.yyzw, l(0.000000, 3.000000, 3.000000, 3.000000)
+  mul r7.yzw, r7.yyzw, r9.xxyz  // r7.y <- f.x; r7.z <- f.y; r7.w <- f.z
+
+#line 317
+  mul r8.z, r8.z, l(157.000000)
+  add r8.y, r8.z, r8.y
+  mul r8.z, r8.w, l(113.000000)
+  add r8.y, r8.z, r8.y  // r8.y <- n
+
+#line 318
+  nop 
+  add r8.z, r8.y, l(0.000000)
+
+#line 306
+  sincos r8.z, null, r8.z
+  mul r8.z, r8.z, l(753.545288)
+  frc r8.z, r8.z  // r8.z <- <hash return value>
+
+#line 318
+  nop 
+  add r8.w, r8.y, l(1.000000)
+
+#line 306
+  sincos r8.w, null, r8.w
+  mul r8.w, r8.w, l(753.545288)
+  frc r8.w, r8.w  // r8.w <- <hash return value>
+
+#line 318
+  mov r9.x, -r8.z
+  add r8.w, r8.w, r9.x
+  mul r8.w, r7.y, r8.w
+  add r8.z, r8.w, r8.z
+  nop 
+  add r8.w, r8.y, l(157.000000)
+
+#line 306
+  sincos r8.w, null, r8.w
+  mul r8.w, r8.w, l(753.545288)
+  frc r8.w, r8.w  // r8.w <- <hash return value>
+
+#line 318
+  nop 
+  add r9.x, r8.y, l(158.000000)
+
+#line 306
+  sincos r9.x, null, r9.x
+  mul r9.x, r9.x, l(753.545288)
+  frc r9.x, r9.x  // r9.x <- <hash return value>
+
+#line 318
+  mov r9.y, -r8.w
+  add r9.x, r9.y, r9.x
+  mul r9.x, r7.y, r9.x
+  add r8.w, r8.w, r9.x
+  mov r9.x, -r8.z
+  add r8.w, r8.w, r9.x
+  mul r8.w, r7.z, r8.w
+  add r8.z, r8.w, r8.z
+  nop 
+  add r8.w, r8.y, l(113.000000)
+
+#line 306
+  sincos r8.w, null, r8.w
+  mul r8.w, r8.w, l(753.545288)
+  frc r8.w, r8.w  // r8.w <- <hash return value>
+
+#line 318
+  nop 
+  add r9.x, r8.y, l(114.000000)
+
+#line 306
+  sincos r9.x, null, r9.x
+  mul r9.x, r9.x, l(753.545288)
+  frc r9.x, r9.x  // r9.x <- <hash return value>
+
+#line 318
+  mov r9.y, -r8.w
+  add r9.x, r9.y, r9.x
+  mul r9.x, r7.y, r9.x
+  add r8.w, r8.w, r9.x
+  nop 
+  add r9.x, r8.y, l(270.000000)
+
+#line 306
+  sincos r9.x, null, r9.x
+  mul r9.x, r9.x, l(753.545288)
+  frc r9.x, r9.x  // r9.x <- <hash return value>
+
+#line 318
+  nop 
+  add r8.y, r8.y, l(271.000000)
+
+#line 306
+  sincos r8.y, null, r8.y
+  mul r8.y, r8.y, l(753.545288)
+  frc r8.y, r8.y  // r8.y <- <hash return value>
+
+#line 318
+  mov r9.y, -r9.x
+  add r8.y, r8.y, r9.y
+  mul r7.y, r7.y, r8.y
+  add r7.y, r7.y, r9.x
+  mov r8.y, -r8.w
+  add r7.y, r7.y, r8.y
+  mul r7.y, r7.y, r7.z
+  add r7.y, r7.y, r8.w
+  mov r7.z, -r8.z
+  add r7.y, r7.z, r7.y
+  mul r7.y, r7.y, r7.w
+  add r7.y, r7.y, r8.z  // r7.y <- <noise_iq return value>
+
+#line 570
+  mul r7.y, r7.y, l(0.062559)
+  add r7.y, r7.y, r8.x  // r7.y <- t
+
+#line 572
+  mov r7.y, r7.y  // r7.y <- <fbm return value>
+
+#line 577
+  mov r7.y, r7.y  // r7.y <- <get_noise return value>
+
+#line 618
+  mov r7.y, r7.y  // r7.y <- dens
+
+#line 620
+  mov r7.z, -cb4[1].x
+  add r7.z, r7.z, l(1.000000)  // r7.z <- cov
+
+#line 624
+  add r7.w, r7.z, l(0.050000)
+  mov r7.z, -r7.z
+  add r7.w, r7.z, r7.w
+  add r7.z, r7.z, r7.y
+  div r7.w, l(1.000000, 1.000000, 1.000000, 1.000000), r7.w
+  mul r7.z, r7.w, r7.z
+  max r7.z, r7.z, l(0.000000)
+  min r7.z, r7.z, l(1.000000)
+  mul r7.w, r7.z, l(-2.000000)
+  add r7.w, r7.w, l(3.000000)
+  mul r7.z, r7.z, r7.z
+  mul r7.z, r7.z, r7.w
+  mul r7.y, r7.z, r7.y
+
+#line 626
+  max r7.y, r7.y, l(0.000000)
+  min r7.y, r7.y, l(1.000000)  // r7.y <- <density return value>
+
+#line 678
+  mov r7.y, r7.y  // r7.y <- dens
+
+#line 680
+  mul r7.z, r7.y, l(-1.030725)
+  mul r7.z, r1.w, r7.z
+  mul r7.z, r7.z, l(1.442695)
+  exp r7.z, r7.z  // r7.z <- T_i
+
+#line 681
+  mul r4.w, r4.w, r7.z
+
+#line 682
+  lt r7.w, r4.w, l(0.010000)
+  if_nz r7.w
     break 
   endif 
-  itof r6.x, r3.w
-  mul r6.x, r6.x, l(0.057708)
-  exp r6.x, r6.x
-  mul r6.x, r1.w, r6.x
-  mul r4.w, r4.w, r6.x
-  mad r6.xyz, r4.wwww, l(0.342857, 0.342857, 0.342857, 0.000000), r5.xyzx
-  add r4.w, -r5.w, l(1.000000)
-  add r5.w, -r2.w, l(1.000000)
-  mad r4.w, r4.w, r5.w, r2.w
-  mad r4.xyz, r0.xyzx, l(0.600000, 0.600000, 0.600000, 0.000000), r4.xyzx
-  dp3 r5.w, r4.xyzx, r4.xyzx
-  sqrt r5.w, r5.w
-  lt r5.w, l(1000.000000), r5.w
-  if_nz r5.w
-    mov r5.xyz, r6.xyzx
-    mov r2.w, r4.w
+
+#line 684
+  mul r7.x, r7.x, l(1.442695)
+  exp r7.x, r7.x
+  div r7.x, r7.x, l(1.750000)
+  mul r7.x, r4.w, r7.x
+  mul r7.x, r7.y, r7.x
+  mul r7.x, r1.w, r7.x
+  add r7.xyw, r6.xyxz, r7.xxxx  // r7.x <- C.x; r7.y <- C.y; r7.w <- C.z
+
+#line 692
+  mov r7.z, -r7.z
+  add r7.z, r7.z, l(1.000000)
+  mov r8.x, -r6.w
+  add r8.x, r8.x, l(1.000000)
+  mul r7.z, r7.z, r8.x
+  add r7.z, r6.w, r7.z  // r7.z <- alpha
+
+#line 694
+  add r5.xyz, r2.xyzx, r5.xyzx
+
+#line 695
+  dp3 r8.x, r5.xyzx, r5.xyzx
+  sqrt r8.x, r8.x
+  lt r8.x, l(1000.000000), r8.x
+  if_nz r8.x
+    mov r6.xyz, r7.xywx  // r6.x <- C.x; r6.y <- C.y; r6.z <- C.z
+    mov r6.w, r7.z  // r6.w <- alpha
     break 
-  endif 
-  mov r5.xyz, r6.xyzx
-  mov r2.w, r4.w
-  iadd r3.w, r3.w, l(1)
+  endif   // r7.x <- C.x; r7.y <- C.y; r7.w <- C.z; r7.z <- alpha
+  mov r6.xyz, r7.xywx  // r6.x <- C.x; r6.y <- C.y; r6.z <- C.z
+  mov r6.w, r7.z  // r6.w <- alpha
+
+#line 675
+  iadd r5.w, r5.w, l(1)
+
+#line 696
 endloop 
-add r0.x, r2.w, l(0.000001)
-div r0.xyz, r5.xyzx, r0.xxxx
-add r0.xyz, -r1.xyzx, r0.xyzx
-mad r0.xyz, r2.wwww, r0.xyzx, r1.xyzx
-lt r0.w, l(0.000000), cb4[1].y
-if_nz r0.w
-  mad r0.w, cb3[0].x, l(0.200000), l(0.100000)
-  mul r1.x, v0.x, l(0.000156)
-  mad r1.xz, r0.wwww, l(0.500000, 0.000000, 0.500000, 0.000000), r1.xxxx
-  mad r2.xyzw, v0.xyxy, l(1.000000, -0.001389, 1.000000, -0.001389), l(0.000000, 1.000000, 0.000000, 1.000000)
-  mad r1.yw, cb3[0].xxxx, l(0.000000, 0.040000, 0.000000, 0.040000), l(0.000000, 0.020000, 0.000000, 0.020000)
-  mad r1.xyzw, r2.xyzw, l(0.000781, 0.010000, 0.000781, 0.010000), r1.xyzw
-  mul r1.xyzw, r1.xyzw, l(200.500000, 200.500000, 125.500000, 125.500000)
-  round_ni r2.xyzw, r1.xyzw
-  frc r1.xyzw, r1.xyzw
-  mul r3.xyzw, r1.xyzw, r1.xyzw
-  mad r1.xyzw, -r1.xyzw, l(2.000000, 2.000000, 2.000000, 2.000000), l(3.000000, 3.000000, 3.000000, 3.000000)
-  mul r1.xyzw, r1.xyzw, r3.xyzw
-  dp2 r0.w, r2.xyxx, l(12.989800, 78.233002, 0.000000, 0.000000)
-  sincos r0.w, null, r0.w
-  mul r0.w, r0.w, l(43758.546875)
-  frc r0.w, r0.w
-  add r3.xyzw, r2.xyxy, l(1.000000, 0.000000, 0.000000, 1.000000)
+
+#line 698
+mov r6.xyz, r6.xyzx  // r6.x <- <render_clouds return value>.x; r6.y <- <render_clouds return value>.y; r6.z <- <render_clouds return value>.z
+mov r6.w, r6.w  // r6.w <- <render_clouds return value>.w
+
+#line 791
+mov r6.xyzw, r6.xyzw  // r6.x <- cld.x; r6.y <- cld.y; r6.z <- cld.z; r6.w <- cld.w
+
+#line 793
+add r0.x, r6.w, l(0.000001)
+div r0.xyz, r6.xyzx, r0.xxxx
+mov r2.xyz, -r1.xyzx
+add r0.xyz, r0.xyzx, r2.xyzx
+mul r0.xyz, r0.xyzx, r6.wwww
+add r0.xyz, r0.xyzx, r1.xyzx  // r0.x <- col.x; r0.y <- col.y; r0.z <- col.z
+
+#line 805
+lt r1.x, l(0.000000), cb4[1].y
+if_nz r1.x
+
+#line 806
+  nop 
+  mov r3.xy, r3.xyxx
+
+#line 728
+  mul r1.x, cb3[0].x, l(0.200000)
+  add r1.x, r1.x, l(0.100000)  // r1.x <- travelTime
+
+#line 730
+  mov r1.yz, l(0,1.000000,0.010000,0)  // r1.y <- tiling.x; r1.z <- tiling.y
+
+#line 731
+  mul r1.w, r1.x, l(0.500000)
+  mul r2.x, r3.x, l(0.200000)
+  add r2.x, r1.w, r2.x  // r2.x <- offset.x
+  mul r2.y, r1.x, l(0.200000)  // r2.y <- offset.y
+
+#line 733
+  mul r1.xy, r1.yzyy, r3.xyxx
+  add r1.xy, r2.xyxx, r1.xyxx  // r1.x <- st.x; r1.y <- st.y
+
+#line 735
+  mov r1.z, l(0.100000)  // r1.z <- rain
+
+#line 736
+  nop 
+  mul r2.xy, r1.xyxx, l(200.500000, 200.500000, 0.000000, 0.000000)
+
+#line 713
+  round_ni r2.zw, r2.xxxy  // r2.z <- i.x; r2.w <- i.y
+
+#line 714
+  frc r2.xy, r2.xyxx  // r2.x <- f.x; r2.y <- f.y
+
+#line 715
+  mul r3.xy, r2.xyxx, r2.xyxx
+  mul r2.xy, r2.xyxx, l(2.000000, 2.000000, 0.000000, 0.000000)
+  mov r2.xy, -r2.xyxx
+  add r2.xy, r2.xyxx, l(3.000000, 3.000000, 0.000000, 0.000000)
+  mul r2.xy, r2.xyxx, r3.xyxx  // r2.x <- f.x; r2.y <- f.y
+
+#line 717
+  nop 
+  add r3.xy, r2.zwzz, l(0.000000, 0.000000, 0.000000, 0.000000)
+
+#line 706
+  dp2 r1.w, r3.xyxx, l(12.989800, 78.233002, 0.000000, 0.000000)
+  sincos r1.w, null, r1.w
+  mul r1.w, r1.w, l(43758.546875)
+  frc r1.w, r1.w  // r1.w <- <rain_random return value>
+
+#line 717
+  mov r1.w, r1.w  // r1.w <- lb
+
+#line 718
+  nop 
+  add r3.xy, r2.zwzz, l(1.000000, 0.000000, 0.000000, 0.000000)
+
+#line 706
   dp2 r3.x, r3.xyxx, l(12.989800, 78.233002, 0.000000, 0.000000)
   sincos r3.x, null, r3.x
   mul r3.x, r3.x, l(43758.546875)
-  dp2 r3.y, r3.zwzz, l(12.989800, 78.233002, 0.000000, 0.000000)
+  frc r3.x, r3.x  // r3.x <- <rain_random return value>
+
+#line 718
+  mov r3.x, r3.x  // r3.x <- rb
+
+#line 719
+  nop 
+  add r3.yz, r2.zzwz, l(0.000000, 0.000000, 1.000000, 0.000000)
+
+#line 706
+  dp2 r3.y, r3.yzyy, l(12.989800, 78.233002, 0.000000, 0.000000)
   sincos r3.y, null, r3.y
   mul r3.y, r3.y, l(43758.546875)
-  frc r3.xy, r3.xyxx
-  add r4.xyzw, r2.xyzw, l(1.000000, 1.000000, 1.000000, 0.000000)
-  dp2 r2.x, r4.xyxx, l(12.989800, 78.233002, 0.000000, 0.000000)
-  sincos r2.x, null, r2.x
-  mul r2.x, r2.x, l(43758.546875)
-  frc r2.x, r2.x
-  add r2.y, -r0.w, r3.x
-  mad r0.w, r1.x, r2.y, r0.w
-  add r2.x, -r3.y, r2.x
-  mad r1.x, r1.x, r2.x, r3.y
-  add r1.x, -r0.w, r1.x
-  mad r0.w, r1.y, r1.x, r0.w
-  dp2 r1.x, r2.zwzz, l(12.989800, 78.233002, 0.000000, 0.000000)
-  sincos r1.x, null, r1.x
-  mul r1.x, r1.x, l(43758.546875)
-  dp2 r1.y, r4.zwzz, l(12.989800, 78.233002, 0.000000, 0.000000)
-  sincos r1.y, null, r1.y
-  mul r1.y, r1.y, l(43758.546875)
-  frc r1.xy, r1.xyxx
-  add r2.xyzw, r2.zwzw, l(0.000000, 1.000000, 1.000000, 1.000000)
+  frc r3.y, r3.y  // r3.y <- <rain_random return value>
+
+#line 719
+  mov r3.y, r3.y  // r3.y <- lt
+
+#line 720
+  nop 
+  add r2.zw, r2.zzzw, l(0.000000, 0.000000, 1.000000, 1.000000)
+
+#line 706
+  dp2 r2.z, r2.zwzz, l(12.989800, 78.233002, 0.000000, 0.000000)
+  sincos r2.z, null, r2.z
+  mul r2.z, r2.z, l(43758.546875)
+  frc r2.z, r2.z  // r2.z <- <rain_random return value>
+
+#line 720
+  mov r2.z, r2.z  // r2.z <- rt
+
+#line 722
+  mov r2.w, -r1.w
+  add r2.w, r2.w, r3.x
+  mul r2.w, r2.w, r2.x
+  add r1.w, r1.w, r2.w
+  mov r2.w, -r3.y
+  add r2.z, r2.w, r2.z
+  mul r2.x, r2.z, r2.x
+  add r2.x, r2.x, r3.y
+  mov r2.z, -r1.w
+  add r2.x, r2.z, r2.x
+  mul r2.x, r2.x, r2.y
+  add r1.w, r1.w, r2.x  // r1.w <- <rain_noise return value>
+
+#line 736
+  nop 
+  mul r1.xy, r1.xyxx, l(125.500000, 125.500000, 0.000000, 0.000000)
+
+#line 713
+  round_ni r2.xy, r1.xyxx  // r2.x <- i.x; r2.y <- i.y
+
+#line 714
+  frc r1.xy, r1.xyxx  // r1.x <- f.x; r1.y <- f.y
+
+#line 715
+  mul r2.zw, r1.xxxy, r1.xxxy
+  mul r1.xy, r1.xyxx, l(2.000000, 2.000000, 0.000000, 0.000000)
+  mov r1.xy, -r1.xyxx
+  add r1.xy, r1.xyxx, l(3.000000, 3.000000, 0.000000, 0.000000)
+  mul r1.xy, r1.xyxx, r2.zwzz  // r1.x <- f.x; r1.y <- f.y
+
+#line 717
+  nop 
+  add r2.zw, r2.xxxy, l(0.000000, 0.000000, 0.000000, 0.000000)
+
+#line 706
+  dp2 r2.z, r2.zwzz, l(12.989800, 78.233002, 0.000000, 0.000000)
+  sincos r2.z, null, r2.z
+  mul r2.z, r2.z, l(43758.546875)
+  frc r2.z, r2.z  // r2.z <- <rain_random return value>
+
+#line 717
+  mov r2.z, r2.z  // r2.z <- lb
+
+#line 718
+  nop 
+  add r3.xy, r2.xyxx, l(1.000000, 0.000000, 0.000000, 0.000000)
+
+#line 706
+  dp2 r2.w, r3.xyxx, l(12.989800, 78.233002, 0.000000, 0.000000)
+  sincos r2.w, null, r2.w
+  mul r2.w, r2.w, l(43758.546875)
+  frc r2.w, r2.w  // r2.w <- <rain_random return value>
+
+#line 718
+  mov r2.w, r2.w  // r2.w <- rb
+
+#line 719
+  nop 
+  add r3.xy, r2.xyxx, l(0.000000, 1.000000, 0.000000, 0.000000)
+
+#line 706
+  dp2 r3.x, r3.xyxx, l(12.989800, 78.233002, 0.000000, 0.000000)
+  sincos r3.x, null, r3.x
+  mul r3.x, r3.x, l(43758.546875)
+  frc r3.x, r3.x  // r3.x <- <rain_random return value>
+
+#line 719
+  mov r3.x, r3.x  // r3.x <- lt
+
+#line 720
+  nop 
+  add r2.xy, r2.xyxx, l(1.000000, 1.000000, 0.000000, 0.000000)
+
+#line 706
   dp2 r2.x, r2.xyxx, l(12.989800, 78.233002, 0.000000, 0.000000)
   sincos r2.x, null, r2.x
   mul r2.x, r2.x, l(43758.546875)
-  dp2 r2.y, r2.zwzz, l(12.989800, 78.233002, 0.000000, 0.000000)
-  sincos r2.y, null, r2.y
-  mul r2.y, r2.y, l(43758.546875)
-  frc r2.xy, r2.xyxx
-  add r1.y, -r1.x, r1.y
-  mad r1.x, r1.z, r1.y, r1.x
-  add r1.y, -r2.x, r2.y
-  mad r1.y, r1.z, r1.y, r2.x
-  add r1.y, -r1.x, r1.y
-  mad r1.x, r1.w, r1.y, r1.x
-  mul r0.w, r0.w, r1.x
-  log r0.w, |r0.w|
-  mul r0.w, r0.w, l(15.000000)
-  exp r0.w, r0.w
-  mul r0.w, r0.w, l(1.875000)
-  min r0.w, r0.w, l(0.250000)
-  add r0.xyz, r0.wwww, r0.xyzx
+  frc r2.x, r2.x  // r2.x <- <rain_random return value>
+
+#line 720
+  mov r2.x, r2.x  // r2.x <- rt
+
+#line 722
+  mov r2.y, -r2.z
+  add r2.y, r2.y, r2.w
+  mul r2.y, r1.x, r2.y
+  add r2.y, r2.y, r2.z
+  mov r2.z, -r3.x
+  add r2.x, r2.z, r2.x
+  mul r1.x, r1.x, r2.x
+  add r1.x, r1.x, r3.x
+  mov r2.x, -r2.y
+  add r1.x, r1.x, r2.x
+  mul r1.x, r1.x, r1.y
+  add r1.x, r1.x, r2.y  // r1.x <- <rain_noise return value>
+
+#line 736
+  mul r1.x, r1.x, r1.w  // r1.x <- f
+
+#line 737
+  mov r1.y, -r1.x
+  max r1.x, r1.y, r1.x
+  log r1.x, r1.x
+  mul r1.x, r1.x, l(15.000000)
+  exp r1.x, r1.x
+  mul r1.x, r1.x, l(1.500000)
+  mul r1.y, r1.z, r1.z
+  mul r1.y, r1.y, l(125.000000)
+  mul r1.x, r1.y, r1.x
+  max r1.x, r1.x, l(0.000000)
+  min r1.x, r1.x, l(0.250000)  // r1.x <- f
+
+#line 738
+  mov r1.x, r1.x  // r1.x <- <rain return value>
+
+#line 806
+  mov r1.x, r1.x  // r1.x <- rainy
+
+#line 808
+  mul r1.xyz, r1.xxxx, l(1.000000, 1.000000, 1.000000, 0.000000)
+  add r0.xyz, r0.xyzx, r1.xyzx
+
+#line 809
 endif 
-mov o0.xyz, r0.xyzx
-mov o0.w, l(1.000000)
-mov o1.xyzw, l(0,0,0,0)
-mov o2.xyzw, l(0,0,0,0)
-mov o3.xyzw, l(0,0,0,0)
-mov o4.xyzw, l(0,0,0,0)
+
+#line 811
+mov r0.xyz, r0.xyzx  // r0.x <- ret.Color.x; r0.y <- ret.Color.y; r0.z <- ret.Color.z
+mov r0.w, l(1.000000)  // r0.w <- ret.Color.w
+
+#line 812
+mov r1.xyzw, l(0,0,0,0)  // r1.x <- ret.Depth.x; r1.y <- ret.Depth.y; r1.z <- ret.Depth.z; r1.w <- ret.Depth.w
+
+#line 813
+mov r2.xyzw, l(0,0,0,0)  // r2.x <- ret.RM.x; r2.y <- ret.RM.y; r2.z <- ret.RM.z; r2.w <- ret.RM.w
+
+#line 814
+mov r3.xyzw, l(0,0,0,0)  // r3.x <- ret.Position.x; r3.y <- ret.Position.y; r3.z <- ret.Position.z; r3.w <- ret.Position.w
+
+#line 815
+mov r4.xyzw, l(0,0,0,0)  // r4.x <- ret.Normal.x; r4.y <- ret.Normal.y; r4.z <- ret.Normal.z; r4.w <- ret.Normal.w
+
+#line 816
+mov o0.xyzw, r0.xyzw
+mov o1.xyzw, r1.xyzw
+mov o2.xyzw, r4.xyzw
+mov o3.xyzw, r3.xyzw
+mov o4.xyzw, r2.xyzw
 ret 
-// Approximately 310 instruction slots used
+// Approximately 699 instruction slots used

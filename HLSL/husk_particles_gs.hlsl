@@ -39,9 +39,9 @@ void main(point VS_OUT input[1] : SV_POSITION, inout TriangleStream<GS_OUT> outp
 		element.position = mul(float4(view_space_pos.xyz + corner_pos, 1), projection);
 		element.color = p.color;
 		element.texcoord = texcoords[vertex_index];
-		output.Append(element);
+		output.Append(element); //現在のストリームに頂点情報を出力
 	}
-	output.RestartStrip();
+	output.RestartStrip();//現在のストリームを終了
 }
 
 //[maxvertexcount(4)]

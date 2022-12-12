@@ -23,9 +23,9 @@ PS_OUT main(VS_OUT pin) :SV_TARGET0
 	
 	float4 color = float4(1, 1, 1, 1);
 	float4 temp_output_343_0 = color * tex2d_node19;
-	float4 lerp_result_246 = _GradientBrightness * temp_output_343_0;
+	float4 lerp_result_246 = GradientBrightness * temp_output_343_0;
 	float4 transform_204 = mul(world, float4(0, 0, 0, 1));
-	float4 lerp_result_20 = lerp(lerp_result_246, _HueVariation, (_HueVariation.a * frac(((transform_204.x + transform_204.y) + transform_204.z))));
+	float4 lerp_result_20 = lerp(lerp_result_246, HueVariation, (HueVariation.a * frac(((transform_204.x + transform_204.y) + transform_204.z))));
 	float4 color_56 = saturate(lerp_result_20);
 	
 	float3 ase_world_pos = pin.position.xyz;
@@ -39,8 +39,8 @@ PS_OUT main(VS_OUT pin) :SV_TARGET0
     float3 albedo = lerp_result_97.rgb;
 	float4 sss45 = pin.vertexToFrag332;
 	float3 emission = sss45.rgb;
-	float3 smoothness = _Smoothness;
-	float lerp_result_53 = lerp(1.0, 0.0, (_AmbientOcclusion * (1.0 - pin.color.r)));
+	float3 smoothness = Smoothness;
+	float lerp_result_53 = lerp(1.0, 0.0, (AmbientOcclusion * (1.0 - pin.color.r)));
 	float ambient_occlusion_218 = lerp_result_53;
 	float occlusion = ambient_occlusion_218;
 	float alpha_31 = tex2d_node19.a;
@@ -48,6 +48,7 @@ PS_OUT main(VS_OUT pin) :SV_TARGET0
 	clip(lerp_result_101 - mask);
 	float4 final_color = float4(albedo, lerp_result_101);
 
+	pin.normal = pin.normal * 0.5 + 0.5;
 	ret.Color = final_color;
 	ret.Position = pin.position;
 	float dist = length(pin.position - camera_constants.position);

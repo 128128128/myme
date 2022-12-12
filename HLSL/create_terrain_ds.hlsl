@@ -16,6 +16,8 @@ DS_OUT main(HS_CONSTANT_DATA_OUTPUT input, float3 domain : SV_DomainLocation, co
 
 	uint mip_level = 0, width, height, number_of_levels;
 	//heightmap.GetDimensions(mip_level, width, height, number_of_levels);
+	
+	//get texture size
 	noise_map.GetDimensions(mip_level, width, height, number_of_levels);
 
 	uint u = output.texcoord.x * width;

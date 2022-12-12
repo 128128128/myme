@@ -253,6 +253,7 @@
     <ClCompile Include="sources\Objects\terrain.cpp" />
     <ClCompile Include="sources\Objects\trees.cpp" />
     <ClCompile Include="sources\Objects\water.cpp" />
+    <ClCompile Include="sources\Objects\water_f.cpp" />
     <ClCompile Include="sources\Objects\water_fall.cpp" />
     <ClCompile Include="sources\Particles\husk_particles.cpp" />
     <ClCompile Include="sources\Particles\snow_particles.cpp" />
@@ -260,6 +261,7 @@
     <ClCompile Include="Sources\Scenes\game_scene.cpp" />
     <ClCompile Include="sources\Scenes\ibl_scene.cpp" />
     <ClCompile Include="sources\Scenes\particle_scene.cpp" />
+    <ClCompile Include="sources\Scenes\raytracing_scene.cpp" />
     <ClCompile Include="sources\Scenes\title_scene.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -323,6 +325,7 @@
     <ClInclude Include="sources\Objects\terrain.h" />
     <ClInclude Include="sources\Objects\trees.h" />
     <ClInclude Include="sources\Objects\water.h" />
+    <ClInclude Include="sources\Objects\water_f.h" />
     <ClInclude Include="sources\Objects\water_fall.h" />
     <ClInclude Include="sources\Particles\husk_particles.h" />
     <ClInclude Include="sources\Particles\snow_particles.h" />
@@ -330,6 +333,7 @@
     <ClInclude Include="Sources\Scenes\game_scene.h" />
     <ClInclude Include="sources\Scenes\ibl_scene.h" />
     <ClInclude Include="sources\Scenes\particle_scene.h" />
+    <ClInclude Include="sources\Scenes\raytracing_scene.h" />
     <ClInclude Include="Sources\Scenes\scene.h" />
     <ClInclude Include="sources\Scenes\title_scene.h" />
   </ItemGroup>

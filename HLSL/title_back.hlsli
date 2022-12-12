@@ -5,8 +5,8 @@ struct VS_OUT
 	float4 color : COLOR;
 	float2 texcoord : TEXCOORD;
 };
-cbuffer CONSTATS:register(b4)
+cbuffer CONSTATS:register(b5)
 {
 	float itime;
-	float3 pad;
+	float3 mouse;
 };

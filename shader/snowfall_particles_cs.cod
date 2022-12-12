@@ -56,243 +56,628 @@
 // -------------------- ----- ------ -------- -------- ------- ------
 // no Output
 cs_5_0
-dcl_globalFlags refactoringAllowed
+dcl_globalFlags refactoringAllowed | skipOptimization
 dcl_constantbuffer CB10[12], immediateIndexed
 dcl_uav_structured u0, 24
 dcl_input vThreadID.x
-dcl_temps 15
+dcl_temps 14
 dcl_thread_group 256, 1, 1
-ld_structured_indexable(structured_buffer, stride=24)(mixed,mixed,mixed,mixed) r0.xyz, vThreadID.x, l(0), u0.xyzx
-ld_structured_indexable(structured_buffer, stride=24)(mixed,mixed,mixed,mixed) r1.y, vThreadID.x, l(16), u0.xxxx
-add r2.xy, r0.xzxx, -cb10[0].xzxx
-dp2 r0.w, r2.xyxx, r2.xyxx
-sqrt r0.w, r0.w
-lt r0.w, cb10[10].x, r0.w
-add r2.xy, r0.xzxx, -cb10[1].xzxx
-add r2.xy, -r2.xyxx, cb10[0].xzxx
-movc r0.xz, r0.wwww, r2.xxyx, r0.xxzx
-frc r0.w, cb10[11].y
-mul r2.xyz, r0.wwww, r0.zyxz
-mul r3.xyz, r2.xyzx, l(10.000000, 10.000000, 10.000000, 0.000000)
-dp3 r0.w, r3.zyxz, l(0.333333, 0.333333, 0.333333, 0.000000)
-dp3 r1.w, r3.xyzx, l(0.333333, 0.333333, 0.333333, 0.000000)
-mad r3.xyz, r2.xyzx, l(10.000000, 10.000000, 10.000000, 0.000000), r1.wwww
-round_ni r3.xyz, r3.xyzx
-mad r4.xyz, r2.zyxz, l(10.000000, 10.000000, 10.000000, 0.000000), r0.wwww
-round_ni r4.xyz, r4.xyzx
-mul r5.xyz, r4.xyzx, l(0.003460, 0.003460, 0.003460, 0.000000)
-round_ni r5.xyz, r5.xyzx
-mad r5.xyz, -r5.xyzx, l(289.000000, 289.000000, 289.000000, 0.000000), r4.xyzx
+//
+// Initial variable locations:
+//   vThreadID.x <- dtid.x; vThreadID.y <- dtid.y; vThreadID.z <- dtid.z
+//
+#line 10 "C:\Users\2200167\Desktop\個人製作\myme03\myme\HLSL\snowfall_particles_cs.hlsl"
+mov r0.x, vThreadID.x  // r0.x <- id
+
+#line 12
+ld_structured_indexable(structured_buffer, stride=24)(mixed,mixed,mixed,mixed) r1.x, r0.x, l(0), u0.xxxx  // r1.x <- p.position.x
+ld_structured_indexable(structured_buffer, stride=24)(mixed,mixed,mixed,mixed) r1.z, r0.x, l(4), u0.xxxx
+ld_structured_indexable(structured_buffer, stride=24)(mixed,mixed,mixed,mixed) r1.y, r0.x, l(8), u0.xxxx  // r1.y <- p.position.z
+ld_structured_indexable(structured_buffer, stride=24)(mixed,mixed,mixed,mixed) r2.y, r0.x, l(16), u0.xxxx
+mov r1.z, r1.z  // r1.z <- p.position.y
+mov r2.y, r2.y  // r2.y <- p.velocity.y
+
+#line 15
+mov r0.yz, -cb10[0].xxzx
+add r0.yz, r0.yyzy, r1.xxyx
+dp2 r0.y, r0.yzyy, r0.yzyy
+sqrt r0.y, r0.y
+lt r0.y, cb10[10].x, r0.y
+if_nz r0.y
+
+#line 17
+  mov r0.yz, -cb10[1].xxzx
+  add r0.yz, r0.yyzy, r1.xxyx
+  mov r0.yz, -r0.yyzy
+  add r1.xy, r0.yzyy, cb10[0].xzxx
+
+#line 18
+endif 
+
+#line 20
+mov r0.y, l(0.300000)  // r0.y <- amplitude
+
+#line 21
+nop 
+frc r0.z, cb10[11].y
+mul r3.xyz, r0.zzzz, r1.xzyx
+mul r3.xyz, r3.xyzx, l(10.000000, 10.000000, 10.000000, 0.000000)
+
+#line 152 "C:\Users\2200167\Desktop\個人製作\myme03\myme\HLSL\noise.hlsli"
+mov r0.zw, l(0,0,0.166667,0.333333)  // r0.z <- C.x; r0.w <- C.y
+
+#line 153
+mov r4.xyzw, l(0,0.500000,1.000000,2.000000)  // r4.x <- D.x; r4.y <- D.y; r4.z <- D.z; r4.w <- D.w
+
+#line 156
+dp3 r1.w, r3.xyzx, r0.wwww
+add r5.xyz, r1.wwww, r3.xyzx
+round_ni r5.xyz, r5.xyzx  // r5.x <- i.x; r5.y <- i.y; r5.z <- i.z
+
+#line 157
+mov r6.xyz, -r5.xyzx
+add r3.xyz, r3.xyzx, r6.xyzx
+dp3 r1.w, r5.xyzx, r0.zzzz
+add r3.xyz, r1.wwww, r3.xyzx  // r3.x <- x0.x; r3.y <- x0.y; r3.z <- x0.z
+
+#line 160
+ge r6.xyz, r3.xyzx, r3.yzxy
+movc r6.xyz, r6.xyzx, l(1.000000,1.000000,1.000000,0), l(0,0,0,0)  // r6.x <- g.x; r6.y <- g.y; r6.z <- g.z
+
+#line 161
+mov r7.xyz, -r6.zxyz
+add r7.xyz, r7.xyzx, l(1.000000, 1.000000, 1.000000, 0.000000)  // r7.x <- l.z; r7.y <- l.x; r7.z <- l.y
+
+#line 162
+min r8.xyz, r6.xyzx, r7.xyzx  // r8.x <- i1.x; r8.y <- i1.y; r8.z <- i1.z
+
+#line 163
+max r6.xyz, r6.yzxy, r7.yzxy  // r6.x <- i2.y; r6.y <- i2.z; r6.z <- i2.x
+
+#line 169
+mov r7.xyz, -r8.xyzx
+add r7.xyz, r3.xyzx, r7.xyzx
+add r7.xyz, r0.zzzz, r7.xyzx  // r7.x <- x1.x; r7.y <- x1.y; r7.z <- x1.z
+
+#line 170
+mov r9.xyz, -r6.zxyz
+add r9.xyz, r3.xyzx, r9.xyzx
+add r9.xyz, r0.wwww, r9.xyzx  // r9.x <- x2.x; r9.y <- x2.y; r9.z <- x2.z
+
+#line 171
+mov r10.xyz, -r4.yyyy
+add r10.xyz, r3.xyzx, r10.xyzx  // r10.x <- x3.x; r10.y <- x3.y; r10.z <- x3.z
+
+#line 174
+nop 
+mov r5.xyz, r5.xyzx
+
+#line 35
+mul r11.xyz, r5.xyzx, l(0.003460, 0.003460, 0.003460, 0.000000)
+round_ni r11.xyz, r11.xyzx
+mul r11.xyz, r11.xyzx, l(289.000000, 289.000000, 289.000000, 0.000000)
+mov r11.xyz, -r11.xyzx
+add r5.xyz, r5.xyzx, r11.xyzx  // r5.x <- <mod289 return value>.x; r5.y <- <mod289 return value>.y; r5.z <- <mod289 return value>.z
+
+#line 174
+mov r5.xyz, r5.xyzx  // r5.x <- i.x; r5.y <- i.y; r5.z <- i.z
+
+#line 175
+nop 
+nop 
+nop 
+mov r11.xw, l(0,0,0,1.000000)
+mov r11.y, r8.z
+mov r11.z, r6.y
+add r11.xyzw, r5.zzzz, r11.xyzw
+
+#line 71
+mul r12.xyzw, r11.xyzw, l(34.000000, 34.000000, 34.000000, 34.000000)
+add r12.xyzw, r12.xyzw, l(1.000000, 1.000000, 1.000000, 1.000000)
+mul r11.xyzw, r11.xyzw, r12.xyzw
+div r11.xyzw, r11.xyzw, l(289.000000, 289.000000, 289.000000, 289.000000)
+mov r12.xyzw, -r11.xyzw
+max r13.xyzw, r11.xyzw, r12.xyzw
+ge r11.xyzw, r11.xyzw, r12.xyzw
+frc r12.xyzw, r13.xyzw
+mov r13.xyzw, -r12.xyzw
+movc r11.xyzw, r11.xyzw, r12.xyzw, r13.xyzw
+mul r11.xyzw, r11.xyzw, l(289.000000, 289.000000, 289.000000, 289.000000)  // r11.x <- <permute return value>.x; r11.y <- <permute return value>.y; r11.z <- <permute return value>.z; r11.w <- <permute return value>.w
+
+#line 175
+add r11.xyzw, r5.yyyy, r11.xyzw
+mov r12.xw, l(0,0,0,1.000000)
+mov r12.y, r8.y
+mov r12.z, r6.x
+add r11.xyzw, r11.xyzw, r12.xyzw
+
+#line 71
+mul r12.xyzw, r11.xyzw, l(34.000000, 34.000000, 34.000000, 34.000000)
+add r12.xyzw, r12.xyzw, l(1.000000, 1.000000, 1.000000, 1.000000)
+mul r11.xyzw, r11.xyzw, r12.xyzw
+div r11.xyzw, r11.xyzw, l(289.000000, 289.000000, 289.000000, 289.000000)
+mov r12.xyzw, -r11.xyzw
+max r13.xyzw, r11.xyzw, r12.xyzw
+ge r11.xyzw, r11.xyzw, r12.xyzw
+frc r12.xyzw, r13.xyzw
+mov r13.xyzw, -r12.xyzw
+movc r11.xyzw, r11.xyzw, r12.xyzw, r13.xyzw
+mul r11.xyzw, r11.xyzw, l(289.000000, 289.000000, 289.000000, 289.000000)  // r11.x <- <permute return value>.x; r11.y <- <permute return value>.y; r11.z <- <permute return value>.z; r11.w <- <permute return value>.w
+
+#line 175
+add r5.xyzw, r5.xxxx, r11.xyzw
 mov r6.xw, l(0,0,0,1.000000)
-mad r7.xyz, r2.zyxz, l(10.000000, 10.000000, 10.000000, 0.000000), -r4.xyzx
-mad r2.xyz, r2.xyzx, l(10.000000, 10.000000, 10.000000, 0.000000), -r3.xyzx
-dp3 r0.w, r4.xyzx, l(0.166667, 0.166667, 0.166667, 0.000000)
-add r4.xyz, r0.wwww, r7.xyzx
-ge r7.xyz, r4.zxyz, r4.xyzx
-and r8.xyz, r7.yzxy, l(0x3f800000, 0x3f800000, 0x3f800000, 0)
-movc r7.xyz, r7.xyzx, l(0,0,0,0), l(1.000000,1.000000,1.000000,0)
-min r9.xyz, r7.xyzx, r8.xyzx
-max r7.xyz, r7.xyzx, r8.xyzx
-mov r6.y, r9.z
-mov r6.z, r7.z
-add r6.xyzw, r5.zzzz, r6.xyzw
-mad r8.xyzw, r6.xyzw, l(34.000000, 34.000000, 34.000000, 34.000000), l(1.000000, 1.000000, 1.000000, 1.000000)
-mul r6.xyzw, r6.xyzw, r8.xyzw
-mul r6.xyzw, r6.xyzw, l(0.003460, 0.003460, 0.003460, 0.003460)
-ge r8.xyzw, r6.xyzw, -r6.xyzw
-frc r6.xyzw, |r6.xyzw|
-movc r6.xyzw, r8.xyzw, r6.xyzw, -r6.xyzw
-mad r6.xyzw, r6.xyzw, l(289.000000, 289.000000, 289.000000, 289.000000), r5.yyyy
-mov r8.xw, l(0,0,0,1.000000)
-mov r8.y, r9.y
-mov r8.z, r7.y
-add r6.xyzw, r6.xyzw, r8.xyzw
-mad r8.xyzw, r6.xyzw, l(34.000000, 34.000000, 34.000000, 34.000000), l(1.000000, 1.000000, 1.000000, 1.000000)
-mul r6.xyzw, r6.xyzw, r8.xyzw
-mul r6.xyzw, r6.xyzw, l(0.003460, 0.003460, 0.003460, 0.003460)
-ge r8.xyzw, r6.xyzw, -r6.xyzw
-frc r6.xyzw, |r6.xyzw|
-movc r6.xyzw, r8.xyzw, r6.xyzw, -r6.xyzw
-mad r5.xyzw, r6.xyzw, l(289.000000, 289.000000, 289.000000, 289.000000), r5.xxxx
-mov r6.xw, l(0,0,0,1.000000)
-mov r6.y, r9.x
-add r8.xyz, r4.xyzx, -r9.xyzx
-add r8.xyz, r8.xyzx, l(0.166667, 0.166667, 0.166667, 0.000000)
-mov r6.z, r7.x
-add r7.xyz, r4.xyzx, -r7.xyzx
-add r7.xyz, r7.xyzx, l(0.333333, 0.333333, 0.333333, 0.000000)
+mov r6.y, r8.x
 add r5.xyzw, r5.xyzw, r6.xyzw
-mad r6.xyzw, r5.xyzw, l(34.000000, 34.000000, 34.000000, 34.000000), l(1.000000, 1.000000, 1.000000, 1.000000)
+
+#line 71
+mul r6.xyzw, r5.xyzw, l(34.000000, 34.000000, 34.000000, 34.000000)
+add r6.xyzw, r6.xyzw, l(1.000000, 1.000000, 1.000000, 1.000000)
 mul r5.xyzw, r5.xyzw, r6.xyzw
-mul r5.xyzw, r5.xyzw, l(0.003460, 0.003460, 0.003460, 0.003460)
-ge r6.xyzw, r5.xyzw, -r5.xyzw
-frc r5.xyzw, |r5.xyzw|
-movc r5.xyzw, r6.xyzw, r5.xyzw, -r5.xyzw
-mul r6.xyzw, r5.xyzw, l(5.897960, 5.897960, 5.897960, 5.897960)
+div r5.xyzw, r5.xyzw, l(289.000000, 289.000000, 289.000000, 289.000000)
+mov r6.xyzw, -r5.xyzw
+max r8.xyzw, r5.xyzw, r6.xyzw
+ge r5.xyzw, r5.xyzw, r6.xyzw
+frc r6.xyzw, r8.xyzw
+mov r8.xyzw, -r6.xyzw
+movc r5.xyzw, r5.xyzw, r6.xyzw, r8.xyzw
+mul r5.xyzw, r5.xyzw, l(289.000000, 289.000000, 289.000000, 289.000000)  // r5.x <- <permute return value>.x; r5.y <- <permute return value>.y; r5.z <- <permute return value>.z; r5.w <- <permute return value>.w
+
+#line 175
+mov r5.xyzw, r5.xyzw  // r5.x <- p.x; r5.y <- p.y; r5.z <- p.z; r5.w <- p.w
+
+#line 182
+mov r0.z, l(0.142857)  // r0.z <- n_
+
+#line 183
+mul r6.xyz, r4.wyzw, r0.zzzz
+mov r4.xyz, -r4.xzxx
+add r4.xyz, r4.xyzx, r6.xyzx  // r4.x <- ns.x; r4.y <- ns.y; r4.z <- ns.z
+
+#line 185
+mul r6.xyzw, r4.zzzz, r5.xyzw
+mul r6.xyzw, r4.zzzz, r6.xyzw
 round_ni r6.xyzw, r6.xyzw
 mul r6.xyzw, r6.xyzw, l(49.000000, 49.000000, 49.000000, 49.000000)
-mad r5.xyzw, r5.xyzw, l(289.000000, 289.000000, 289.000000, 289.000000), -r6.xyzw
-mul r6.xyzw, r5.xyzw, l(0.142857, 0.142857, 0.142857, 0.142857)
-round_ni r6.xyzw, r6.xyzw
-mad r5.xyzw, -r6.xyzw, l(7.000000, 7.000000, 7.000000, 7.000000), r5.xyzw
-mad r6.xyzw, r6.zxwy, l(0.285714, 0.285714, 0.285714, 0.285714), l(-0.928571, -0.928571, -0.928571, -0.928571)
-round_ni r5.xyzw, r5.xyzw
-mad r5.xyzw, r5.xyzw, l(0.285714, 0.285714, 0.285714, 0.285714), l(-0.928571, -0.928571, -0.928571, -0.928571)
-mov r9.yw, r5.xxxy
-mov r9.xz, r6.yywy
-round_ni r10.yw, r5.xxxy
-round_ni r10.xz, r6.yywy
-mad r10.xyzw, r10.xyzw, l(2.000000, 2.000000, 2.000000, 2.000000), l(1.000000, 1.000000, 1.000000, 1.000000)
-add r11.xyzw, -|r6.ywxz|, l(1.000000, 1.000000, 1.000000, 1.000000)
-add r11.xyzw, -|r5.xywz|, r11.xywz
-ge r12.xyzw, l(0.000000, 0.000000, 0.000000, 0.000000), r11.xywz
-movc r12.xyzw, r12.xyzw, l(-1.000000,-1.000000,-1.000000,-1.000000), l(-0.000000,-0.000000,-0.000000,-0.000000)
-mad r9.xyzw, r10.zwxy, r12.yyxx, r9.zwxy
-mov r10.xy, r9.zwzz
-mov r10.z, r11.x
-dp3 r13.x, r10.xyzx, r10.xyzx
-mov r9.z, r11.y
-dp3 r13.y, r9.xyzx, r9.xyzx
-round_ni r14.yw, r5.zzzw
-mov r6.yw, r5.zzzw
-round_ni r14.xz, r6.xxzx
-mad r5.xyzw, r14.xyzw, l(2.000000, 2.000000, 2.000000, 2.000000), l(1.000000, 1.000000, 1.000000, 1.000000)
-mad r5.xyzw, r5.xyzw, r12.zzww, r6.xyzw
-mov r11.xy, r5.zwzz
-mov r5.z, r11.w
-dp3 r13.z, r5.xyzx, r5.xyzx
-dp3 r13.w, r11.xyzx, r11.xyzx
-mad r6.xyzw, -r13.xyzw, l(0.853735, 0.853735, 0.853735, 0.853735), l(1.792843, 1.792843, 1.792843, 1.792843)
-mul r9.xyz, r6.yyyy, r9.xyzx
-dp3 r9.y, r9.xyzx, r8.xyzx
-dp3 r8.y, r8.xyzx, r8.xyzx
-mul r5.xyz, r5.xyzx, r6.zzzz
-dp3 r9.z, r5.xyzx, r7.xyzx
-dp3 r8.z, r7.xyzx, r7.xyzx
-mul r5.xyz, r6.xxxx, r10.xyzx
-mul r6.xyz, r6.wwww, r11.xyzx
-dp3 r9.x, r5.xyzx, r4.xyzx
-add r5.xyz, r4.xyzx, l(-0.500000, -0.500000, -0.500000, 0.000000)
-dp3 r8.x, r4.xyzx, r4.xyzx
-dp3 r9.w, r6.xyzx, r5.xyzx
-dp3 r8.w, r5.xyzx, r5.xyzx
-add r4.xyzw, -r8.xyzw, l(0.500000, 0.500000, 0.500000, 0.500000)
-max r4.xyzw, r4.xyzw, l(0.000000, 0.000000, 0.000000, 0.000000)
-mul r4.xyzw, r4.xyzw, r4.xyzw
-mul r4.xyzw, r4.xyzw, r4.xyzw
-dp4 r0.w, r4.xyzw, r9.xyzw
-mul r1.x, r0.w, l(31.500002)
-mul r4.xyz, r3.xyzx, l(0.003460, 0.003460, 0.003460, 0.000000)
-round_ni r4.xyz, r4.xyzx
-mad r4.xyz, -r4.xyzx, l(289.000000, 289.000000, 289.000000, 0.000000), r3.xyzx
-dp3 r0.w, r3.xyzx, l(0.166667, 0.166667, 0.166667, 0.000000)
-add r2.xyz, r0.wwww, r2.xyzx
-mov r3.xw, l(0,0,0,1.000000)
-ge r5.xyz, r2.zxyz, r2.xyzx
-and r6.xyz, r5.yzxy, l(0x3f800000, 0x3f800000, 0x3f800000, 0)
-movc r5.xyz, r5.xyzx, l(0,0,0,0), l(1.000000,1.000000,1.000000,0)
-min r7.xyz, r5.xyzx, r6.xyzx
-max r5.xyz, r5.xyzx, r6.xyzx
-mov r3.y, r7.z
-mov r3.z, r5.z
-add r3.xyzw, r3.xyzw, r4.zzzz
-mad r6.xyzw, r3.xyzw, l(34.000000, 34.000000, 34.000000, 34.000000), l(1.000000, 1.000000, 1.000000, 1.000000)
-mul r3.xyzw, r3.xyzw, r6.xyzw
-mul r3.xyzw, r3.xyzw, l(0.003460, 0.003460, 0.003460, 0.003460)
-ge r6.xyzw, r3.xyzw, -r3.xyzw
-frc r3.xyzw, |r3.xyzw|
-movc r3.xyzw, r6.xyzw, r3.xyzw, -r3.xyzw
-mad r3.xyzw, r3.xyzw, l(289.000000, 289.000000, 289.000000, 289.000000), r4.yyyy
-mov r6.xw, l(0,0,0,1.000000)
-mov r6.y, r7.y
-mov r6.z, r5.y
-add r3.xyzw, r3.xyzw, r6.xyzw
-mad r6.xyzw, r3.xyzw, l(34.000000, 34.000000, 34.000000, 34.000000), l(1.000000, 1.000000, 1.000000, 1.000000)
-mul r3.xyzw, r3.xyzw, r6.xyzw
-mul r3.xyzw, r3.xyzw, l(0.003460, 0.003460, 0.003460, 0.003460)
-ge r6.xyzw, r3.xyzw, -r3.xyzw
-frc r3.xyzw, |r3.xyzw|
-movc r3.xyzw, r6.xyzw, r3.xyzw, -r3.xyzw
-mad r3.xyzw, r3.xyzw, l(289.000000, 289.000000, 289.000000, 289.000000), r4.xxxx
-mov r4.xw, l(0,0,0,1.000000)
-mov r4.y, r7.x
-add r6.xyz, r2.xyzx, -r7.xyzx
-add r6.xyz, r6.xyzx, l(0.166667, 0.166667, 0.166667, 0.000000)
-mov r4.z, r5.x
-add r5.xyz, r2.xyzx, -r5.xyzx
-add r5.xyz, r5.xyzx, l(0.333333, 0.333333, 0.333333, 0.000000)
-add r3.xyzw, r3.xyzw, r4.xyzw
-mad r4.xyzw, r3.xyzw, l(34.000000, 34.000000, 34.000000, 34.000000), l(1.000000, 1.000000, 1.000000, 1.000000)
-mul r3.xyzw, r3.xyzw, r4.xyzw
-mul r3.xyzw, r3.xyzw, l(0.003460, 0.003460, 0.003460, 0.003460)
-ge r4.xyzw, r3.xyzw, -r3.xyzw
-frc r3.xyzw, |r3.xyzw|
-movc r3.xyzw, r4.xyzw, r3.xyzw, -r3.xyzw
-mul r4.xyzw, r3.xyzw, l(5.897960, 5.897960, 5.897960, 5.897960)
-round_ni r4.xyzw, r4.xyzw
-mul r4.xyzw, r4.xyzw, l(49.000000, 49.000000, 49.000000, 49.000000)
-mad r3.xyzw, r3.xyzw, l(289.000000, 289.000000, 289.000000, 289.000000), -r4.xyzw
-mul r4.xyzw, r3.xyzw, l(0.142857, 0.142857, 0.142857, 0.142857)
-round_ni r4.xyzw, r4.xyzw
-mad r3.xyzw, -r4.xyzw, l(7.000000, 7.000000, 7.000000, 7.000000), r3.xyzw
-mad r4.xyzw, r4.zxwy, l(0.285714, 0.285714, 0.285714, 0.285714), l(-0.928571, -0.928571, -0.928571, -0.928571)
-round_ni r3.xyzw, r3.xyzw
-mad r3.xyzw, r3.xyzw, l(0.285714, 0.285714, 0.285714, 0.285714), l(-0.928571, -0.928571, -0.928571, -0.928571)
-mov r7.yw, r3.xxxy
-mov r7.xz, r4.yywy
-round_ni r8.yw, r3.xxxy
-round_ni r8.xz, r4.yywy
-mad r8.xyzw, r8.xyzw, l(2.000000, 2.000000, 2.000000, 2.000000), l(1.000000, 1.000000, 1.000000, 1.000000)
-add r9.xyzw, -|r4.ywxz|, l(1.000000, 1.000000, 1.000000, 1.000000)
-add r9.xyzw, -|r3.xywz|, r9.xywz
-ge r10.xyzw, l(0.000000, 0.000000, 0.000000, 0.000000), r9.xywz
-movc r10.xyzw, r10.xyzw, l(-1.000000,-1.000000,-1.000000,-1.000000), l(-0.000000,-0.000000,-0.000000,-0.000000)
-mad r7.xyzw, r8.zwxy, r10.yyxx, r7.zwxy
-mov r8.xy, r7.zwzz
-mov r8.z, r9.x
-dp3 r11.x, r8.xyzx, r8.xyzx
-mov r7.z, r9.y
+mov r6.xyzw, -r6.xyzw
+add r5.xyzw, r5.xyzw, r6.xyzw  // r5.x <- j.x; r5.y <- j.y; r5.z <- j.z; r5.w <- j.w
+
+#line 187
+mul r6.xyzw, r4.zzzz, r5.xyzw
+round_ni r6.xyzw, r6.xyzw  // r6.x <- x_.x; r6.y <- x_.y; r6.z <- x_.z; r6.w <- x_.w
+
+#line 188
+mul r8.xyzw, r6.xyzw, l(7.000000, 7.000000, 7.000000, 7.000000)
+mov r8.xyzw, -r8.xyzw
+add r5.xyzw, r5.xyzw, r8.xyzw
+round_ni r5.xyzw, r5.xyzw  // r5.x <- y_.x; r5.y <- y_.y; r5.z <- y_.z; r5.w <- y_.w
+
+#line 190
+mul r6.xyzw, r4.xxxx, r6.xyzw
+add r6.xyzw, r4.yyyy, r6.xyzw  // r6.x <- x.x; r6.y <- x.y; r6.z <- x.z; r6.w <- x.w
+
+#line 191
+mul r5.xyzw, r4.xxxx, r5.xyzw
+add r4.xyzw, r4.yyyy, r5.xzyw  // r4.x <- y.x; r4.y <- y.z; r4.z <- y.y; r4.w <- y.w
+
+#line 192
+mov r5.xyzw, -r6.xyzw
+max r5.xyzw, r5.xyzw, r6.xyzw
+mov r5.xyzw, -r5.xyzw
+add r5.xyzw, r5.xyzw, l(1.000000, 1.000000, 1.000000, 1.000000)
+mov r8.xyzw, -r4.xzyw
+max r8.xyzw, r4.xzyw, r8.xyzw
+mov r8.xyzw, -r8.xyzw
+add r5.xyzw, r5.xywz, r8.xywz  // r5.x <- h.x; r5.y <- h.y; r5.z <- h.w; r5.w <- h.z
+
+#line 194
+mov r8.xz, r6.xxyx  // r8.x <- b0.x; r8.z <- b0.y
+mov r8.yw, r4.xxxz  // r8.y <- b0.z; r8.w <- b0.w
+
+#line 195
+mov r4.xz, r6.zzwz  // r4.x <- b1.x; r4.z <- b1.y
+mov r4.yw, r4.yyyw  // r4.y <- b1.z; r4.w <- b1.w
+
+#line 199
+round_ni r6.xyzw, r8.xyzw
+mul r6.xyzw, r6.xyzw, l(2.000000, 2.000000, 2.000000, 2.000000)
+add r6.xyzw, r6.xyzw, l(1.000000, 1.000000, 1.000000, 1.000000)  // r6.x <- s0.x; r6.y <- s0.z; r6.z <- s0.y; r6.w <- s0.w
+
+#line 200
+round_ni r11.xyzw, r4.xyzw
+mul r11.xyzw, r11.xyzw, l(2.000000, 2.000000, 2.000000, 2.000000)
+add r11.xyzw, r11.xyzw, l(1.000000, 1.000000, 1.000000, 1.000000)  // r11.x <- s1.x; r11.y <- s1.z; r11.z <- s1.y; r11.w <- s1.w
+
+#line 201
+ge r12.xyzw, l(0.000000, 0.000000, 0.000000, 0.000000), r5.xywz
+movc r12.xyzw, r12.xyzw, l(1.000000,1.000000,1.000000,1.000000), l(0,0,0,0)
+mov r12.xyzw, -r12.xyzw  // r12.x <- sh.x; r12.y <- sh.y; r12.z <- sh.z; r12.w <- sh.w
+
+#line 203
+mul r6.xyzw, r6.xyzw, r12.xxyy
+add r6.xyzw, r6.zwxy, r8.zwxy  // r6.x <- a0.z; r6.y <- a0.w; r6.z <- a0.x; r6.w <- a0.y
+
+#line 204
+mul r8.xyzw, r11.xyzw, r12.zzww
+add r4.xyzw, r4.xyzw, r8.xyzw  // r4.x <- a1.x; r4.y <- a1.y; r4.z <- a1.z; r4.w <- a1.w
+
+#line 206
+mov r8.xy, r6.zwzz  // r8.x <- p0.x; r8.y <- p0.y
+mov r8.z, r5.x  // r8.z <- p0.z
+
+#line 207
+mov r6.xy, r6.xyxx  // r6.x <- p1.x; r6.y <- p1.y
+mov r6.z, r5.y  // r6.z <- p1.z
+
+#line 208
+mov r11.xy, r4.xyxx  // r11.x <- p2.x; r11.y <- p2.y
+mov r11.z, r5.w  // r11.z <- p2.z
+
+#line 209
+mov r5.xy, r4.zwzz  // r5.x <- p3.x; r5.y <- p3.y
+mov r5.z, r5.z  // r5.z <- p3.z
+
+#line 212
+nop 
+dp3 r4.x, r8.xyzx, r8.xyzx
+dp3 r4.y, r6.xyzx, r6.xyzx
+dp3 r4.z, r11.xyzx, r11.xyzx
+dp3 r4.w, r5.xyzx, r5.xyzx
+
+#line 75
+mul r4.xyzw, r4.xyzw, l(0.853735, 0.853735, 0.853735, 0.853735)
+mov r4.xyzw, -r4.xyzw
+add r4.xyzw, r4.xyzw, l(1.792843, 1.792843, 1.792843, 1.792843)  // r4.x <- <taylor_inv_sqrt return value>.x; r4.y <- <taylor_inv_sqrt return value>.y; r4.z <- <taylor_inv_sqrt return value>.z; r4.w <- <taylor_inv_sqrt return value>.w
+
+#line 212
+mov r4.xyzw, r4.xyzw  // r4.x <- norm.x; r4.y <- norm.y; r4.z <- norm.z; r4.w <- norm.w
+
+#line 213
+mul r8.xyz, r4.xxxx, r8.xyzx
+
+#line 214
+mul r6.xyz, r4.yyyy, r6.xyzx
+
+#line 215
+mul r4.xyz, r4.zzzz, r11.xyzx  // r4.x <- p2.x; r4.y <- p2.y; r4.z <- p2.z
+
+#line 216
+mul r5.xyz, r4.wwww, r5.xyzx
+
+#line 219
+dp3 r11.x, r3.xyzx, r3.xyzx
 dp3 r11.y, r7.xyzx, r7.xyzx
-round_ni r12.yw, r3.zzzw
-mov r4.yw, r3.zzzw
-round_ni r12.xz, r4.xxzx
-mad r3.xyzw, r12.xyzw, l(2.000000, 2.000000, 2.000000, 2.000000), l(1.000000, 1.000000, 1.000000, 1.000000)
-mad r3.xyzw, r3.xyzw, r10.zzww, r4.xyzw
-mov r9.xy, r3.zwzz
-mov r3.z, r9.w
-dp3 r11.z, r3.xyzx, r3.xyzx
-dp3 r11.w, r9.xyzx, r9.xyzx
-mad r4.xyzw, -r11.xyzw, l(0.853735, 0.853735, 0.853735, 0.853735), l(1.792843, 1.792843, 1.792843, 1.792843)
-mul r7.xyz, r4.yyyy, r7.xyzx
-dp3 r7.y, r7.xyzx, r6.xyzx
-dp3 r6.y, r6.xyzx, r6.xyzx
-mul r3.xyz, r3.xyzx, r4.zzzz
-dp3 r7.z, r3.xyzx, r5.xyzx
-dp3 r6.z, r5.xyzx, r5.xyzx
-mul r3.xyz, r4.xxxx, r8.xyzx
-mul r4.xyz, r4.wwww, r9.xyzx
-dp3 r7.x, r3.xyzx, r2.xyzx
-add r3.xyz, r2.xyzx, l(-0.500000, -0.500000, -0.500000, 0.000000)
-dp3 r6.x, r2.xyzx, r2.xyzx
-dp3 r7.w, r4.xyzx, r3.xyzx
-dp3 r6.w, r3.xyzx, r3.xyzx
-add r2.xyzw, -r6.xyzw, l(0.500000, 0.500000, 0.500000, 0.500000)
-max r2.xyzw, r2.xyzw, l(0.000000, 0.000000, 0.000000, 0.000000)
-mul r2.xyzw, r2.xyzw, r2.xyzw
-mul r2.xyzw, r2.xyzw, r2.xyzw
-dp4 r0.w, r2.xyzw, r7.xyzw
-mul r1.z, r0.w, l(31.500002)
-mad r0.xyz, r1.xyzx, cb10[11].xxxx, r0.xyzx
-mov r0.w, r1.x
-mad r1.x, cb10[10].y, l(0.500000), cb10[0].y
-lt r1.x, r1.x, r0.y
-add r1.y, r0.y, -cb10[10].y
-movc r1.x, r1.x, r1.y, r0.y
-mad r1.y, -cb10[10].y, l(0.500000), cb10[0].y
-lt r1.y, r0.y, r1.y
-add r1.w, r0.y, cb10[10].y
-movc r0.y, r1.y, r1.w, r1.x
-store_structured u0.xyzw, vThreadID.x, l(0), r0.xyzw
-store_structured u0.x, vThreadID.x, l(20), r1.z
+dp3 r11.z, r9.xyzx, r9.xyzx
+dp3 r11.w, r10.xyzx, r10.xyzx
+mov r11.xyzw, -r11.xyzw
+add r11.xyzw, r11.xyzw, l(0.500000, 0.500000, 0.500000, 0.500000)
+max r11.xyzw, r11.xyzw, l(0.000000, 0.000000, 0.000000, 0.000000)  // r11.x <- m.x; r11.y <- m.y; r11.z <- m.z; r11.w <- m.w
+
+#line 220
+mul r11.xyzw, r11.xyzw, r11.xyzw
+
+#line 221
+mul r11.xyzw, r11.xyzw, r11.xyzw
+dp3 r3.x, r8.xyzx, r3.xyzx
+dp3 r3.y, r6.xyzx, r7.xyzx
+dp3 r3.z, r4.xyzx, r9.xyzx
+dp3 r3.w, r5.xyzx, r10.xyzx
+dp4 r0.z, r11.xyzw, r3.xyzw
+mul r0.z, r0.z, l(105.000000)  // r0.z <- <snoise return value>
+
+#line 21 "C:\Users\2200167\Desktop\個人製作\myme03\myme\HLSL\snowfall_particles_cs.hlsl"
+mul r2.x, r0.y, r0.z  // r2.x <- p.velocity.x
+
+#line 22
+nop 
+frc r0.z, cb10[11].y
+mul r3.xyz, r0.zzzz, r1.yzxy
+mul r3.xyz, r3.xyzx, l(10.000000, 10.000000, 10.000000, 0.000000)
+
+#line 152 "C:\Users\2200167\Desktop\個人製作\myme03\myme\HLSL\noise.hlsli"
+mov r0.zw, l(0,0,0.166667,0.333333)  // r0.z <- C.x
+
+#line 153
+mov r4.xyzw, l(0,0.500000,1.000000,2.000000)  // r4.x <- D.x; r4.y <- D.y; r4.z <- D.z; r4.w <- D.w
+
+#line 156
+dp3 r1.w, r3.xyzx, r0.wwww
+add r5.xyz, r1.wwww, r3.xyzx
+round_ni r5.xyz, r5.xyzx  // r5.x <- i.x; r5.y <- i.y; r5.z <- i.z
+
+#line 157
+mov r6.xyz, -r5.xyzx
+add r3.xyz, r3.xyzx, r6.xyzx
+dp3 r1.w, r5.xyzx, r0.zzzz
+add r3.xyz, r1.wwww, r3.xyzx  // r3.x <- x0.x; r3.y <- x0.y; r3.z <- x0.z
+
+#line 160
+ge r6.xyz, r3.xyzx, r3.yzxy
+movc r6.xyz, r6.xyzx, l(1.000000,1.000000,1.000000,0), l(0,0,0,0)  // r6.x <- g.x; r6.y <- g.y; r6.z <- g.z
+
+#line 161
+mov r7.xyz, -r6.zxyz
+add r7.xyz, r7.xyzx, l(1.000000, 1.000000, 1.000000, 0.000000)  // r7.x <- l.z; r7.y <- l.x; r7.z <- l.y
+
+#line 162
+min r8.xyz, r6.xyzx, r7.xyzx  // r8.x <- i1.x; r8.y <- i1.y; r8.z <- i1.z
+
+#line 163
+max r6.xyz, r6.yzxy, r7.yzxy  // r6.x <- i2.y; r6.y <- i2.z; r6.z <- i2.x
+
+#line 169
+mov r7.xyz, -r8.xyzx
+add r7.xyz, r3.xyzx, r7.xyzx
+add r7.xyz, r0.zzzz, r7.xyzx  // r7.x <- x1.x; r7.y <- x1.y; r7.z <- x1.z
+
+#line 170
+mov r9.xyz, -r6.zxyz
+add r9.xyz, r3.xyzx, r9.xyzx
+add r9.xyz, r0.wwww, r9.xyzx  // r9.x <- x2.x; r9.y <- x2.y; r9.z <- x2.z
+
+#line 171
+mov r10.xyz, -r4.yyyy
+add r10.xyz, r3.xyzx, r10.xyzx  // r10.x <- x3.x; r10.y <- x3.y; r10.z <- x3.z
+
+#line 174
+nop 
+mov r5.xyz, r5.xyzx
+
+#line 35
+mul r11.xyz, r5.xyzx, l(0.003460, 0.003460, 0.003460, 0.000000)
+round_ni r11.xyz, r11.xyzx
+mul r11.xyz, r11.xyzx, l(289.000000, 289.000000, 289.000000, 0.000000)
+mov r11.xyz, -r11.xyzx
+add r5.xyz, r5.xyzx, r11.xyzx  // r5.x <- <mod289 return value>.x; r5.y <- <mod289 return value>.y; r5.z <- <mod289 return value>.z
+
+#line 174
+mov r5.xyz, r5.xyzx  // r5.x <- i.x; r5.y <- i.y; r5.z <- i.z
+
+#line 175
+nop 
+nop 
+nop 
+mov r11.xw, l(0,0,0,1.000000)
+mov r11.y, r8.z
+mov r11.z, r6.y
+add r11.xyzw, r5.zzzz, r11.xyzw
+
+#line 71
+mul r12.xyzw, r11.xyzw, l(34.000000, 34.000000, 34.000000, 34.000000)
+add r12.xyzw, r12.xyzw, l(1.000000, 1.000000, 1.000000, 1.000000)
+mul r11.xyzw, r11.xyzw, r12.xyzw
+div r11.xyzw, r11.xyzw, l(289.000000, 289.000000, 289.000000, 289.000000)
+mov r12.xyzw, -r11.xyzw
+max r13.xyzw, r11.xyzw, r12.xyzw
+ge r11.xyzw, r11.xyzw, r12.xyzw
+frc r12.xyzw, r13.xyzw
+mov r13.xyzw, -r12.xyzw
+movc r11.xyzw, r11.xyzw, r12.xyzw, r13.xyzw
+mul r11.xyzw, r11.xyzw, l(289.000000, 289.000000, 289.000000, 289.000000)  // r11.x <- <permute return value>.x; r11.y <- <permute return value>.y; r11.z <- <permute return value>.z; r11.w <- <permute return value>.w
+
+#line 175
+add r11.xyzw, r5.yyyy, r11.xyzw
+mov r12.xw, l(0,0,0,1.000000)
+mov r12.y, r8.y
+mov r12.z, r6.x
+add r11.xyzw, r11.xyzw, r12.xyzw
+
+#line 71
+mul r12.xyzw, r11.xyzw, l(34.000000, 34.000000, 34.000000, 34.000000)
+add r12.xyzw, r12.xyzw, l(1.000000, 1.000000, 1.000000, 1.000000)
+mul r11.xyzw, r11.xyzw, r12.xyzw
+div r11.xyzw, r11.xyzw, l(289.000000, 289.000000, 289.000000, 289.000000)
+mov r12.xyzw, -r11.xyzw
+max r13.xyzw, r11.xyzw, r12.xyzw
+ge r11.xyzw, r11.xyzw, r12.xyzw
+frc r12.xyzw, r13.xyzw
+mov r13.xyzw, -r12.xyzw
+movc r11.xyzw, r11.xyzw, r12.xyzw, r13.xyzw
+mul r11.xyzw, r11.xyzw, l(289.000000, 289.000000, 289.000000, 289.000000)  // r11.x <- <permute return value>.x; r11.y <- <permute return value>.y; r11.z <- <permute return value>.z; r11.w <- <permute return value>.w
+
+#line 175
+add r5.xyzw, r5.xxxx, r11.xyzw
+mov r6.xw, l(0,0,0,1.000000)
+mov r6.y, r8.x
+add r5.xyzw, r5.xyzw, r6.xyzw
+
+#line 71
+mul r6.xyzw, r5.xyzw, l(34.000000, 34.000000, 34.000000, 34.000000)
+add r6.xyzw, r6.xyzw, l(1.000000, 1.000000, 1.000000, 1.000000)
+mul r5.xyzw, r5.xyzw, r6.xyzw
+div r5.xyzw, r5.xyzw, l(289.000000, 289.000000, 289.000000, 289.000000)
+mov r6.xyzw, -r5.xyzw
+max r8.xyzw, r5.xyzw, r6.xyzw
+ge r5.xyzw, r5.xyzw, r6.xyzw
+frc r6.xyzw, r8.xyzw
+mov r8.xyzw, -r6.xyzw
+movc r5.xyzw, r5.xyzw, r6.xyzw, r8.xyzw
+mul r5.xyzw, r5.xyzw, l(289.000000, 289.000000, 289.000000, 289.000000)  // r5.x <- <permute return value>.x; r5.y <- <permute return value>.y; r5.z <- <permute return value>.z; r5.w <- <permute return value>.w
+
+#line 175
+mov r5.xyzw, r5.xyzw  // r5.x <- p.x; r5.y <- p.y; r5.z <- p.z; r5.w <- p.w
+
+#line 182
+mov r0.z, l(0.142857)  // r0.z <- n_
+
+#line 183
+mul r6.xyz, r4.wyzw, r0.zzzz
+mov r4.xyz, -r4.xzxx
+add r4.xyz, r4.xyzx, r6.xyzx  // r4.x <- ns.x; r4.y <- ns.y; r4.z <- ns.z
+
+#line 185
+mul r6.xyzw, r4.zzzz, r5.xyzw
+mul r6.xyzw, r4.zzzz, r6.xyzw
+round_ni r6.xyzw, r6.xyzw
+mul r6.xyzw, r6.xyzw, l(49.000000, 49.000000, 49.000000, 49.000000)
+mov r6.xyzw, -r6.xyzw
+add r5.xyzw, r5.xyzw, r6.xyzw  // r5.x <- j.x; r5.y <- j.y; r5.z <- j.z; r5.w <- j.w
+
+#line 187
+mul r6.xyzw, r4.zzzz, r5.xyzw
+round_ni r6.xyzw, r6.xyzw  // r6.x <- x_.x; r6.y <- x_.y; r6.z <- x_.z; r6.w <- x_.w
+
+#line 188
+mul r8.xyzw, r6.xyzw, l(7.000000, 7.000000, 7.000000, 7.000000)
+mov r8.xyzw, -r8.xyzw
+add r5.xyzw, r5.xyzw, r8.xyzw
+round_ni r5.xyzw, r5.xyzw  // r5.x <- y_.x; r5.y <- y_.y; r5.z <- y_.z; r5.w <- y_.w
+
+#line 190
+mul r6.xyzw, r4.xxxx, r6.xyzw
+add r6.xyzw, r4.yyyy, r6.xyzw  // r6.x <- x.x; r6.y <- x.y; r6.z <- x.z; r6.w <- x.w
+
+#line 191
+mul r5.xyzw, r4.xxxx, r5.xyzw
+add r4.xyzw, r4.yyyy, r5.xzyw  // r4.x <- y.x; r4.y <- y.z; r4.z <- y.y; r4.w <- y.w
+
+#line 192
+mov r5.xyzw, -r6.xyzw
+max r5.xyzw, r5.xyzw, r6.xyzw
+mov r5.xyzw, -r5.xyzw
+add r5.xyzw, r5.xyzw, l(1.000000, 1.000000, 1.000000, 1.000000)
+mov r8.xyzw, -r4.xzyw
+max r8.xyzw, r4.xzyw, r8.xyzw
+mov r8.xyzw, -r8.xyzw
+add r5.xyzw, r5.xywz, r8.xywz  // r5.x <- h.x; r5.y <- h.y; r5.z <- h.w; r5.w <- h.z
+
+#line 194
+mov r8.xz, r6.xxyx  // r8.x <- b0.x; r8.z <- b0.y
+mov r8.yw, r4.xxxz  // r8.y <- b0.z; r8.w <- b0.w
+
+#line 195
+mov r4.xz, r6.zzwz  // r4.x <- b1.x; r4.z <- b1.y
+mov r4.yw, r4.yyyw  // r4.y <- b1.z; r4.w <- b1.w
+
+#line 199
+round_ni r6.xyzw, r8.xyzw
+mul r6.xyzw, r6.xyzw, l(2.000000, 2.000000, 2.000000, 2.000000)
+add r6.xyzw, r6.xyzw, l(1.000000, 1.000000, 1.000000, 1.000000)  // r6.x <- s0.x; r6.y <- s0.z; r6.z <- s0.y; r6.w <- s0.w
+
+#line 200
+round_ni r11.xyzw, r4.xyzw
+mul r11.xyzw, r11.xyzw, l(2.000000, 2.000000, 2.000000, 2.000000)
+add r11.xyzw, r11.xyzw, l(1.000000, 1.000000, 1.000000, 1.000000)  // r11.x <- s1.x; r11.y <- s1.z; r11.z <- s1.y; r11.w <- s1.w
+
+#line 201
+ge r12.xyzw, l(0.000000, 0.000000, 0.000000, 0.000000), r5.xywz
+movc r12.xyzw, r12.xyzw, l(1.000000,1.000000,1.000000,1.000000), l(0,0,0,0)
+mov r12.xyzw, -r12.xyzw  // r12.x <- sh.x; r12.y <- sh.y; r12.z <- sh.z; r12.w <- sh.w
+
+#line 203
+mul r6.xyzw, r6.xyzw, r12.xxyy
+add r6.xyzw, r6.zwxy, r8.zwxy  // r6.x <- a0.z; r6.y <- a0.w; r6.z <- a0.x; r6.w <- a0.y
+
+#line 204
+mul r8.xyzw, r11.xyzw, r12.zzww
+add r4.xyzw, r4.xyzw, r8.xyzw  // r4.x <- a1.x; r4.y <- a1.y; r4.z <- a1.z; r4.w <- a1.w
+
+#line 206
+mov r8.xy, r6.zwzz  // r8.x <- p0.x; r8.y <- p0.y
+mov r8.z, r5.x  // r8.z <- p0.z
+
+#line 207
+mov r6.xy, r6.xyxx  // r6.x <- p1.x; r6.y <- p1.y
+mov r6.z, r5.y  // r6.z <- p1.z
+
+#line 208
+mov r11.xy, r4.xyxx  // r11.x <- p2.x; r11.y <- p2.y
+mov r11.z, r5.w  // r11.z <- p2.z
+
+#line 209
+mov r5.xy, r4.zwzz  // r5.x <- p3.x; r5.y <- p3.y
+mov r5.z, r5.z  // r5.z <- p3.z
+
+#line 212
+nop 
+dp3 r4.x, r8.xyzx, r8.xyzx
+dp3 r4.y, r6.xyzx, r6.xyzx
+dp3 r4.z, r11.xyzx, r11.xyzx
+dp3 r4.w, r5.xyzx, r5.xyzx
+
+#line 75
+mul r4.xyzw, r4.xyzw, l(0.853735, 0.853735, 0.853735, 0.853735)
+mov r4.xyzw, -r4.xyzw
+add r4.xyzw, r4.xyzw, l(1.792843, 1.792843, 1.792843, 1.792843)  // r4.x <- <taylor_inv_sqrt return value>.x; r4.y <- <taylor_inv_sqrt return value>.y; r4.z <- <taylor_inv_sqrt return value>.z; r4.w <- <taylor_inv_sqrt return value>.w
+
+#line 212
+mov r4.xyzw, r4.xyzw  // r4.x <- norm.x; r4.y <- norm.y; r4.z <- norm.z; r4.w <- norm.w
+
+#line 213
+mul r8.xyz, r4.xxxx, r8.xyzx
+
+#line 214
+mul r6.xyz, r4.yyyy, r6.xyzx
+
+#line 215
+mul r4.xyz, r4.zzzz, r11.xyzx  // r4.x <- p2.x; r4.y <- p2.y; r4.z <- p2.z
+
+#line 216
+mul r5.xyz, r4.wwww, r5.xyzx
+
+#line 219
+dp3 r11.x, r3.xyzx, r3.xyzx
+dp3 r11.y, r7.xyzx, r7.xyzx
+dp3 r11.z, r9.xyzx, r9.xyzx
+dp3 r11.w, r10.xyzx, r10.xyzx
+mov r11.xyzw, -r11.xyzw
+add r11.xyzw, r11.xyzw, l(0.500000, 0.500000, 0.500000, 0.500000)
+max r11.xyzw, r11.xyzw, l(0.000000, 0.000000, 0.000000, 0.000000)  // r11.x <- m.x; r11.y <- m.y; r11.z <- m.z; r11.w <- m.w
+
+#line 220
+mul r11.xyzw, r11.xyzw, r11.xyzw
+
+#line 221
+mul r11.xyzw, r11.xyzw, r11.xyzw
+dp3 r3.x, r8.xyzx, r3.xyzx
+dp3 r3.y, r6.xyzx, r7.xyzx
+dp3 r3.z, r4.xyzx, r9.xyzx
+dp3 r3.w, r5.xyzx, r10.xyzx
+dp4 r0.z, r11.xyzw, r3.xyzw
+mul r0.z, r0.z, l(105.000000)  // r0.z <- <snoise return value>
+
+#line 22 "C:\Users\2200167\Desktop\個人製作\myme03\myme\HLSL\snowfall_particles_cs.hlsl"
+mul r2.z, r0.y, r0.z  // r2.z <- p.velocity.z
+
+#line 23
+mul r0.yzw, r2.xxyz, cb10[11].xxxx
+add r0.yzw, r0.zzyw, r1.zzxy  // r0.y <- p.position.y; r0.z <- p.position.x; r0.w <- p.position.z
+
+#line 26
+mul r1.x, cb10[10].y, l(0.500000)
+mov r1.x, -r1.x
+add r1.x, r1.x, cb10[0].y
+lt r1.x, r0.y, r1.x
+if_nz r1.x
+
+#line 28
+  add r0.y, r0.y, cb10[10].y
+
+#line 29
+else 
+
+#line 30
+  mul r1.x, cb10[10].y, l(0.500000)
+  add r1.x, r1.x, cb10[0].y
+  lt r1.x, r1.x, r0.y
+  if_nz r1.x
+
+#line 32
+    mov r1.x, -cb10[10].y
+    add r0.y, r0.y, r1.x
+
+#line 33
+  endif 
+endif 
+
+#line 35
+store_structured u0.x, r0.x, l(0), r0.z
+store_structured u0.x, r0.x, l(4), r0.y
+store_structured u0.x, r0.x, l(8), r0.w
+store_structured u0.x, r0.x, l(12), r2.x
+store_structured u0.x, r0.x, l(16), r2.y
+store_structured u0.x, r0.x, l(20), r2.z
+
+#line 37
 ret 
-// Approximately 233 instruction slots used
+// Approximately 377 instruction slots used

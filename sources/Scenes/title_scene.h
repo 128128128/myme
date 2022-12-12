@@ -62,11 +62,11 @@ public:
 	struct shader_constants
 	{
 		float time;
-		DirectX::XMFLOAT3 pad;
+		DirectX::XMFLOAT3 mouse;
 	};
-	shader_constants shader_data;
+	
 
-	Microsoft::WRL::ComPtr<ID3D11Buffer> constant_buffers[8];
+	Microsoft::WRL::ComPtr<ID3D11Buffer> constant_buffers[2];
 
 	struct spherical_coordinate_system
 	{

@@ -58,6 +58,7 @@ Texture2D texture_maps[4] : register(t0);
 //	particle_buffer.Append(p);
 //}
 
+////////パーティクル集合体状態でのピクセルシェーダー
 struct husk_particle
 {
 	float4 color;

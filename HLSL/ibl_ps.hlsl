@@ -5,14 +5,14 @@
 
 static const int NUM_DIRECTIONAL_LIGHT = 1; 
 
-float3 GetNormal(float3 normal, float3 tangent, float3 biNormal, float2 uv)
+float3 get_normal(float3 normal, float3 tangent, float3 biNormal, float2 uv)
 {
-    float3 binSpaceNormal = normal_map.SampleLevel(sampler_states[LINEAR_WRAP], uv, 0.0f).xyz;
-    binSpaceNormal = (binSpaceNormal * 2.0f) - 1.0f;
+    float3 bins_space_normal = normal_map.SampleLevel(sampler_states[LINEAR_WRAP], uv, 0.0f).xyz;
+    bins_space_normal = (bins_space_normal * 2.0f) - 1.0f;
 
-    float3 newNormal = tangent * binSpaceNormal.x + biNormal * binSpaceNormal.y + normal * binSpaceNormal.z;
+    float3 new_normal = tangent * bins_space_normal.x + biNormal * bins_space_normal.y + normal * bins_space_normal.z;
 
-    return newNormal;
+    return new_normal;
 }
 
 material_info fetch_material_info(float2 texcoord)
@@ -20,14 +20,14 @@ material_info fetch_material_info(float2 texcoord)
     material_info material_info;
 #if 1
     material_info.basecolor = 1.0;
-    material_info.ior = 1.5;
+    material_info.ior = 1.5;//屈折率
     material_info.perceptual_roughness = 1.0;
-    material_info.f0 = 0.04;
-    material_info.alpha_roughness = 1.0;
+    material_info.f0 = 0.04;//全反射カラー
+    material_info.alpha_roughness = 1.0;//知覚的粗さ
     material_info.c_diff = 1.0;
     material_info.f90 = 1.0;
     material_info.metallic = 1.0;
-    material_info.sheen_roughness_factor = 0.0;
+    material_info.sheen_roughness_factor = 0.0;//シアノラフネス係数
     material_info.sheen_color_factor = 0.0;
     material_info.clearcoat_f0 = 0.04;
     material_info.clearcoat_f90 = 1.0;
@@ -46,22 +46,26 @@ material_info fetch_material_info(float2 texcoord)
 
 
     float4 sampled = diffuse_map.Sample(sampler_states[ANISOTROPIC_WRAP], texcoord);
+    //gamma correction
     sampled.rgb = pow(sampled.rgb, gamma);
-
+    //base color = diffuse texture
     material_info.basecolor = sampled;
 
     float r_factor = 0;
     float m_factor = 0;
 
     sampled = metallic_map.Sample(sampler_states[LINEAR_WRAP], texcoord);
-    r_factor = roughness_factor * sampled.a;// g;
-    m_factor = metallic_factor * sampled.r;// b;
+    //roughness , metallic can be controled
+    r_factor = roughness_factor * sampled.a;
+    m_factor = metallic_factor * sampled.r;
 
+    //rm add to material info
     material_info.metallic = m_factor;
     material_info.perceptual_roughness = r_factor;
 
-    // Achromatic f0 based on IOR.
+    // Achromatic f0 based on IOR(屈折率).
     material_info.c_diff = lerp(material_info.basecolor.rgb, 0.0, material_info.metallic);
+    //// full reflectance color (n incidence angle)// 全反射カラー（n入射角）
     material_info.f0 = lerp(material_info.f0, material_info.basecolor.rgb, material_info.metallic);
 
 
@@ -76,19 +80,21 @@ material_info fetch_material_info(float2 texcoord)
     //material_info.occlusion_factor = occlusion_factor;
     //material_info.occlusion_strength = material.occlusion_texture.strength;
 
+    //emissive values
     float e_factor=0;
     sampled = emissive_map.Sample(sampler_states[ANISOTROPIC_WRAP], texcoord);
     sampled.rgb = pow(sampled.rgb, gamma);
-    e_factor=emissive_factor * sampled.rgb;
-
+    e_factor=emissive_factor * sampled.rgb;//can control
+    //register
     material_info.emissive_factor = e_factor;
 
     // Roughness is authored as perceptual roughness; as is convention,
     // convert to material roughness by squaring the perceptual roughness.
+    //知覚的粗さを二乗して物質的粗さに変換する
     material_info.alpha_roughness = material_info.perceptual_roughness * material_info.perceptual_roughness;
 
-    // Anything less than 2% is physically impossible and is instead considered to be shadowing. Compare to "Real-Time-Rendering" 4th editon on page 325.
-    material_info.f90 = 1.0;
+    // Anything less than 2% is physically impossible and is instead considered to be shadowing. Compare to "Real-Time-Rendering" 4th edition on page 325.
+    material_info.f90 = 1.0;//reflectance color at grazing angle//かすむ寸前の角度でのカラー
 
 
     return material_info;
@@ -98,12 +104,12 @@ float4 main(VS_OUT pin) : SV_TARGET
 {
     material_info material_info = fetch_material_info(pin.texcoord);
 
-    const float3 P = pin.position.xyz;
+    const float3 P = pin.position.xyz;//position in world
 
-    material_info.basecolor.a = 1.0;
+    material_info.basecolor.a = 1.0;//base color alpha
 
 
-    float3 V = normalize(camera_constants.position.xyz - pin.position.xyz);
+    float3 V = normalize(camera_constants.position.xyz - pin.position.xyz);//position->camera position(in world)
 
     float3 L = normalize(-light_direction.direction.xyz);
 
@@ -111,14 +117,16 @@ float4 main(VS_OUT pin) : SV_TARGET
      float3 T = float3(pin.tangent.xyz);
      float sigma = pin.tangent.w;
      T = normalize(T - N * dot(N, T));
-     float3 B = normalize(cross(N, T) * sigma);
-   
+     float3 B = normalize(cross(N, T) * sigma);//binormal
+
+    //normal
      float4 sampled = normal_map.Sample(sampler_states[LINEAR_WRAP], pin.texcoord);
      float3 normal_factor = sampled.xyz;
-     normal_factor = (normal_factor * 2.0) - 1.0;
+     normal_factor = (normal_factor * 2.0) - 1.0;//-1~1
      normal_factor = normalize(normal_factor * float3(1.0, 1.0, 1.0));
      N = normalize((normal_factor.x * T) + (normal_factor.y * B) + (normal_factor.z * N));
 
+    //pbr
      return physically_based_rendering(material_info, L, V, N, P);
 
 }

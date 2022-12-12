@@ -144,7 +144,7 @@ PS_OUT main(VS_OUT pin)
 	ret.Position = pin.position;
 	float dist = length(pin.position - camera_constants.position);
     ret.Depth = float4(dist, 0, 0, 1);
-	ret.RM = float4(1.0,0.0,0.0,0.0);
+	ret.RM = float4(0.0,0.0,0.0,1.0);
 
 	ret.Shadow_param = float4(255.0f * shadow_reciever, 255.0f * shadow_reciever, 255.0f * shadow_reciever, 255.0f * shadow_reciever);
 	return ret;

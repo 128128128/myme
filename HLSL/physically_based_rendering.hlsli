@@ -18,7 +18,11 @@
 //     https://www.cs.virginia.edu/~jdl/bib/appearance/analytic%20models/schlick94b.pdf
 // [5] "KHR_materials_clearcoat"
 //     https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Khronos/KHR_materials_clearcoat
-
+//physically based rendering
+/////L... -light direction 
+////V...position->camera position(in world)
+////N...normalize normal
+///P....world position
 float4 physically_based_rendering(material_info material_info, float3 L, float3 V, float3 N, float3 P)
 {
 	float3 f_specular = 0.0;
@@ -30,9 +34,11 @@ float4 physically_based_rendering(material_info material_info, float3 L, float3 
 
 	float albedo_sheen_scaling = 1.0;
 	// Calculate lighting contribution from image based lighting source (IBL)
-	if (image_based_lighting > 0)
+	if (image_based_lighting > 0)//bool ibl
 	{
+		//lambert
 		f_diffuse += ibl_radiance_lambertian(N, V, material_info.perceptual_roughness, material_info.c_diff, material_info.f0, material_info.specular_weight);
+		//specular
 		f_specular += ibl_radiance_ggx(N, V, material_info.perceptual_roughness, material_info.f0, material_info.specular_weight);
 
 	}
@@ -40,17 +46,19 @@ float4 physically_based_rendering(material_info material_info, float3 L, float3 
 		float3 R = reflect(-L, N);
 		float3 H = normalize(V + L);
 
-		float NoL = max(0.0, dot(N, L));
-		float NoH = max(0.0, dot(N, H));
-		float HoV = max(0.0, dot(H, V));
-		float NoV = max(0.0, dot(N, V));
+		float NoL = max(0.0, dot(N, L));//dot normal Vec*light Vec
+		float NoH = max(0.0, dot(N, H));//dot normal Vec*half Vec
+		float HoV = max(0.0, dot(H, V));//dot half Vec*eye Vec
+		float NoV = max(0.0, dot(N, V));//dot normal Vec*eye Vec
 
 		float3 Li = pure_white;
 		if (NoL > 0.0 || NoV > 0.0)
 		{
-			// Calculation of analytical light
+			// Calculation of analytical light//ï™êÕåıÇÃéZèo
 			// https://github.com/KhronosGroup/glTF/tree/master/specification/2.0#acknowledgments AppendixB
+			//lambert
 			f_diffuse += Li * NoL * brdf_lambertian(material_info.f0, material_info.f90, material_info.c_diff, material_info.specular_weight, HoV);
+			//specular
 			f_specular += Li * NoL * brdf_specular_ggx(material_info.f0, material_info.f90, material_info.alpha_roughness, material_info.specular_weight, HoV, NoL, NoV, NoH);
 
 		}

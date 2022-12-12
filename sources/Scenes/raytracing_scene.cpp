@@ -1,11 +1,11 @@
-#include "game_scene.h"
+#include "raytracing_scene.h"
 #include "../Math/collision.h"
 
 using namespace DirectX;
 
-bool game_scene::initialize(ID3D11Device* device, CONST LONG screen_width, CONST LONG screen_height)
+bool raytracing_scene::initialize(ID3D11Device* device, CONST LONG screen_width, CONST LONG screen_height)
 {
-    //blend state
+	//blend state
 	blend_states[NONE] = std::make_unique<Descartes::blend_state>(device, BLEND_MODE::NONE);
 	blend_states[ALPHA] = std::make_unique<Descartes::blend_state>(device, BLEND_MODE::ALPHA);
 	blend_states[ADD] = std::make_unique<Descartes::blend_state>(device, BLEND_MODE::ADD);
@@ -27,17 +27,17 @@ bool game_scene::initialize(ID3D11Device* device, CONST LONG screen_width, CONST
 	depth_stencil_states[ZT_OFF_ZW_ON] = std::make_unique<Descartes::depth_stencil_state>(device, FALSE, D3D11_DEPTH_WRITE_MASK_ALL, D3D11_COMPARISON_LESS);
 	depth_stencil_states[ZT_OFF_ZW_OFF] = std::make_unique<Descartes::depth_stencil_state>(device, FALSE, D3D11_DEPTH_WRITE_MASK_ZERO, D3D11_COMPARISON_LESS);
 
-			if (!player)
-			{
-				player = std::make_unique<Player>();
-				// player->player=std::make_unique<dynamic_mesh>(device, ".\\resources\\nico.fbx");
-				player->player = std::make_unique<dynamic_mesh>(device, ".\\resources\\rock_girl\\rock_girl.fbx", true);
-				//player->player= std::make_unique<pbr_dynamic_mesh>(device, ".\\resources\\objects\\chest\\chest1.fbx", ".\\resources\\objects\\chest\\WoodChest_Wood_Chest_MetallicSmoothness.png");
-				pbr_ship = std::make_unique<pbr_Stage>(device);
-				//pbr_ship_1 = std::make_unique<pbr_Stage>(device);
-				//pbr_ship_1->position.z += 5.5f;
-				pbr_ship->position = XMFLOAT4{ -91.6f, -9.0f, - 60.0f,0.0f };
-			}
+	if (!player)
+	{
+		player = std::make_unique<Player>();
+		// player->player=std::make_unique<dynamic_mesh>(device, ".\\resources\\nico.fbx");
+		player->player = std::make_unique<dynamic_mesh>(device, ".\\resources\\rock_girl\\rock_girl.fbx", true);
+		//player->player= std::make_unique<pbr_dynamic_mesh>(device, ".\\resources\\objects\\chest\\chest1.fbx", ".\\resources\\objects\\chest\\WoodChest_Wood_Chest_MetallicSmoothness.png");
+		//pbr_ship = std::make_unique<pbr_Stage>(device);
+		//pbr_ship_1 = std::make_unique<pbr_Stage>(device);
+		//pbr_ship_1->position.z += 5.5f;
+		//pbr_ship->position.z -= 5.5f;
+	}
 
 	//to factory model
 			/*if (!ground)
@@ -52,64 +52,64 @@ bool game_scene::initialize(ID3D11Device* device, CONST LONG screen_width, CONST
 			//}
 
 
-			if(!terrains)
-			{
-				terrains = std::make_unique<Terrain>(device,true);
-			}
+	if (!terrains)
+	{
+		terrains = std::make_unique<Terrain>(device, true);
+	}
 
-			if (!rocks)
-			{
-				rocks = std::make_unique<Rocks>(device,true);
-			}
-            if (!trees)
-			{
-				trees = std::make_unique<Trees>(device);
-				shadow_trees = std::make_unique<Ground>();
-				shadow_trees->mesh = std::make_unique<static_mesh>(device, ".\\resources\\enviroments\\trees\\tree_T.fbx");
-			}
-            if (!water_fall)
-			{
-				water_fall = std::make_unique<Water_Fall>(device);
-			}
-            if (!water)
-			{
-				water = std::make_unique<Water>(device);
-			}
-			/*if (!structures)
-			{
-				structures = std::make_unique<Structures>(device);
-			}*/
-			/*if(!vegetation_small)
-			{
-				vegetation_small = std::make_unique < VegetationSmall > (device);
-			}*/
-			//if (!sky)
-			//{
-			//	sky = std::make_unique<skydome>();
-			//	//skydome->skydome = std::make_unique<static_mesh>(device, ".\\resources\\Model\\Skydome\\skydome.fbx");
-			//	sky->Initialize(device);
-			//}
+	if (!rocks)
+	{
+		rocks = std::make_unique<Rocks>(device, true);
+	}
+	if (!trees)
+	{
+		trees = std::make_unique<Trees>(device);
+		shadow_trees = std::make_unique<Ground>();
+		shadow_trees->mesh = std::make_unique<static_mesh>(device, ".\\resources\\enviroments\\trees\\tree_T.fbx");
+	}
+	if (!water_fall)
+	{
+		water_fall = std::make_unique<Water_Fall>(device);
+	}
+	if (!water)
+	{
+		water = std::make_unique<Water>(device);
+	}
+	/*if (!structures)
+	{
+		structures = std::make_unique<Structures>(device);
+	}*/
+	/*if(!vegetation_small)
+	{
+		vegetation_small = std::make_unique < VegetationSmall > (device);
+	}*/
+	//if (!sky)
+	//{
+	//	sky = std::make_unique<skydome>();
+	//	//skydome->skydome = std::make_unique<static_mesh>(device, ".\\resources\\Model\\Skydome\\skydome.fbx");
+	//	sky->Initialize(device);
+	//}
 
-			if (!eye_space_camera)
-			{
-				eye_space_camera = std::make_unique<camera>(device);
-				
-				//eye_space_camera->reset(player->position, player->direction, focal_length, 0.8f/*height_above_ground*/);
-			}
-			if (!light_space_camera)
-			{
-				light_space_camera = std::make_unique<camera>(device);
-			}
+	if (!eye_space_camera)
+	{
+		eye_space_camera = std::make_unique<camera>(device);
 
-    framebuffers[0] = std::make_unique<Descartes::framebuffer>(device, screen_width, screen_height, DXGI_FORMAT_R16G16B16A16_FLOAT, DXGI_FORMAT_R24G8_TYPELESS);
+		//eye_space_camera->reset(player->position, player->direction, focal_length, 0.8f/*height_above_ground*/);
+	}
+	if (!light_space_camera)
+	{
+		light_space_camera = std::make_unique<camera>(device);
+	}
+
+	framebuffers[0] = std::make_unique<Descartes::framebuffer>(device, screen_width, screen_height, DXGI_FORMAT_R16G16B16A16_FLOAT, DXGI_FORMAT_R24G8_TYPELESS);
 	framebuffers[1] = std::make_unique<Descartes::framebuffer>(device, screen_width, screen_height, DXGI_FORMAT_R16G16B16A16_FLOAT, DXGI_FORMAT_R24G8_TYPELESS);
 	framebuffers[2] = std::make_unique<Descartes::framebuffer>(device, screen_width, screen_height, DXGI_FORMAT_R16G16B16A16_FLOAT, DXGI_FORMAT_UNKNOWN);
 	shadowmap = std::make_unique<Descartes::framebuffer>(device, 1024 * 5, 1024 * 5, DXGI_FORMAT_R32G32_FLOAT/*not needed*/, DXGI_FORMAT_R32_TYPELESS);
-    shadowmap_df = std::make_unique <shadow_map>();
-    shadowmap_df->initialize(device);
+	shadowmap_df = std::make_unique <shadow_map>();
+	shadowmap_df->initialize(device);
 	DirectX::XMFLOAT3 dir = { 0.0f, -1.0f, 1.0f };
 	screen = std::make_unique <gbuffer>();
-	screen->initialize(device,dir);
+	screen->initialize(device, dir);
 
 	//effects
 	{
@@ -154,7 +154,7 @@ bool game_scene::initialize(ID3D11Device* device, CONST LONG screen_width, CONST
 		light_constants_buffer = std::make_unique<Descartes::constant_buffer<light_constants>>(device);
 		renderer_constants_buffer = std::make_unique<Descartes::constant_buffer<renderer_constants>>(device);
 
-		d_shadow_constant_buffer = std::make_unique < Descartes::constant_buffer <d_shadow_param >> (device);
+		d_shadow_constant_buffer = std::make_unique < Descartes::constant_buffer <d_shadow_param >>(device);
 	}
 
 	//particles
@@ -166,7 +166,7 @@ bool game_scene::initialize(ID3D11Device* device, CONST LONG screen_width, CONST
 	return true;
 }
 
-const char* game_scene::update(float& elapsed_time/*Elapsed seconds from last frame*/)
+const char* raytracing_scene::update(float& elapsed_time/*Elapsed seconds from last frame*/)
 {
 	GamePad& gamePad = Input::Instance().GetGamePad();
 
@@ -174,7 +174,7 @@ const char* game_scene::update(float& elapsed_time/*Elapsed seconds from last fr
 	scene_constants_buffer->data.player_object.position = player->position;
 	scene_constants_buffer->data.player_object.direction = player->direction;
 
-	pbr_ship->update(elapsed_time);
+	//pbr_ship->update(elapsed_time);
 	//pbr_ship_1->update(elapsed_time);
 	//ground->update(elapsed_time);
 	terrains->update(elapsed_time);
@@ -193,7 +193,7 @@ const char* game_scene::update(float& elapsed_time/*Elapsed seconds from last fr
 	else
 	{
 		//eye_space_camera->update(player->position, elapsed_time);
-		eye_space_camera->firstperson_update(elapsed_time,DirectX::XMFLOAT4(player->position.x,player->position.y+2.0f ,player->position.z+player->direction.z*0.1f,0));
+		eye_space_camera->firstperson_update(elapsed_time, DirectX::XMFLOAT4(player->position.x, player->position.y + 2.0f, player->position.z + player->direction.z * 0.1f, 0));
 	}
 
 
@@ -203,10 +203,10 @@ const char* game_scene::update(float& elapsed_time/*Elapsed seconds from last fr
 	//ImGui::Checkbox("lens_flare", &enable_lens_flare);
 
 	//point light options
-    /* ImGui::SliderFloat3("point_position", &light_constants_buffer->data.point_light.position.x, -100.0f, 100.0f);
-    ImGui::SliderFloat("point_range", &light_constants_buffer->data.point_light.range, 0.0f, 100.0f);
+	/* ImGui::SliderFloat3("point_position", &light_constants_buffer->data.point_light.position.x, -100.0f, 100.0f);
+	ImGui::SliderFloat("point_range", &light_constants_buffer->data.point_light.range, 0.0f, 100.0f);
 	ImGui::ColorPicker4("point_color", &light_constants_buffer->data.point_light.color.x, 0);*/
-	
+
 	//spot light options
 	//ImGui::SliderFloat3("spot_position", &light_constants_buffer->data.spot_light.position.x, -100.0f, 100.0f);
 	//ImGui::SliderFloat3("spot_direction", &light_constants_buffer->data.spot_light.direction.x, -1.0f, 1.0f);
@@ -224,7 +224,7 @@ const char* game_scene::update(float& elapsed_time/*Elapsed seconds from last fr
 	return 0;
 }
 
-void game_scene::render(ID3D11DeviceContext* immediate_context, float elapsed_time/*Elapsed seconds from last frame*/)
+void raytracing_scene::render(ID3D11DeviceContext* immediate_context, float elapsed_time/*Elapsed seconds from last frame*/)
 {
 	rasterizer_states[SOLID]->active(immediate_context);
 	blend_states[ALPHA]->active(immediate_context);
@@ -243,7 +243,7 @@ void game_scene::render(ID3D11DeviceContext* immediate_context, float elapsed_ti
 	float aspect_ratio{ viewport.Width / viewport.Height };
 
 	time += elapsed_time;
-	triple_speed_time += elapsed_time*3.0f;
+	triple_speed_time += elapsed_time * 3.0f;
 	scene_constants_buffer->data.cb_somthing.iTime = time;
 	scene_constants_buffer->data.cb_somthing.triple_speed_iTime = triple_speed_time;
 	scene_constants_buffer->data.cb_somthing.elapse_time = elapsed_time;
@@ -310,12 +310,12 @@ void game_scene::render(ID3D11DeviceContext* immediate_context, float elapsed_ti
 	screen->active(immediate_context);
 
 	eye_space_camera->aspect_ratio = aspect_ratio;
-	eye_space_camera->active(immediate_context, 1, true, true,false,false);
+	eye_space_camera->active(immediate_context, 1, true, true, false, false);
 
 	//view frustum
-	const Descartes::view_frustum view_frustum(eye_space_camera->view_projection(),eye_space_camera->inverse_view_projection());
+	const Descartes::view_frustum view_frustum(eye_space_camera->view_projection(), eye_space_camera->inverse_view_projection());
 
-    //renderer_constants_buffer->active(immediate_context, 3, true, true);
+	//renderer_constants_buffer->active(immediate_context, 3, true, true);
 	//light_constants_buffer->active(immediate_context, 4, true, true);
 
 	d_shadow_constant_buffer->data.light_view_projection = light_space_camera->view_projection();
@@ -323,11 +323,11 @@ void game_scene::render(ID3D11DeviceContext* immediate_context, float elapsed_ti
 	//objects render
 	{
 		//sky
-		white->render(immediate_context, 0, 0, 1280, 720, 1, 1, 1, 1, 0);
+		//white->render(immediate_context, 0, 0, 1280, 720, 1, 1, 1, 1, 0);
 		//water
-	    water->render(immediate_context);
+		water->render(immediate_context);
 
-		trees->render(immediate_context);
+		//trees->render(immediate_context);
 
 		//dynamic_mesh_vs->active(immediate_context);
 		//dynamic_mesh_ps->active(immediate_context);
@@ -337,11 +337,11 @@ void game_scene::render(ID3D11DeviceContext* immediate_context, float elapsed_ti
 		//dynamic_mesh_ps->inactive(immediate_context);
 
 		//pbr
-		pbr_dynamic_mesh_ps->active(immediate_context);
+		/*pbr_dynamic_mesh_ps->active(immediate_context);
 		pbr_static_mesh_vs->active(immediate_context);
 		pbr_ship->render(immediate_context);
 		pbr_static_mesh_vs->inactive(immediate_context);
-		pbr_dynamic_mesh_ps->inactive(immediate_context);
+		pbr_dynamic_mesh_ps->inactive(immediate_context);*/
 
 		//skydome
 		//skydome_vs->active(immediate_context);
@@ -359,12 +359,12 @@ void game_scene::render(ID3D11DeviceContext* immediate_context, float elapsed_ti
 		//static_mesh_vs->inactive(immediate_context);
 
 		//terrain renderer
-		terrains->render(immediate_context,view_frustum);
+		//terrains->render(immediate_context,view_frustum);
 		//structures->render(immediate_context,view_frustum);
 		//vegetation_small->render(immediate_context);
 
-		rocks->render(immediate_context);
-		water_fall->render(immediate_context);
+		//rocks->render(immediate_context);
+		//water_fall->render(immediate_context);
 
 		// Snowfall particles drawing process
 		//depth_stencil_states[ZT_ON_ZW_ON]->inactive(immediate_context);
@@ -377,7 +377,7 @@ void game_scene::render(ID3D11DeviceContext* immediate_context, float elapsed_ti
 		//depth_stencil_states[ZT_ON_ZW_OFF]->inactive(immediate_context);
 		//depth_stencil_states[ZT_ON_ZW_ON]->active(immediate_context);
 
-		
+
 		//point light mesh render
 		/*static_mesh_vs->active(immediate_context);
 		point_light_mesh_ps->active(immediate_context);
@@ -389,28 +389,28 @@ void game_scene::render(ID3D11DeviceContext* immediate_context, float elapsed_ti
 		//#ifdef 0
 	/*		static_mesh_vs->active(immediate_context);
 			spot_light_mesh_ps->active(immediate_context);
-			
+
 			static_mesh_vs->inactive(immediate_context);
 			spot_light_mesh_ps->inactive(immediate_context);*/
 
-	//#endif
+			//#endif
 
-	//lim_light for static mesh
-	//lim_light_vs->active(immediate_context);
-	//lim_light_ps->active(immediate_context);
-	//lim_light_vs->inactive(immediate_context);
-	//lim_light_ps->inactive(immediate_context);
+			//lim_light for static mesh
+			//lim_light_vs->active(immediate_context);
+			//lim_light_ps->active(immediate_context);
+			//lim_light_vs->inactive(immediate_context);
+			//lim_light_ps->inactive(immediate_context);
 
-	//hemisphere light
-	/*static_mesh_vs->active(immediate_context);
-	hemi_light_ps->active(immediate_context);
-	hemi_light_ps->inactive(immediate_context);
-	static_mesh_vs->inactive(immediate_context);*/
+			//hemisphere light
+			/*static_mesh_vs->active(immediate_context);
+			hemi_light_ps->active(immediate_context);
+			hemi_light_ps->inactive(immediate_context);
+			static_mesh_vs->inactive(immediate_context);*/
 
-	//sprite
+			//sprite
 
 		screen->inactive(immediate_context);
-	
+
 		//framebuffers[0]->inactive(immediate_context);
 
 		if (enable_post_effects)
@@ -486,8 +486,8 @@ void game_scene::render(ID3D11DeviceContext* immediate_context, float elapsed_ti
 	screen->DebugDrawGUI();
 	light_manager::instance().DrawDebugGUI();
 	//pbr_ship_1->DebugDrawGUI();
-	pbr_ship->DebugDrawGUI();
-    ImGui::Render();
+	//pbr_ship->DebugDrawGUI();
+	ImGui::Render();
 
 	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 

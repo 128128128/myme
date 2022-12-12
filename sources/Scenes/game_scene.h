@@ -91,7 +91,7 @@ public:
 
 	//objects
 	std::unique_ptr<Player> player;
-	//std::unique_ptr<pbr_Stage>pbr_ship;
+	std::unique_ptr<pbr_Stage>pbr_ship;
 	//std::unique_ptr<pbr_Stage>pbr_ship_1;
 	//std::unique_ptr<Ground>ground;//factory
 	//std::unique_ptr<dynamic_mesh> test;

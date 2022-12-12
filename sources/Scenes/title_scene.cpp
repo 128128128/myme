@@ -323,10 +323,20 @@ void title_scene::render(ID3D11DeviceContext* immediate_context, float elapsed_t
 	immediate_context->OMGetRenderTargets(1, default_render_target_view.ReleaseAndGetAddressOf(), default_depth_stencil_view.ReleaseAndGetAddressOf());
 	immediate_context->OMSetRenderTargets(1, default_render_target_view.GetAddressOf(), default_depth_stencil_view.Get());
 
+	Mouse& mouse = Input::Instance().GetMouse();
+
+	shader_constants shader_data = {};
 	time += elapsed_time;
 	shader_data.time = time;
+	shader_data.mouse.x = mouse.GetPositionX();
+	shader_data.mouse.y = mouse.GetPositionY();
+	if (mouse.GetButtonDown() & Mouse::BTN_LEFT)
+		shader_data.mouse.z = 1.0f;
+	else
+		shader_data.mouse.z = 0.0f;
+
 	immediate_context->UpdateSubresource(constant_buffers[1].Get(), 0, 0, &shader_data, 0, 0);
-	immediate_context->PSSetConstantBuffers(4, 1, constant_buffers[1].GetAddressOf());
+	immediate_context->PSSetConstantBuffers(5, 1, constant_buffers[1].GetAddressOf());
 	//noise rendering
 	back->render(immediate_context, 0, 0, 1280, 720, 1, 1, 1, 1, 0);
 

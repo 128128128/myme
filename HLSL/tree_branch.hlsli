@@ -40,10 +40,10 @@ cbuffer WIND_CONSTANTS:register(b5)
 
 Texture2D wind_vectors:register(t4);
 
-#define _AmbientOcclusion 0
-#define _HueVariation float4(1, 0.5, 0, 0.184)
-#define _TransmissionColor float4(1,1,1,0)
-#define _AmbientOcclusion 1
-#define _GradientBrightness 1
-#define _Smoothness 0
-#define _LightColor0 float4(1,1,1,1)
+#define AmbientOcclusion 0
+#define HueVariation float4(1, 0.5, 0, 0.184)
+#define TransmissionColor float4(1,1,1,0)
+#define AmbientOcclusion 1
+#define GradientBrightness 1
+#define Smoothness 0
+#define LightColor0 float4(1,1,1,1)

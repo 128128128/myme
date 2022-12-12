@@ -24,14 +24,14 @@ struct material_info
 	float4 basecolor;
 
 	float ior;
-	float perceptual_roughness; // roughness value, as authored by the model creator (input to shader)
+	float perceptual_roughness; // roughness value, as authored by the model creator (input to shader)//モデル作成者に制作されたラフネスの値
 	float3 f0; // full reflectance color (n incidence angle)
 
-	float alpha_roughness; // roughness mapped to a more linear change in the roughness (proposed by [2])
+	float alpha_roughness; // roughness mapped to a more linear change in the roughness (proposed by [2])//粗さがより直線的に変化するようにマッピングされている
 	float3 c_diff;
 
-	float3 f90; // reflectance color at grazing angle
-	float metallic;
+	float3 f90; // reflectance color at grazing angle////かすむ寸前の角度でのカラー
+	float metallic;//metallic param
 
 	float occlusion_factor;
 	float occlusion_strength;

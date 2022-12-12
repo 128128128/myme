@@ -28,21 +28,21 @@ void light_manager::register_light(std::string name, std::shared_ptr<light> ligh
 {
 	//ID
 	int id = 0;
-	//元の名前
+	//original name
 	std::string  unique_name = name;
 	for (auto& l : lights)
 	{
-		//もし名前がかぶっていたら
+		//if there is same name 
 		if (name == l.first)
 		{
-			//元の名前の後ろに数字を付け足す
+			//Add a number after the original name
 			id++;
 			name = unique_name + std::to_string(id);
 		}
 	}
-	//マップに登録
+	//register light
 	lights[name] = light;
-	//ライトに変更した名前を登録
+	//register light name
 	light->name = name;
 }
 
@@ -58,14 +58,14 @@ void light_manager::draw(ID3D11DeviceContext* immediate_context, ID3D11ShaderRes
 	//normal light draw
 	for (auto& light : lights)
 	{
-		//リンクが切れていないかチェック
+		//Check for broken links
 		if (!light.second.expired())
 		{
-			//監視しているライトの関数処理
+			//Function processing of monitored lights
 			light.second.lock()->light_constants->active(immediate_context, 2,true,true);
 			light_screen->blit(immediate_context, rtv, 0 , rtv_num, dir_light_ps.Get());
 		}
-		//要素がないのにmapの領域をとっているときに警告を出す
+		//Warn when an element is taking the map area even though it is not there.
 		_ASSERT_EXPR(!light.second.expired(), L"light_mapにnullptrが存在しています\n delete_light()を呼び忘れている可能性があります");
 	}
 }
@@ -93,6 +93,6 @@ void light_manager::DrawDebugGUI()
 //delete lights
 void light_manager::delete_light(std::string name)
 {
-	//指定のキーの要素をマップから削除
+	//Removes elements of a given key from the map
 	lights.erase(name);
 }

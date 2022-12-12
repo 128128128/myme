@@ -39,6 +39,6 @@ private:
 	Microsoft::WRL::ComPtr<ID3D11PixelShader> dir_light_shadow_ps;
 	Microsoft::WRL::ComPtr<ID3D11PixelShader> dir_light_ps;
 
-	bool display_imgui = false;
+	bool display_imgui = true;
 
 };

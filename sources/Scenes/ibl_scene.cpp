@@ -54,6 +54,7 @@ bool ibl_scene::initialize(ID3D11Device* device, CONST LONG screen_width, CONST 
 				pbr_ship_1 = std::make_unique<pbr_Stage>(device);
 				//pbr_ship_1->position = DirectX::XMFLOAT4(-14.286f, 16.204f, 24.0f, 1.0f );
 				pbr_ship_1->position = DirectX::XMFLOAT4(-2.0f, 0.0f, 0.0f, 1.0f );
+				
 			}
 		
 
@@ -284,6 +285,7 @@ const char* ibl_scene::update(float& elapsed_time/*Elapsed seconds from last fra
 
 	pbr_ship->update(elapsed_time);
 	pbr_ship_1->update(elapsed_time);
+
 	//ground->update(elapsed_time);
 	//vegetation_small->update(elapsed_time);
 	sky->update(elapsed_time);
@@ -494,7 +496,7 @@ void ibl_scene::render(ID3D11DeviceContext* immediate_context, float elapsed_tim
 		static_mesh_ps->inactive(immediate_context);
 		static_mesh_vs->inactive(immediate_context);
 
-	
+
 		//terrain renderer
 		//if (!enable_grasss)
 	
