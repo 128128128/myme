@@ -64,34 +64,27 @@ void Water_Fall::render(ID3D11DeviceContext* immediate_context)
 	vs->inactive(immediate_context);
 }
 
-void Water_Fall::DebugDrawGUI()
+void Water_Fall::DebugDrawGUI(bool flag)
 {
-#ifdef _DEBUG
+	if (flag)
+	{
 	ImGui::SetNextWindowPos(ImVec2(10, 10), ImGuiCond_FirstUseEver);
 	ImGui::SetNextWindowSize(ImVec2(300, 300), ImGuiCond_FirstUseEver);
 
-	if (ImGui::Begin("Terrain", nullptr, ImGuiWindowFlags_None))
+	if (ImGui::Begin("water_fall", nullptr, ImGuiWindowFlags_None))
 	{
-		//transform
-		if (ImGui::CollapsingHeader("Transform", ImGuiTreeNodeFlags_DefaultOpen))
-		{
-			//position
-			ImGui::SliderFloat3("Position", &this->position.x, -100.0f, 100.0f);
-			//Scale
-			ImGui::InputFloat3("Scale", &this->scale.x);
-		}
 		//constant buffer
-		if (ImGui::CollapsingHeader("Texture", ImGuiTreeNodeFlags_DefaultOpen))
+		if (ImGui::CollapsingHeader("Texture_param", ImGuiTreeNodeFlags_DefaultOpen))
 		{
-			//ˆÊ’u
+			//speed
 			ImGui::SliderFloat("Speed", &water_fall_constants_buffer->data.speed, -1.0f, 1.0f);
 			//Scale
-			ImGui::SliderFloat("Offset", &water_fall_constants_buffer->data.offset,0.0f,1.0f);
+			ImGui::SliderFloat("Offset", &water_fall_constants_buffer->data.offset, 0.0f, 1.0f);
 			ImGui::Image(srv_shader_map.Get(), { 256,256 });
 			ImGui::Image(noise_map_1.Get(), { 256,256 });
 			ImGui::Image(noise_map_2.Get(), { 256,256 });
 		}
 	}
 	ImGui::End();
-#endif
+    }
 }

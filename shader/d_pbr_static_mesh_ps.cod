@@ -4,6 +4,16 @@
 //
 // Buffer Definitions: 
 //
+// cbuffer PBR_CONSTANTS
+// {
+//
+//   float metallic_factor;             // Offset:    0 Size:     4
+//   float roughness_factor;            // Offset:    4 Size:     4
+//   float pure_white;                  // Offset:    8 Size:     4
+//   float pad;                         // Offset:   12 Size:     4 [unused]
+//
+// }
+//
 // cbuffer CAMERA_CONSTANT_BUFFER
 // {
 //
@@ -33,6 +43,7 @@
 // normal_map                        texture  float4          2d             t3      1 
 // roughness_map                     texture  float4          2d             t6      1 
 // CAMERA_CONSTANT_BUFFER            cbuffer      NA          NA            cb1      1 
+// PBR_CONSTANTS                     cbuffer      NA          NA            cb4      1 
 //
 //
 //
@@ -60,6 +71,7 @@
 //
 ps_5_0
 dcl_globalFlags refactoringAllowed | skipOptimization
+dcl_constantbuffer CB4[1], immediateIndexed
 dcl_constantbuffer CB1[1], immediateIndexed
 dcl_sampler s1, mode_default
 dcl_sampler s2, mode_default
@@ -168,23 +180,27 @@ itof r3.yzw, l(0, 0, 0, 1)  // r3.y <- ret.Depth.y; r3.z <- ret.Depth.z; r3.w <-
 mov r3.x, r3.x  // r3.x <- ret.Depth.x
 
 #line 104
-sample_indexable(texture2d)(float,float,float,float) r4.x, v5.xyxx, t6.xyzw, s2
-mov r4.x, r4.x  // r4.x <- roughness
+sample_indexable(texture2d)(float,float,float,float) r4.x, v5.xyxx, t6.wxyz, s2
+mul r4.w, r4.x, cb4[0].y  // r4.w <- roughness
 
 #line 105
-sample_indexable(texture2d)(float,float,float,float) r4.z, v5.xyxx, t6.xywz, s2
-mov r4.z, r4.z  // r4.z <- metallic
+sample_indexable(texture2d)(float,float,float,float) r5.x, v5.xyxx, t6.xyzw, s2
+mul r4.x, r5.x, cb4[0].x  // r4.x <- metallic
 
 #line 106
-itof r4.yw, l(0, 0, 0, 1)  // r4.y <- ret.RM.y; r4.w <- ret.RM.w
-mov r4.x, r4.x  // r4.x <- ret.RM.x
-mov r4.z, r4.z  // r4.z <- ret.RM.z
+mov r4.y, cb4[0].z  // r4.y <- white
 
-#line 108
+#line 107
+itof r4.z, l(0)  // r4.z <- ret.RM.z
+mov r4.x, r4.x  // r4.x <- ret.RM.x
+mov r4.y, r4.y  // r4.y <- ret.RM.y
+mov r4.w, r4.w  // r4.w <- ret.RM.w
+
+#line 109
 mov o0.xyzw, r0.xyzw
 mov o1.xyzw, r3.xyzw
 mov o2.xyzw, r1.xyzw
 mov o3.xyzw, r2.xyzw
 mov o4.xyzw, r4.xyzw
 ret 
-// Approximately 61 instruction slots used
+// Approximately 63 instruction slots used

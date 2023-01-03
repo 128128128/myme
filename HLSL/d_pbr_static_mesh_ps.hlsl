@@ -101,9 +101,10 @@ PS_OUT main(VS_OUT pin)
 	ret.Position = pin.position;
 	float dist = length(pin.position - camera_constants.position);
 	ret.Depth = float4(dist, 0, 0, 1);
-	float roughness = roughness_map.Sample(anisotropic_sampler_state, pin.texcoord).r;
-	float metallic = roughness_map.Sample(anisotropic_sampler_state, pin.texcoord).a;
-	ret.RM = float4(roughness, 0, metallic, 1);
+	float roughness = roughness_factor* roughness_map.Sample(anisotropic_sampler_state, pin.texcoord).a;
+	float metallic = metallic_factor * roughness_map.Sample(anisotropic_sampler_state, pin.texcoord).r;
+	float white = pure_white;
+	ret.RM = float4(metallic, white, 0, roughness);
 
 	return ret;
 

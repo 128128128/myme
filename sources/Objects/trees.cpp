@@ -73,7 +73,7 @@ void Trees::render(ID3D11DeviceContext* immediate_context)
 
 }
 
-void Trees::DebugDrawGUI()
+void Trees::DebugDrawGUI(bool flag)
 {
 	ImGui::SetNextWindowPos(ImVec2(10, 10), ImGuiCond_FirstUseEver);
 	ImGui::SetNextWindowSize(ImVec2(300, 300), ImGuiCond_FirstUseEver);

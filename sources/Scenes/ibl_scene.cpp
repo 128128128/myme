@@ -320,44 +320,7 @@ const char* ibl_scene::update(float& elapsed_time/*Elapsed seconds from last fra
 			}
 		}
 	}
-	//light direction
-	ImGui::SliderFloat4("light_direction", &scene_constants_buffer->data.directional_light.direction.x, -1.0f, 1.0f);
-	ImGui::SliderFloat4("light_color", &light_constants_buffer->data.point_light.color.x, 0,256.0f);
-
-	ImGui::SliderFloat("pure_white", &ibl.pure_white, 0.0f, +100.0f);
-	ImGui::SliderFloat("emissive_intensity", &ibl.emissive_intensity, 0.0f, +100.0f);
-	ImGui::SliderFloat("emissive_factor", &ibl.emissive_factor, 0.0f, +1.0f);
-	ImGui::SliderFloat("occlusion_factor", &ibl.occlusion_factor, 0.0f, +10.0f);
-	ImGui::SliderFloat("occlusion_strength", &ibl.occlusion_strength, 0.0f, +10.0f);
-	ImGui::SliderFloat("roughness_factor", &ibl.roughness_factor, 0.0f, +10.0f);
-	ImGui::SliderFloat("metallic_factor", &ibl.metallic_factor, 0.0f, +10.0f);
-	ImGui::Checkbox("image_based_lighting", reinterpret_cast<bool*>(&ibl.image_based_lighting));
-
-
-	//posteffects
-	ImGui::Checkbox("enable_post_effects", &enable_post_effects);
-	ImGui::Checkbox("post_blooming", &post_blooming);
-	ImGui::Checkbox("lens_flare", &enable_lens_flare);
-
-	//grass
-	ImGui::Checkbox("enable_grass", &enable_grasss);
-
-
-	//point light options
-   /* ImGui::SliderFloat3("point_position", &light_constants_buffer->data.point_light.position.x, -100.0f, 100.0f);
-    ImGui::SliderFloat("point_range", &light_constants_buffer->data.point_light.range, 0.0f, 100.0f);
-	ImGui::ColorPicker4("point_color", &light_constants_buffer->data.point_light.color.x, 0);*/
 	
-	//spot light options
-	//ImGui::SliderFloat3("spot_position", &light_constants_buffer->data.spot_light.position.x, -100.0f, 100.0f);
-	//ImGui::SliderFloat3("spot_direction", &light_constants_buffer->data.spot_light.direction.x, -1.0f, 1.0f);
-	//ImGui::SliderFloat("spot_range", &light_constants_buffer->data.spot_light.range, 0.0f, 500.0f);
-	//ImGui::ColorPicker3("spot_color", &light_constants_buffer->data.spot_light.color.x, 0);
-	//ImGui::SliderFloat("spot_angle", &light_constants_buffer->data.spot_light.angle, -180.0f,180.0f);
-
-	//camera
-	if (ImGui::Button("freeLook"))
-		freelook = !freelook;
 
 
 	if (gamePad.GetButton() & GamePad::BTN_B)
@@ -624,16 +587,78 @@ void ibl_scene::render(ID3D11DeviceContext* immediate_context, float elapsed_tim
 		
 	}
 
-	//vegetation_small->DebugDrawGUI();
-	sky->DrawDebugGUI();
-	eye_space_camera->DrawDebugGUI();
-	//ground->DebugDrawGUI();
-	player->DebugDrawGUI();
-	post_effects->DrawDebugGUI();
-	bloom_effect->DrawDebugGUI();
-	white->DebugDrawGUI();
-	pbr_ship_1->DebugDrawGUI();
-	pbr_ship->DebugDrawGUI();
+	
+
+	ImGui::SliderFloat("pure_white", &ibl.pure_white, 0.0f, +100.0f);
+	ImGui::SliderFloat("emissive_intensity", &ibl.emissive_intensity, 0.0f, +100.0f);
+	ImGui::SliderFloat("emissive_factor", &ibl.emissive_factor, 0.0f, +1.0f);
+	ImGui::SliderFloat("occlusion_factor", &ibl.occlusion_factor, 0.0f, +10.0f);
+	ImGui::SliderFloat("occlusion_strength", &ibl.occlusion_strength, 0.0f, +10.0f);
+	ImGui::SliderFloat("roughness_factor", &ibl.roughness_factor, 0.0f, +10.0f);
+	ImGui::SliderFloat("metallic_factor", &ibl.metallic_factor, 0.0f, +10.0f);
+	ImGui::Checkbox("image_based_lighting", reinterpret_cast<bool*>(&ibl.image_based_lighting));
+
+
+	//posteffects
+	ImGui::Checkbox("enable_post_effects", &enable_post_effects);
+	ImGui::Checkbox("post_blooming", &post_blooming);
+	ImGui::Checkbox("lens_flare", &enable_lens_flare);
+
+	//point light options
+   /* ImGui::SliderFloat3("point_position", &light_constants_buffer->data.point_light.position.x, -100.0f, 100.0f);
+	ImGui::SliderFloat("point_range", &light_constants_buffer->data.point_light.range, 0.0f, 100.0f);
+	ImGui::ColorPicker4("point_color", &light_constants_buffer->data.point_light.color.x, 0);*/
+
+	//spot light options
+	//ImGui::SliderFloat3("spot_position", &light_constants_buffer->data.spot_light.position.x, -100.0f, 100.0f);
+	//ImGui::SliderFloat3("spot_direction", &light_constants_buffer->data.spot_light.direction.x, -1.0f, 1.0f);
+	//ImGui::SliderFloat("spot_range", &light_constants_buffer->data.spot_light.range, 0.0f, 500.0f);
+	//ImGui::ColorPicker3("spot_color", &light_constants_buffer->data.spot_light.color.x, 0);
+	//ImGui::SliderFloat("spot_angle", &light_constants_buffer->data.spot_light.angle, -180.0f,180.0f);
+
+	//camera
+	if (ImGui::Button("freeLook"))
+		freelook = !freelook;
+
+	ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_FirstUseEver);
+	ImGui::SetNextWindowSize(ImVec2(1280, 100), ImGuiCond_FirstUseEver);
+
+	//ImGui::Begin("imgui", nullptr, ImGuiWindowFlags_MenuBar);
+
+	static bool test_im = false;
+
+	if (ImGui::BeginMainMenuBar())
+	{
+		if (ImGui::BeginMenu("light"))
+		{
+			ImGui::MenuItem("light_direction", NULL, &test_im);
+			ImGui::EndMenu();
+		}
+		ImGui::EndMainMenuBar();
+	}
+
+	//ImGui::End();
+		//sky->DrawDebugGUI();
+		//eye_space_camera->DrawDebugGUI();
+		//player->DebugDrawGUI();
+		//post_effects->DrawDebugGUI();
+		//bloom_effect->DrawDebugGUI();
+		//white->DebugDrawGUI();
+		//pbr_ship_1->DebugDrawGUI();
+		//pbr_ship->DebugDrawGUI();
+
+	if(test_im)
+	{
+		//if (ImGui::CollapsingHeader("Transform", ImGuiTreeNodeFlags_DefaultOpen))
+		//{
+		//	//light direction
+		//	ImGui::SliderFloat4("light_direction", &scene_constants_buffer->data.directional_light.direction.x, -1.0f, 1.0f);
+		//	ImGui::SliderFloat4("light_color", &light_constants_buffer->data.point_light.color.x, 0, 256.0f);
+		//}
+		ImGui::Begin("TEst");
+		ImGui::Text("aaaaaaaaaaaaaa");
+		ImGui::End();
+	}
     ImGui::Render();
 
 	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());

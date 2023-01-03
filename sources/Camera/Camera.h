@@ -72,7 +72,7 @@ public:
 	void set_target(const DirectX::XMFLOAT4& target) { this->target = target; };
 	void set_position(const DirectX::XMFLOAT4& position) { this->position = position; };
 
-	void DrawDebugGUI();
+	void DrawDebugGUI(bool flag=false);
 
 private:
 	DirectX::XMFLOAT4 target{ 0,0,0 ,0};

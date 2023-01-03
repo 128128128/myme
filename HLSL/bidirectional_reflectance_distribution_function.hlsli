@@ -131,19 +131,22 @@ float3 ibl_radiance_ggx(float3 N, float3 V, float roughness, float3 f0, float sp
 	return specular_weight * specular_light * fss_ess;
 }
 // specularWeight is introduced with KHR_materials_specular
-//ibl lambert
+//BRDFについては、lambertian拡散ローブとCook-Torrance microfacet model をスペキュラーローブに使用するという一般的なアプローチをとる
+//Image Based Lighting with Multiple Scattering//多重散乱法を利用したIBL
 float3 ibl_radiance_lambertian(float3 N, float3 V, float roughness, float3 diffuse_color, float3 f0, float specular_weight)
 {
 	float NoV = clamp(dot(N, V), 0.0, 1.0);
 	
 	float2 brdf_sample_point = clamp(float2(NoV, roughness), 0.0, 1.0);
 	//brdf...双方向反射率分布関数と呼ばれ、ある特定の角度から光を入射した時の反射光の角度分布特性を表す
+	//lut texture...color filter の用に利用する
 	float2 f_ab = sample_lut_ggx(brdf_sample_point).rg;
-	//Projection of the surrounding environment reflected by the normal//法線で反射した周囲環境を投影
+	//Projection of the surrounding environment reflected by the normal
+    //法線で反射した周囲環境を投影
 	float3 irradiance = sample_diffuse_iem(N).rgb;
 	
     // see https://bruop.github.io/ibl/#single_scattering_results at Single Scattering Results
-    // Roughness dependent fresnel, from Fdez-Aguera
+    // Roughness dependent fresnel, from Fdez-Aguera //Roughness 依存のフラネル
 	float3 fr = max(1.0 - roughness, f0) - f0;
 	float3 k_s = f0 + fr * pow(1.0 - NoV, 5.0);
 	float3 fss_ess = specular_weight * k_s * f_ab.x + f_ab.y; // <--- GGX / specular light contribution (scale it down if the specularWeight is low)

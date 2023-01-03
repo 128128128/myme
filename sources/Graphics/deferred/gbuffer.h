@@ -94,6 +94,9 @@ private:
 
 	//Shader	envlight;
 	Microsoft::WRL::ComPtr <ID3D11ShaderResourceView> env_shader_resource_view;
+	Microsoft::WRL::ComPtr <ID3D11ShaderResourceView> diffuse_shader_resource_view;
+	Microsoft::WRL::ComPtr <ID3D11ShaderResourceView> specular_shader_resource_view;
+	Microsoft::WRL::ComPtr <ID3D11ShaderResourceView> lut_ggx_shader_resource_view;
 
 	//Deferred
 	//Shader	dirlight;

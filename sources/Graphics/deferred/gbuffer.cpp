@@ -480,6 +480,10 @@ void gbuffer::initialize(ID3D11Device* device, DirectX::XMFLOAT3 dir)
 
 
 	load_texture_from_file(device, ".\\resources\\skymaps\\sky.png", env_shader_resource_view.GetAddressOf(), true, true);
+
+	load_texture_from_file(device, "./environments/sunset_jhbcentral_4k/diffuse_iem.dds", diffuse_shader_resource_view.GetAddressOf(), true, true);
+	load_texture_from_file(device, "./environments/sunset_jhbcentral_4k/specular_pmrem.dds", specular_shader_resource_view.GetAddressOf(), true, true);
+	load_texture_from_file(device, "./environments/lut_ggx.dds", lut_ggx_shader_resource_view.GetAddressOf(), true, true);
 }
 
 void gbuffer::active(ID3D11DeviceContext* immediate_context)
@@ -604,8 +608,13 @@ void gbuffer::lightning(ID3D11DeviceContext* immediate_context)
 	immediate_context->VSSetShader(differred_light_vs.Get(), nullptr, 0);
 	immediate_context->PSSetShaderResources(5, 1, srv_light.GetAddressOf());
 
+	immediate_context->PSSetShaderResources(33, 1, diffuse_shader_resource_view.GetAddressOf());
+	immediate_context->PSSetShaderResources(34, 1, specular_shader_resource_view.GetAddressOf());
+	immediate_context->PSSetShaderResources(35, 1, lut_ggx_shader_resource_view.GetAddressOf());
+	immediate_context->IASetInputLayout(input_layout.Get());
+
 	composite_ps->active(immediate_context);
-immediate_context->DrawIndexed(4, 0, 0);
+    immediate_context->DrawIndexed(4, 0, 0);
 	composite_ps->inactive(immediate_context);
 }
 
@@ -675,7 +684,7 @@ void gbuffer::DebugDrawGUI()
 			ImGui::Text("position");
 			ImGui::Image(srv_position.Get(), { 320,180 });
 			ImGui::Text("shadow_param");
-			ImGui::Image(srv_shadow_param.Get(), { 320,180 });
+			//ImGui::Image(srv_shadow_param.Get(), { 320,180 });
 			light_manager::instance().DrawDebugGUI();
 		}
 	}

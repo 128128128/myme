@@ -28,7 +28,7 @@ public:
 		direction.z = cosf(angle * 0.01745f);
 	}
 	//Debug
-	void DebugDrawGUI()override;
+	void DebugDrawGUI(bool flag = false)override;
 
 	//getter setter
 	XMFLOAT4 get_position() { return position; }

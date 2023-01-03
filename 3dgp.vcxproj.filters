@@ -315,6 +315,9 @@
     <ClCompile Include="sources\Scenes\raytracing_scene.cpp">
       <Filter>Sources\Scene</Filter>
     </ClCompile>
+    <ClCompile Include="HLSL\ibl_functions.cpp">
+      <Filter>HLSL\DifferredLight</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Sources\Scenes\scene.h">
@@ -639,6 +642,12 @@
     </None>
     <None Include="HLSL\title_back.hlsli">
       <Filter>HLSL\Sprites</Filter>
+    </None>
+    <None Include="HLSL\pbr_ibl_functions.hlsli">
+      <Filter>HLSL\DifferredLight</Filter>
+    </None>
+    <None Include="HLSL\material_info.hlsli">
+      <Filter>HLSL\DifferredLight</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

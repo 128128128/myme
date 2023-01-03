@@ -24,7 +24,7 @@
 ////N...normalize normal
 ///P....world position
 float4 physically_based_rendering(material_info material_info, float3 L, float3 V, float3 N, float3 P)
-{
+{ 
 	float3 f_specular = 0.0;
 	float3 f_diffuse = 0.0;
 	float3 f_emissive = 0.0;

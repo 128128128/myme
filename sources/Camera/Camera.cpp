@@ -323,23 +323,25 @@ void camera::set_view(const DirectX::XMFLOAT4& eye, const DirectX::XMFLOAT4& foc
 }
 
 //debug imgui
-void camera::DrawDebugGUI()
+void camera::DrawDebugGUI(bool flag)
 {
-	ImGui::SetNextWindowPos(ImVec2(10, 10), ImGuiCond_FirstUseEver);
-	ImGui::SetNextWindowSize(ImVec2(300, 300), ImGuiCond_FirstUseEver);
+	if (flag) {
+		ImGui::SetNextWindowPos(ImVec2(10, 10), ImGuiCond_FirstUseEver);
+		ImGui::SetNextWindowSize(ImVec2(300, 300), ImGuiCond_FirstUseEver);
 
-	if (ImGui::Begin("Camera", nullptr, ImGuiWindowFlags_None))
-	{
-		//transform
-		if (ImGui::CollapsingHeader("CameraTransform", ImGuiTreeNodeFlags_DefaultOpen))
+		if (ImGui::Begin("Camera", nullptr, ImGuiWindowFlags_None))
 		{
-			//position
-			ImGui::SliderFloat3("Position", &position.x, -100, 100);
-			//focus
-			ImGui::SliderFloat3("camerafocus", &focus.x, -180.0f, 180.0f);
+			//transform
+			if (ImGui::CollapsingHeader("CameraTransform", ImGuiTreeNodeFlags_DefaultOpen))
+			{
+				//position
+				ImGui::SliderFloat3("Position", &position.x, -100, 100);
+				//focus
+				ImGui::SliderFloat3("camerafocus", &focus.x, -180.0f, 180.0f);
 
+			}
 		}
+		ImGui::End();
 	}
-	ImGui::End();
 }
 

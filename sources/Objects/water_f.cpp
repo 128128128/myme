@@ -56,7 +56,7 @@ void Water_franel::render(ID3D11DeviceContext* immediate_context)
 	vs->inactive(immediate_context);
 }
 
-void Water_franel::DebugDrawGUI()
+void Water_franel::DebugDrawGUI(bool flag)
 {
 	ImGui::SetNextWindowPos(ImVec2(10, 10), ImGuiCond_FirstUseEver);
 	ImGui::SetNextWindowSize(ImVec2(300, 300), ImGuiCond_FirstUseEver);

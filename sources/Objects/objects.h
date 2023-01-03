@@ -22,7 +22,7 @@ public:
 	virtual void reset(XMFLOAT4& location) = 0;
 
 	//Debug
-	virtual void DebugDrawGUI() = 0;
+	virtual void DebugDrawGUI(bool flag=false) = 0;
 
 };
 
@@ -55,7 +55,7 @@ public:
 		direction.z = cosf(angle * 0.01745f);
 	}
 	//Debug
-	void DebugDrawGUI()override;
+	void DebugDrawGUI(bool flag = false)override;
 
 	//getter setter
 	XMFLOAT4 GetPosition() { return position; }
@@ -80,9 +80,10 @@ public:
 
 	struct pbr_constants
 	{
-		float mettallic = 1;
-		float smooth = 0;
-		DirectX::XMFLOAT2 pad = { 0.0f,0.0f };
+		float metallic = 1;
+		float roughness = 1;
+		float pure_white = 1;
+		float pad = 0.0f;
 	};
 	std::unique_ptr<Descartes::constant_buffer<pbr_constants>> pbr_constant_buffer;
 
@@ -96,7 +97,7 @@ public:
 
 	void render(ID3D11DeviceContext* immediate_context, ID3D11PixelShader* replaced_pixel_shader=nullptr)
 	{
-		pbr_constant_buffer->active(immediate_context, 3, true, true);
+		pbr_constant_buffer->active(immediate_context, 4, true, true);
 		//immediate_context->PSSetShaderResources(5, 1, r_srv.GetAddressOf());
 		//immediate_context->PSSetShaderResources(6, 1, m_srv.GetAddressOf());
 		mesh->render(immediate_context, world_transform, replaced_pixel_shader);
@@ -113,7 +114,7 @@ public:
 		direction.z = cosf(angle * 0.01745f);
 	}
 	//Debug
-	void DebugDrawGUI();
+	void DebugDrawGUI(bool flag=false);
 
 	//getter setter
 	XMFLOAT4 GetPosition() { return position; }

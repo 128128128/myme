@@ -103,6 +103,8 @@ float4 sample_transmission(float2 texcoord, float roughness, float ior)
 	
 	// Scale roughness with IOR so that an IOR of 1.0 results in no microfacet refraction and
     // an IOR of 1.5 results in the default amount of microfacet refraction.
+	//IOR を使って粗さをスケーリングし、IOR が 1.0 の場合はマイクロファセット屈折が発生せず
+	//IORが1.5の場合は、デフォルトのマイクロファセット屈折量になります。
 #if 0
 	float lod = log2(width) * roughness * clamp(ior * 2.0 - 2.0, 0.0, 1.0);
 #else

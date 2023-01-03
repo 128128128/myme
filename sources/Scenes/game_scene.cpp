@@ -470,12 +470,11 @@ void game_scene::render(ID3D11DeviceContext* immediate_context, float elapsed_ti
 	terrains->DebugDrawGUI();
 	rocks->DebugDrawGUI();
 	trees->DebugDrawGUI();
-	water_fall->DebugDrawGUI();
+	
 	//water->DebugDrawGUI();
 	//structures->DebugDrawGUI();
 	//vegetation_small->DebugDrawGUI();
 	//sky->DrawDebugGUI();
-	eye_space_camera->DrawDebugGUI();
 	//light_space_camera->DrawDebugGUI();
 	//ground->DebugDrawGUI();
 	//player->DebugDrawGUI();
@@ -486,7 +485,38 @@ void game_scene::render(ID3D11DeviceContext* immediate_context, float elapsed_ti
 	screen->DebugDrawGUI();
 	light_manager::instance().DrawDebugGUI();
 	//pbr_ship_1->DebugDrawGUI();
-	pbr_ship->DebugDrawGUI();
+
+	static bool pbr_ = false;
+	static bool w_fall = false;
+
+	static bool m_camera = false;
+
+	if (ImGui::BeginMainMenuBar())
+	{
+		//object
+		if (ImGui::BeginMenu("object"))
+		{
+			ImGui::MenuItem("pbr_obj", NULL, &pbr_);
+			ImGui::MenuItem("water_fall", NULL, &w_fall);
+			ImGui::EndMenu();
+		}
+
+		water_fall->DebugDrawGUI(w_fall);
+	    pbr_ship->DebugDrawGUI(pbr_);
+
+		//camera
+		if (ImGui::BeginMenu("camera"))
+		{
+			ImGui::MenuItem("main_camera", NULL, &m_camera);
+			ImGui::EndMenu();
+		}
+		eye_space_camera->DrawDebugGUI(m_camera);
+
+
+	    ImGui::EndMainMenuBar();
+	}
+
+
     ImGui::Render();
 
 	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());

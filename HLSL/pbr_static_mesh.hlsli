@@ -26,7 +26,8 @@ cbuffer OBJECT_CONSTANTS : register(b0)
 
 cbuffer PBR_CONSTANTS:register(b4)
 {
-	float metallic_param;
-	float smooth_param;
-	float2 pad;
+	float metallic_factor;
+	float roughness_factor;
+	float pure_white;
+	float pad;
 };

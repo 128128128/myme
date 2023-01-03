@@ -48,9 +48,8 @@ void Cube::update(float elapsed_time)
 
 }
 
-void Cube::DebugDrawGUI()
+void Cube::DebugDrawGUI(bool flag)
 {
-#ifdef _DEBUG
 	ImGui::SetNextWindowPos(ImVec2(10, 10), ImGuiCond_FirstUseEver);
 	ImGui::SetNextWindowSize(ImVec2(300, 300), ImGuiCond_FirstUseEver);
 
@@ -67,7 +66,6 @@ void Cube::DebugDrawGUI()
 		}
 	}
 	ImGui::End();
-#endif
 }
 
 pbr_Stage::pbr_Stage(ID3D11Device* device)
@@ -120,29 +118,37 @@ void pbr_Stage::update(float elapsed_time)
 
 }
 
-void pbr_Stage::DebugDrawGUI()
+void pbr_Stage::DebugDrawGUI(bool flag)
 {
-	ImGui::SetNextWindowPos(ImVec2(10, 10), ImGuiCond_FirstUseEver);
-	ImGui::SetNextWindowSize(ImVec2(300, 300), ImGuiCond_FirstUseEver);
-
-	if (ImGui::Begin("pbr_obj", nullptr, ImGuiWindowFlags_None))
+	
+	
+	if (flag)
 	{
-		
-		if (ImGui::CollapsingHeader("Transform", ImGuiTreeNodeFlags_DefaultOpen))
+		ImGui::SetNextWindowPos(ImVec2(10, 10), ImGuiCond_FirstUseEver);
+		ImGui::SetNextWindowSize(ImVec2(300, 300), ImGuiCond_FirstUseEver);
+
+		if (ImGui::Begin("pbr_obj", nullptr, ImGuiWindowFlags_None))
 		{
-			ImGui::SliderFloat3("Position", &this->position.x, -100.0f, 100.0f);
-			
-			ImGui::InputFloat3("Scale", &this->scale.x);
+			//Transform
+			if (ImGui::CollapsingHeader("Transform", ImGuiTreeNodeFlags_DefaultOpen))
+			{
+				ImGui::SliderFloat3("Position", &this->position.x, -100.0f, 100.0f);
+
+				ImGui::InputFloat3("Scale", &this->scale.x);
+			}
+			//pbr
+			if (ImGui::CollapsingHeader("MetallicRoughness", ImGuiTreeNodeFlags_DefaultOpen))
+			{
+				//RM
+				ImGui::SliderFloat("Metallic", &pbr_constant_buffer->data.metallic, 0.0f, 1.0f);
+				ImGui::SliderFloat("Roughness", &pbr_constant_buffer->data.roughness, 0.0f, 1.0f);
+				//pure white
+				ImGui::SliderFloat("pure_white", &pbr_constant_buffer->data.pure_white, 0.0f, +10.0f);
+
+			}
 		}
-		//pbr
-		if (ImGui::CollapsingHeader("MetallicSmooth", ImGuiTreeNodeFlags_DefaultOpen))
-		{
-			//metallic
-			ImGui::SliderFloat("Metallic", &pbr_constant_buffer->data.mettallic, 0.0f, 1.0f);
-			ImGui::SliderFloat("Smooth", &pbr_constant_buffer->data.smooth, 0.0f, 1.0f);
-		}
+		ImGui::End();
 	}
-	ImGui::End();
 }
 
 Ground::Ground()
