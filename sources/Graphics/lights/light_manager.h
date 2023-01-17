@@ -17,7 +17,7 @@ public:
 	//ƒ‰ƒCƒg‚ðG-Buffer‚É‘—‚é
 	void draw(ID3D11DeviceContext* immediate_context, ID3D11ShaderResourceView** rtv, int rtv_num);
 
-	void DrawDebugGUI();
+	void DrawDebugGUI(bool flag=false);
 
 	void delete_light(std::string name);
 

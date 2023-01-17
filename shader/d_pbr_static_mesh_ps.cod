@@ -163,8 +163,8 @@ mov r0.xyz, r0.xyzx  // r0.x <- ret.Color.x; r0.y <- ret.Color.y; r0.z <- ret.Co
 mov r0.w, r0.w  // r0.w <- ret.Color.w
 
 #line 100
-mov r1.w, l(0)
-mov r1.xyzw, r1.xyzw  // r1.x <- ret.Normal.x; r1.y <- ret.Normal.y; r1.z <- ret.Normal.z; r1.w <- ret.Normal.w
+mov r1.xyz, r1.xyzx  // r1.x <- ret.Normal.x; r1.y <- ret.Normal.y; r1.z <- ret.Normal.z
+mov r1.w, l(1.000000)  // r1.w <- ret.Normal.w
 
 #line 101
 mov r2.xyzw, v1.xyzw  // r2.x <- ret.Position.x; r2.y <- ret.Position.y; r2.z <- ret.Position.z; r2.w <- ret.Position.w
@@ -181,7 +181,7 @@ mov r3.x, r3.x  // r3.x <- ret.Depth.x
 
 #line 104
 sample_indexable(texture2d)(float,float,float,float) r4.x, v5.xyxx, t6.wxyz, s2
-mul r4.w, r4.x, cb4[0].y  // r4.w <- roughness
+mul r4.z, r4.x, cb4[0].y  // r4.z <- roughness
 
 #line 105
 sample_indexable(texture2d)(float,float,float,float) r5.x, v5.xyxx, t6.xyzw, s2
@@ -191,10 +191,8 @@ mul r4.x, r5.x, cb4[0].x  // r4.x <- metallic
 mov r4.y, cb4[0].z  // r4.y <- white
 
 #line 107
-itof r4.z, l(0)  // r4.z <- ret.RM.z
-mov r4.x, r4.x  // r4.x <- ret.RM.x
-mov r4.y, r4.y  // r4.y <- ret.RM.y
-mov r4.w, r4.w  // r4.w <- ret.RM.w
+mov r4.w, l(1.000000)
+mov r4.xyzw, r4.xyzw  // r4.x <- ret.RM.x; r4.y <- ret.RM.y; r4.z <- ret.RM.z; r4.w <- ret.RM.w
 
 #line 109
 mov o0.xyzw, r0.xyzw
@@ -203,4 +201,4 @@ mov o2.xyzw, r1.xyzw
 mov o3.xyzw, r2.xyzw
 mov o4.xyzw, r4.xyzw
 ret 
-// Approximately 63 instruction slots used
+// Approximately 61 instruction slots used

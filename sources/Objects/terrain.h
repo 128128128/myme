@@ -21,7 +21,7 @@ public:
 
 
 	//Debug
-	void DebugDrawGUI();
+	void DebugDrawGUI(bool flag=false);
 
 	//getter setter
 	XMFLOAT4 get_position() { return position; }

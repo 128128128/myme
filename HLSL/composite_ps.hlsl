@@ -58,7 +58,11 @@ Texture2D envTexture : register(t15);
 //    float3 E = P.xyz - camera_constants.position.xyz;
 //    E = normalize(E);
 //    //normal
-//    float3 N = normal_map.Sample(sampler_states[ANISOTROPIC], pin.texcoord);
+//    float4 nor = normal_map.Sample(sampler_states[ANISOTROPIC], pin.texcoord);
+//    if (nor.w <= 0.0)
+//        return tex;
+//    float3 N = nor.xyz;
+//   
 //    float NoLight = 1.0 - length(N);
 //    NoLight = step(0.9, NoLight);
 //    N = N * 2.0 - 1.0; //0<-->1 -1<-->+1
@@ -88,7 +92,7 @@ material_info fetch_material_info(float2 texcoord)
     material_info.metallic = 1.0;
     material_info.sheen_roughness_factor = 0.0;//シアノラフネス係数
     material_info.sheen_color_factor = 0.0;
-    material_info.clearcoat_f0 = 0.04;
+    material_info.clearcoat_f0 = 0.04; //GLTF の仕様に従って一様な 4 % と見なされる
     material_info.clearcoat_f90 = 1.0;
     material_info.clearcoat_factor = 0.0;
     material_info.clearcoat_normal = 0.0;
@@ -116,7 +120,7 @@ material_info fetch_material_info(float2 texcoord)
 
     sampled = RM_map.Sample(sampler_states[LINEAR], texcoord);
     //roughness , metallic can be controled
-    r_factor =  sampled.a;
+    r_factor =  sampled.b;
     m_factor = sampled.r;
     pure_white = sampled.g;
 
@@ -128,6 +132,7 @@ material_info fetch_material_info(float2 texcoord)
     // Achromatic f0 based on IOR(屈折率).
     material_info.c_diff = lerp(material_info.basecolor.rgb, 0.0, material_info.metallic);
     //// full reflectance color (n incidence angle)// 全反射カラー（n入射角）
+    //平面に垂直方向から光が入射した際の鏡面反射率//鏡面反射率を表す材質特性
     material_info.f0 = lerp(material_info.f0, material_info.basecolor.rgb, material_info.metallic);
 
 
@@ -161,7 +166,6 @@ material_info fetch_material_info(float2 texcoord)
 
     return material_info;
 }
-
 float4 main(PS_IN pin) : SV_TARGET
 {
     material_info material_info = fetch_material_info(pin.texcoord);
@@ -172,10 +176,27 @@ float4 main(PS_IN pin) : SV_TARGET
 
    float3 V = normalize(camera_constants.position.xyz - P);
 
+   float4 light = light_map.Sample(sampler_states[ANISOTROPIC], pin.texcoord);
+ 
    float3 L = normalize(-light_direction.direction.xyz);
 
-   float3 N = normal_map.Sample(sampler_states[ANISOTROPIC], pin.texcoord);
+   float3 N = normal_map.Sample(sampler_states[ANISOTROPIC], pin.texcoord).rgb;
 
-   return physically_based_rendering(material_info, L, V, N, P);
+   return  physically_based_rendering(material_info, L, V, N, P,light.rgb);
 
 }
+
+//SamplerState sceneSampler : register(s0);
+//float4 main(PS_IN pin) : SV_TARGET
+//{
+//	float4 tex = albedo_map.Sample(sceneSampler, pin.texcoord);
+//	float4 light = light_map.Sample(sceneSampler, pin.texcoord);
+//
+//	float4 N = normal_map.Sample(sceneSampler, pin.texcoord);
+//	float dist = length(N.xyz * 2.0 - 1.0);
+//	float n = step(0.5, dist);
+//
+//	float4 color = tex * lerp(1.0, light, n);
+//	//color = light;
+//	return color;
+//}

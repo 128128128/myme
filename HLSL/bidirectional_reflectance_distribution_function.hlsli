@@ -144,7 +144,8 @@ float3 ibl_radiance_lambertian(float3 N, float3 V, float roughness, float3 diffu
 	//Projection of the surrounding environment reflected by the normal
     //–@ü‚Å”½Ë‚µ‚½üˆÍŠÂ‹«‚ğ“Š‰e
 	float3 irradiance = sample_diffuse_iem(N).rgb;
-	
+	//return float4(f_ab, 0, 1);
+
     // see https://bruop.github.io/ibl/#single_scattering_results at Single Scattering Results
     // Roughness dependent fresnel, from Fdez-Aguera //Roughness ˆË‘¶‚Ìƒtƒ‰ƒlƒ‹
 	float3 fr = max(1.0 - roughness, f0) - f0;

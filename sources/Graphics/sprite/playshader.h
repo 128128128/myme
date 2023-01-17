@@ -38,7 +38,9 @@ public:
 		float coverage = 0.5f;//â_ÇÃñßèWìx
 		float rain = 0.0f;//âJ
 		float cloud_speed = 0.07f;//â_ÇÃë¨ìx
-		float pad;
+		float sky_state;
+		DirectX::XMFLOAT4 top_sky_color;
+		DirectX::XMFLOAT4 under_sky_color;
 	};
 
 	playshader(ID3D11Device* device, const char* filename, bool force_srgb, bool enable_caching, D3D11_FILTER sampler_filter = D3D11_FILTER_ANISOTROPIC, D3D11_TEXTURE_ADDRESS_MODE sampler_texture_address_mode = D3D11_TEXTURE_ADDRESS_BORDER, DirectX::XMFLOAT4 sampler_boarder_color = DirectX::XMFLOAT4(0, 0, 0, 0));
@@ -51,12 +53,15 @@ public:
 	void render(ID3D11DeviceContext* immediate_context, float dx, float dy, float dw, float dh, float r, float g, float b, float a, float angle/*degree*/, float sx, float sy, float sw, float sh);
 	void render(ID3D11DeviceContext* immediate_context, float dx, float dy, float dw, float dh);
 	void textout(ID3D11DeviceContext* immediate_context, std::string s, float x, float y, float w, float h, float r, float g, float b, float a);
-	void DebugDrawGUI();
+	void DebugDrawGUI(bool flag);
 
 private:
 	float cover = 0.5f;
 	float rainy = 0.0f;
 	float c_speed = 0.07f;
+	float sky_state = 0.0f;
+	DirectX::XMFLOAT4 top_sky_color = DirectX::XMFLOAT4(0.0f, 0.1f, 0.4f, 1.0f);
+	DirectX::XMFLOAT4 un_sky_color = DirectX::XMFLOAT4(0.3f, 0.6f, 0.8f, 1.0f);
 
 
 };

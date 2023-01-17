@@ -75,32 +75,34 @@ void Trees::render(ID3D11DeviceContext* immediate_context)
 
 void Trees::DebugDrawGUI(bool flag)
 {
-	ImGui::SetNextWindowPos(ImVec2(10, 10), ImGuiCond_FirstUseEver);
-	ImGui::SetNextWindowSize(ImVec2(300, 300), ImGuiCond_FirstUseEver);
+	if (flag) {
+		ImGui::SetNextWindowPos(ImVec2(10, 10), ImGuiCond_FirstUseEver);
+		ImGui::SetNextWindowSize(ImVec2(300, 300), ImGuiCond_FirstUseEver);
 
-	if (ImGui::Begin("Trees", nullptr, ImGuiWindowFlags_None))
-	{
-		//Transform
-		if (ImGui::CollapsingHeader("Transform", ImGuiTreeNodeFlags_DefaultOpen))
+		if (ImGui::Begin("Trees", nullptr, ImGuiWindowFlags_None))
 		{
-			//Position
-			ImGui::SliderFloat3("Position", &this->position.x, -100.0f, 100.0f);
-			//Scale
-			ImGui::InputFloat3("Scale", &this->scale.x);
+			//Transform
+			if (ImGui::CollapsingHeader("Transform", ImGuiTreeNodeFlags_DefaultOpen))
+			{
+				//Position
+				ImGui::SliderFloat3("Position", &this->position.x, -100.0f, 100.0f);
+				//Scale
+				ImGui::InputFloat3("Scale", &this->scale.x);
+			}
+			//Wind Param
+			if (ImGui::CollapsingHeader("Wind", ImGuiTreeNodeFlags_DefaultOpen))
+			{
+				ImGui::SliderFloat("max_wind_strength", &constant_buffer->data.max_wind_strength, 0.0f, 1.0f);
+				ImGui::SliderFloat("wind_strength", &constant_buffer->data.wind_strength, 0.0f, 1.0f);
+				ImGui::SliderFloat("wind_speed", &constant_buffer->data.wind_speed, 0.0f, 1.0f);
+				ImGui::SliderFloat3("wind_direction", &constant_buffer->data.wind_direction.x, -1.0f, 1.0f);
+				ImGui::SliderFloat("wind_amplitude", &constant_buffer->data.wind_amplitude, 0.0f, 5.0f);
+				ImGui::SliderFloat("wind_amplitude_multiplier", &constant_buffer->data.wind_amplitude_multiplier, 0.0f, 10.0f);
+				ImGui::SliderFloat("flat_lighting", &constant_buffer->data.flat_lighting, 0.0f, 1.0f);
+				ImGui::SliderFloat("wind_debug", &constant_buffer->data.wind_debug, 0.0f, 1.0f);
+				ImGui::SliderFloat("mask", &constant_buffer->data.mask, 0.15f, 2.0f);
+			}
 		}
-		//Wind Param
-		if (ImGui::CollapsingHeader("Wind", ImGuiTreeNodeFlags_DefaultOpen))
-		{
-			ImGui::SliderFloat("max_wind_strength", & constant_buffer->data.max_wind_strength, 0.0f, 1.0f);
-			ImGui::SliderFloat("wind_strength", & constant_buffer->data.wind_strength, 0.0f, 1.0f);
-			ImGui::SliderFloat("wind_speed", & constant_buffer->data.wind_speed, 0.0f, 1.0f);
-			ImGui::SliderFloat3("wind_direction", & constant_buffer->data.wind_direction.x, -1.0f, 1.0f);
-			ImGui::SliderFloat("wind_amplitude", & constant_buffer->data.wind_amplitude, 0.0f, 5.0f);
-			ImGui::SliderFloat("wind_amplitude_multiplier", & constant_buffer->data.wind_amplitude_multiplier, 0.0f, 10.0f);
-			ImGui::SliderFloat("flat_lighting", & constant_buffer->data.flat_lighting, 0.0f, 1.0f);
-			ImGui::SliderFloat("wind_debug", & constant_buffer->data.wind_debug, 0.0f, 1.0f);
-			ImGui::SliderFloat("mask", & constant_buffer->data.mask, 0.15f, 2.0f);
-		}
+		ImGui::End();
 	}
-	ImGui::End();
 }

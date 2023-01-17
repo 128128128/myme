@@ -177,33 +177,59 @@ SamplerState sampler_states[3] : register(s0);
 
 float4 main(VS_OUT pin) : SV_TARGET
 {
-    float4 tex = normal_texture.Sample(sampler_states[ANISOTROPIC], pin.texcoord); // *input.Color;
+    //float4 tex = normal_texture.Sample(sampler_states[ANISOTROPIC], pin.texcoord); // *input.Color;
 
-    //point light
-    float3 p_light_pos = light_direction.direction.xyz;
-    float4 P = position_texture.Sample(sampler_states[ANISOTROPIC], pin.texcoord);
-    float3 p_light_dir = P.xyz - p_light_pos;
-    // judge light type(0:dir light...平行光 1:point light...点光源)
-    float lighttype = step(0.01, light_direction.direction.w);
-    // 方向決定(平行光:w=0.0 点光源:w>0)
-    //float3 dir = LightDir.w < 0.001 ? LightDir.xyz : PLightDir;
-    float3 dir = lerp(
-        light_direction.direction.xyz, p_light_dir, lighttype);
-    //attenuation...減衰
-    float attenuation = light_direction.direction.w < 0.001 ?
-        1.0 :
-        1.0 - (length(p_light_dir) / light_direction.direction.w);
-    attenuation = saturate(attenuation); //0.0<--->1.0
-    // lighting
-    float3 L = dir; //direction
-    float3 C = light_direction.color.rgb; //color
-    C *= attenuation; // attenuation
-    float3 N = tex * 2.0 - 1.0; //normal
+    ////point light
+    //float3 p_light_pos = light_direction.direction.xyz;
+    //float4 P = position_texture.Sample(sampler_states[ANISOTROPIC], pin.texcoord);
+    //float3 p_light_dir = P.xyz - p_light_pos;
+    //// judge light type(0:dir light...平行光 1:point light...点光源)
+    //float lighttype = step(0.01, light_direction.direction.w);
+    //// 方向決定(平行光:w=0.0 点光源:w>0)
+    ////float3 dir = LightDir.w < 0.001 ? LightDir.xyz : PLightDir;
+    //float3 dir = lerp(
+    //    light_direction.direction.xyz, p_light_dir, lighttype);
+    ////attenuation...減衰
+    //float attenuation = light_direction.direction.w < 0.001 ?
+    //    1.0 :
+    //    1.0 - (length(p_light_dir) / light_direction.direction.w);
+    //attenuation = saturate(attenuation); //0.0<--->1.0
+    //// lighting
+    //float3 L = dir; //direction
+    //float3 C = light_direction.color.rgb; //color
+    //C *= attenuation; // attenuation
+    //float3 N = tex * 2.0 - 1.0; //normal
+    //L = normalize(L);
+    //N = normalize(N);
+    //// degree of hit = -cos = -inner product
+    //float i = -dot(N, L);
+    //i = saturate(i); // 0.0～1.0
+    //tex.rgb = C * i; // decide color
+    //return tex;
+
+    // カラーの取得
+    float4 tex = normal_texture.Sample(sampler_states[1], pin.texcoord);
+    // 点光源方向
+    float4 P = position_texture.Sample(sampler_states[1], pin.texcoord);
+    float3 PLightPos = light_direction.direction.xyz;
+    float3 PLightDir = P.xyz - PLightPos;
+    // ライト種別
+    float type = step(0.001, light_direction.direction.w);
+    // 減衰の設定
+    float attenuation = type < 0.1 ? 1.0 : 1.0 - (length(PLightDir) / light_direction.direction.w);
+    attenuation = saturate(attenuation);
+    // 平行光
+    float3 L = lerp(light_direction.direction.xyz, PLightDir, type);
+
+    float3 N = tex.xyz * 2.0 - 1.0;
+    float3 C = light_direction.color.rgb * 2;
+    C *= attenuation; //減衰
+
     L = normalize(L);
     N = normalize(N);
-    // degree of hit = -cos = -inner product
-    float i = -dot(N, L);
-    i = saturate(i); // 0.0～1.0
-    tex.rgb = C * i; // deside color
-    return tex;
+    float d = -dot(N, L); //= -cos
+    d = saturate(d); // 0～1にクリッピング
+    tex.rgb = C * d; //ライト決定
+
+    return 0;
 }

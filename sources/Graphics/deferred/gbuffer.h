@@ -21,7 +21,8 @@ public:
 	void inactive(ID3D11DeviceContext* immediate_context);
 	void render(ID3D11DeviceContext* immediate_context);
 
-	void DebugDrawGUI();
+	void DebugDrawGUI(bool flag=false);
+	void ef_DebugDrawGUI(bool flag=false);
 protected:
 
 	struct d_posteffect_param {

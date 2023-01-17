@@ -8,6 +8,9 @@ Texture2D lut_ggx : register(t35);
 #define POINT 0
 #define LINEAR 1
 #define ANISOTROPIC 2
+#define POINT_CLAMP 2
+#define LINEAR_CLAMP 2
+#define ANISOTROPIC_CLAMP 2
 SamplerState sampler_states[3] : register(s0);
 
 static const float gamma = 2.2;
@@ -20,7 +23,7 @@ float4 sample_specular_pmrem(float3 v, float roughness)
 
 	float lod = roughness * float(number_of_levels - 1);
 
-	return specular_pmrem.SampleLevel(sampler_states[LINEAR], v, lod);
+	return  specular_pmrem.SampleLevel(sampler_states[LINEAR_CLAMP], v, lod);
 }
 
 // specularWeight is introduced with KHR_materials_specular
@@ -31,12 +34,15 @@ float3 ibl_radiance_lambertian(float3 N, float3 V, float roughness, float3 diffu
 	float NoV = clamp(dot(N, V), 0.0, 1.0);
 
 	float2 brdf_sample_point = clamp(float2(NoV, roughness), 0.0, 1.0);
+
+
 	//brdf...双方向反射率分布関数と呼ばれ、ある特定の角度から光を入射した時の反射光の角度分布特性を表す
 	//lut texture...color filter の用に利用する
-	float2 f_ab = lut_ggx.Sample(sampler_states[LINEAR], brdf_sample_point).rg;
+	float2 f_ab = lut_ggx.Sample(sampler_states[LINEAR_CLAMP], brdf_sample_point).rg;
 	//Projection of the surrounding environment reflected by the normal
 	//法線で反射した周囲環境を投影
-	float3 irradiance = diffuse_iem.Sample(sampler_states[LINEAR], N).rgb;
+	float3 irradiance = diffuse_iem.Sample(sampler_states[LINEAR_CLAMP], N).rgb;
+	//return float4(f_ab,0, 1);
 
 	// see https://bruop.github.io/ibl/#single_scattering_results at Single Scattering Results
 	// Roughness dependent fresnel, from Fdez-Aguera //Roughness 依存のフラネル
@@ -54,15 +60,15 @@ float3 ibl_radiance_lambertian(float3 N, float3 V, float roughness, float3 diffu
 }
 
 
-float3 ibl_radiance_ggx(float3 N, float3 V, float roughness, float3 f0, float specular_weight)
+float3 ibl_radiance_ggx(float3 N, float3 V, float roughness, float3 f0, float specular_weight,float3 light_color)
 {
 	float NoV = clamp(dot(N, V), 0.0, 1.0);
 
 	float2 brdf_sample_point = clamp(float2(NoV, roughness), 0.0, 1.0);
-	float2 f_ab = lut_ggx.Sample(sampler_states[LINEAR], brdf_sample_point).rg;
+	float2 f_ab = lut_ggx.Sample(sampler_states[LINEAR_CLAMP], brdf_sample_point).rg;
 
 	float3 R = normalize(reflect(-V, N));
-	float3 specular_light = sample_specular_pmrem(R, roughness).rgb;
+	float3 specular_light = light_color;// sample_specular_pmrem(R, roughness).rgb;
 
 	// see https://bruop.github.io/ibl/#single_scattering_results at Single Scattering Results
 	// Roughness dependent fresnel, from Fdez-Aguera
@@ -144,7 +150,7 @@ float3 brdf_specular_ggx(float3 f0, float3 f90, float alpha_roughness, float spe
 ////V...position->camera position(in world)
 ////N...normalize normal
 ///P....world position
-float4 physically_based_rendering(material_info material_info,float3 L, float3 V, float3 N, float3 P)
+float4 physically_based_rendering(material_info material_info,float3 L, float3 V, float3 N, float3 P,float3 light_color)
 {
 	float3 f_specular = 0.0;
 	float3 f_diffuse = 0.0;
@@ -156,14 +162,14 @@ float4 physically_based_rendering(material_info material_info,float3 L, float3 V
 	float albedo_sheen_scaling = 1.0;
 	// Calculate lighting contribution from image based lighting source (IBL)
 	//if (image_based_lighting > 0)//bool ibl
-	//{
+	{
 		//lambert
 		f_diffuse += ibl_radiance_lambertian(N, V, material_info.perceptual_roughness, material_info.c_diff, material_info.f0, material_info.specular_weight);
 		//specular
-		f_specular += ibl_radiance_ggx(N, V, material_info.perceptual_roughness, material_info.f0, material_info.specular_weight);
+		f_specular += ibl_radiance_ggx(N, V, material_info.perceptual_roughness, material_info.f0, material_info.specular_weight,light_color);
 
-	//}
-
+	}
+	
 	float3 R = reflect(-L, N);
 	float3 H = normalize(V + L);
 
@@ -179,10 +185,12 @@ float4 physically_based_rendering(material_info material_info,float3 L, float3 V
 		// https://github.com/KhronosGroup/glTF/tree/master/specification/2.0#acknowledgments AppendixB
 		//lambert
 		f_diffuse += Li * NoL * brdf_lambertian(material_info.f0, material_info.f90, material_info.c_diff, material_info.specular_weight, HoV);
+
 		//specular
 		f_specular += Li * NoL * brdf_specular_ggx(material_info.f0, material_info.f90, material_info.alpha_roughness, material_info.specular_weight, HoV, NoL, NoV, NoH);
 
 	}
+		//return float4(f_specular, 1);
 
 
 	// Apply ambient occlusion to all lighting that is not punctual
@@ -203,8 +211,8 @@ float4 physically_based_rendering(material_info material_info,float3 L, float3 V
 	float clearcoat_factor = 0.0;
 	float3 clearcoat_fresnel = 0.0;
 
-
-	color = f_emissive + f_diffuse + f_specular;
+	float3 F = f_schlick(material_info.f0, material_info.f90, HoV);//フラネル
+	color = f_emissive + f_diffuse*(1-F) + f_specular;
 	color = f_sheen + color * albedo_sheen_scaling;
 	color = color * (1.0 - clearcoat_factor * clearcoat_fresnel) + f_clearcoat;
 	return float4(max(0, color), material_info.basecolor.a);

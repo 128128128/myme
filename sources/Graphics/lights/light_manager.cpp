@@ -71,23 +71,25 @@ void light_manager::draw(ID3D11DeviceContext* immediate_context, ID3D11ShaderRes
 }
 
 //debug gui
-void light_manager::DrawDebugGUI()
+void light_manager::DrawDebugGUI(bool flag)
 {
-	ImGui::Begin("Lights", nullptr, ImGuiWindowFlags_None);
-	if (display_imgui)
-	{
-#if CAST_SHADOW
-		shadow_dir_light->debug_gui(-1);
-#endif
-		for (auto& l : lights)
+	if (flag) {
+		ImGui::Begin("Lights", nullptr, ImGuiWindowFlags_None);
+		if (display_imgui)
 		{
-			if (!l.second.expired())
+#if CAST_SHADOW
+			shadow_dir_light->debug_gui(-1);
+#endif
+			for (auto& l : lights)
 			{
-				l.second.lock()->DebugDrawGUI(l.first);
+				if (!l.second.expired())
+				{
+					l.second.lock()->DebugDrawGUI(l.first);
+				}
 			}
 		}
+		ImGui::End();
 	}
-	ImGui::End();
 }
 
 //delete lights

@@ -307,7 +307,7 @@ PS_OUT main(VS_OUT pin)
 	ret.Position = pin.position;
 	float depth = length(pin.position - camera_constants.position);
 	ret.Depth = float4(depth, 0, 0, 1);
-	ret.RM = float4(1.0, 0.0, 0.0, 0.0);
+	ret.RM = float4(0.0, 0.0, 0.0, 1.0);
 	return ret;
 
     //{

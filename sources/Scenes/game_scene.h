@@ -83,8 +83,8 @@ public:
 	enum { WIREFRAME, SOLID, SOLID_CULL_NONE };
 	std::unique_ptr<Descartes::rasterizer_state> rasterizer_states[3];
 
-	enum { POINT, LINEAR, ANISOTROPIC };
-	std::unique_ptr<Descartes::sampler_state> sampler_states[3];
+	enum { POINT, LINEAR, ANISOTROPIC,POINT_CLAMP,LINEAR_CLAMP, ANISOTROPIC_CLAMP};
+	std::unique_ptr<Descartes::sampler_state> sampler_states[6];
 
 	enum { ZT_ON_ZW_ON, ZT_ON_ZW_OFF, ZT_OFF_ZW_ON, ZT_OFF_ZW_OFF };
 	std::unique_ptr<Descartes::depth_stencil_state> depth_stencil_states[4];
@@ -161,7 +161,7 @@ public:
 		//directional
 		struct something_constants
 		{
-			float iTime = 0.0f;//triple speed
+			float iTime = 0.0f;//speed
 			float triple_speed_iTime = 0.0f;//triple speed
 			float elapse_time = 0;
 			float shadow_map_num=0;

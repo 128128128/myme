@@ -259,7 +259,7 @@ mov r3.x, r3.x  // r3.x <- ret.Depth.x
 mov r0.xyzw, r0.xyzw  // r0.x <- ret.Normal.x; r0.y <- ret.Normal.y; r0.z <- ret.Normal.z; r0.w <- ret.Normal.w
 
 #line 57
-mov r4.xyzw, l(0,0,0,1.000000)  // r4.x <- ret.RM.x; r4.y <- ret.RM.y; r4.z <- ret.RM.z; r4.w <- ret.RM.w
+mov r4.xyzw, l(0,0,1.000000,1.000000)  // r4.x <- ret.RM.x; r4.y <- ret.RM.y; r4.z <- ret.RM.z; r4.w <- ret.RM.w
 
 #line 58
 mov o0.xyzw, r2.xyzw

@@ -75,7 +75,7 @@ const float EPSILON = 1e-3;
 
 
 /**** TWEAK *****************************************************************/
-#define COVERAGE		0.5   //—LŒø”ÍˆÍ//‰_‚Ì•ªŒú‚³
+#define COVERAGE		0.4   //—LŒø”ÍˆÍ//‰_‚Ì•ªŒú‚³
 #define THICKNESS		15.  //‰_‚ÌŒú‚³
 #define ABSORPTION		1.030725  //“¯‰»
 #define WIND			float3(0, 0, -u_time * .2)   //•—
@@ -578,6 +578,7 @@ float get_noise(const in float3 x)// get noise
 }
 
 static const float3 sun_color = float3(1., .7, .55);
+static const float3 moon_color = float3(.9, .9, .9);
 
 //atmosphere..‘å‹CŒ—
 static const sphere_t atmosphere = {
@@ -590,21 +591,83 @@ static const plane_t ground = {
 float3(0., -1., 0.), 0., 1
 };
 
+float star_rand(float2 co)
+{
+    return frac(sin(dot(co.xy, float2(12.9898, 78.233))) * 43758.5453);
+}
+
 //sky color...‹ó‚Ì•`‰æ
 float3 render_sky_color(
-    const in ray_t eye
+    const in ray_t eye,float2 texcoord
 ) {
     float3 rd = eye.direction;
-    //sun speed setting
-    float3 sun_dir = normalize(float3(0, abs(sin(something.iTime * .05)), -1));
-    float sun_amount = max(dot(rd, sun_dir), 0.0);
+   
 
-    //sky gradation
-    float3  sky_color = lerp(float3(.0, .1, .4), float3(.3, .6, .8), 1.0 - rd.y);
-    sky_color = sky_color + sun_color * min(pow(sun_amount, 1500.0) * 5.0, 1.0);
-    sky_color = sky_color + sun_color * min(pow(sun_amount, 10.0) * .6, 1.0);
+    //blue sky
+    if(sky_state<=0)
+    {
+        //sun speed setting
+        float3 sun_dir = normalize(float3(0, abs(sin(something.iTime * .05)), -1));
+        float sun_amount = max(dot(rd, sun_dir), 0.0);
+        //sky gradation//top color & under color
+        float3  sky_color = lerp(top_sky_color.rgb, under_sky_color.rgb, 1.0 - rd.y);
+        sky_color = sky_color + sun_color * min(pow(sun_amount, 1500.0) * 5.0, 1.0);
+        sky_color = sky_color + sun_color * min(pow(sun_amount, 10.0) * .6, 1.0);
 
-    return sky_color;
+        return sky_color;
+
+
+    }
+
+    //star night
+    else if(sky_state>=0&&sky_state<=1)
+    {
+        float3 moon_dir = normalize(float3(0, abs(sin(something.iTime * .05)), -1));
+        float moon_amount = max(dot(rd, moon_dir), 0.0);
+
+        float size = 30.0;
+        float prob = 0.95;
+
+        float2 pos = floor(1.0 / size * texcoord.xy);
+
+        float color = 0.0;
+        float star_value = star_rand(pos);
+        float2 iResolution = float2(1280, 720);
+
+        if (star_value > prob)
+        {
+            float2 center = size * pos + float2(size, size) * 0.5;
+
+            float t = 0.9 + 0.2 * sin(something.iTime + (star_value - prob) / (1.0 - prob) * 45.0);
+
+            color = 1.0 - distance(texcoord.xy, center) / (0.5 * size);
+            color = color * t / (abs(texcoord.y - center.y)) * t / (abs(texcoord.x - center.x));
+        }
+        else if (star_rand(texcoord.xy / iResolution.xy) > 0.996)
+        {
+            float r = star_rand(texcoord.xy);
+            color = r * (sin(something.iTime * (r * 5.0) + 720.0 * r) + 0.75);
+        }
+
+        float3  sky_color = float3(.1, .1, .4);
+        sky_color += color;
+        sky_color = sky_color + moon_color * min(pow(moon_amount, 500.0) * 5.0, 0.7);
+
+        return sky_color;
+    }
+    //sunset sky
+    else
+    {
+        //sun speed setting
+        float3 sun_dir = normalize(float3(0, 0, -1));
+        float sun_amount = max(dot(rd, sun_dir), 0.0);
+        //sky gradation//top color & under color
+        float3  sky_color = lerp(float3(.09, .09, .4), float3(1., .5, .0), 1.0 - rd.y);
+        sky_color = sky_color + sun_color * min(pow(sun_amount, 1500.0) * 5.0, 1.0);
+        sky_color = sky_color + sun_color * min(pow(sun_amount, 10.0) * .6, 1.0);
+
+        return sky_color;
+    }
 }
 
 //density...–§“xŒvŽZ
@@ -668,7 +731,11 @@ float4 render_clouds(
     float3 pos = //eye.origin + eye.direction * 100.; 
         hit.origin;
 
-    float T = 1.; // transmitance..“§‰ß—¦
+    float T = 1.0; // transmitance..“§‰ß—¦ //rainy cloud...about 0.6...something..? Š´Šo(ŒÂl“I‚É)
+
+    if (sky_state >= 2)
+        T = 0.6;
+
     float3 C = float3(0, 0, 0); // color
     float alpha = 0.;
 
@@ -787,10 +854,16 @@ PS_OUT main(VS_OUT pin)
     }
     else {*/
 
-        float3 sky = render_sky_color(eye_ray);
+        float3 sky = render_sky_color(eye_ray,pin.texcoord);
         float4 cld = render_clouds(eye_ray);
         //cld.rgb...cloud.rbg, cld.a...alpha
+    if(sky_state<=0)//blue
+        col = lerp(sky, cld.rgb / (0.000001 + cld.a),cld.a);
+    else if(sky_state<=1)//night
+        col = lerp(sky, cld.rgb / (0.000001 + cld.a),0.3);///cld.alpha is 0.3 in star night maybe
+    else
         col = lerp(sky, cld.rgb / (0.000001 + cld.a), cld.a);
+
 
         ///--------if use check borad material-----///
         /* intersect_sphere(eye_ray, atmosphere, hit);
@@ -810,7 +883,7 @@ PS_OUT main(VS_OUT pin)
         
         ret.Color = float4(col, 1.0);
         ret.Depth = float4(0.0, 0.0, 0.0, 0.0);
-        ret.RM = float4(0.0, 0.0, 0.0, 0.0);
+        ret.RM = float4(0.0, 0.0, 1.0, 1.0);
         ret.Position = float4(0.0, 0.0, 0.0, 0.0);
         ret.Normal = float4(0.0, 0.0, 0.0, 0.0);
         return ret;

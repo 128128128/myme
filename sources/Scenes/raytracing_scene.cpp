@@ -481,7 +481,6 @@ void raytracing_scene::render(ID3D11DeviceContext* immediate_context, float elap
 	//player->DebugDrawGUI();
 	//post_effects->DrawDebugGUI();
 	//bloom_effect->DrawDebugGUI();
-	white->DebugDrawGUI();
 	shadowmap_df->DebugDrawGUI();
 	screen->DebugDrawGUI();
 	light_manager::instance().DrawDebugGUI();

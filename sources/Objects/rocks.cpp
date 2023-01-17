@@ -71,28 +71,30 @@ void Rocks::render(ID3D11DeviceContext* immediate_context)
 
 void Rocks::DebugDrawGUI(bool flag)
 {
-	ImGui::SetNextWindowPos(ImVec2(10, 10), ImGuiCond_FirstUseEver);
-	ImGui::SetNextWindowSize(ImVec2(300, 300), ImGuiCond_FirstUseEver);
+	if (flag) {
+		ImGui::SetNextWindowPos(ImVec2(10, 10), ImGuiCond_FirstUseEver);
+		ImGui::SetNextWindowSize(ImVec2(300, 300), ImGuiCond_FirstUseEver);
 
-	if (ImGui::Begin("Rocks", nullptr, ImGuiWindowFlags_None))
-	{
-		//transform
-		if (ImGui::CollapsingHeader("Transform", ImGuiTreeNodeFlags_DefaultOpen))
+		if (ImGui::Begin("Rocks", nullptr, ImGuiWindowFlags_None))
 		{
-			//position
-			ImGui::SliderFloat3("Position", &this->position.x, -100.0f, 100.0f);
-			//Scale
-			ImGui::InputFloat3("Scale", &this->scale.x);
+			//transform
+			if (ImGui::CollapsingHeader("Transform", ImGuiTreeNodeFlags_DefaultOpen))
+			{
+				//position
+				ImGui::SliderFloat3("Position", &this->position.x, -100.0f, 100.0f);
+				//Scale
+				ImGui::InputFloat3("Scale", &this->scale.x);
+			}
+			/*if (ImGui::CollapsingHeader("Textures", ImGuiTreeNodeFlags_DefaultOpen))
+			{
+				ImGui::SliderFloat("Blend01", &rocks_constants_buffer->data.Falloff01, 0.0f, 1.0f);
+				ImGui::SliderFloat("Blend02", &rocks_constants_buffer->data.Falloff02, 0.0f, 1.0f);
+				ImGui::SliderFloat("TextureScale01", &rocks_constants_buffer->data.TextureScale01, 0.0f, 1.0f);
+				ImGui::SliderFloat("TextureScale02", &rocks_constants_buffer->data.TextureScale02, 0.0f, 1.0f);
+				ImGui::SliderFloat("StoneTextureScale03", &rocks_constants_buffer->data.TextureScale03, 0.0f, 1.0f);
+
+			}*/
 		}
-		/*if (ImGui::CollapsingHeader("Textures", ImGuiTreeNodeFlags_DefaultOpen))
-		{
-			ImGui::SliderFloat("Blend01", &rocks_constants_buffer->data.Falloff01, 0.0f, 1.0f);
-			ImGui::SliderFloat("Blend02", &rocks_constants_buffer->data.Falloff02, 0.0f, 1.0f);
-			ImGui::SliderFloat("TextureScale01", &rocks_constants_buffer->data.TextureScale01, 0.0f, 1.0f);
-			ImGui::SliderFloat("TextureScale02", &rocks_constants_buffer->data.TextureScale02, 0.0f, 1.0f);
-			ImGui::SliderFloat("StoneTextureScale03", &rocks_constants_buffer->data.TextureScale03, 0.0f, 1.0f);
-
-		}*/
+		ImGui::End();
 	}
-	ImGui::End();
 }

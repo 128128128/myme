@@ -20,6 +20,9 @@ bool game_scene::initialize(ID3D11Device* device, CONST LONG screen_width, CONST
 	sampler_states[POINT] = std::make_unique<Descartes::sampler_state>(device, D3D11_FILTER_MIN_MAG_MIP_POINT);
 	sampler_states[LINEAR] = std::make_unique<Descartes::sampler_state>(device, D3D11_FILTER_MIN_MAG_MIP_LINEAR);
 	sampler_states[ANISOTROPIC] = std::make_unique<Descartes::sampler_state>(device, D3D11_FILTER_ANISOTROPIC);
+	sampler_states[POINT_CLAMP] = std::make_unique<Descartes::sampler_state>(device, D3D11_FILTER_ANISOTROPIC,D3D11_TEXTURE_ADDRESS_CLAMP);
+	sampler_states[LINEAR_CLAMP] = std::make_unique<Descartes::sampler_state>(device, D3D11_FILTER_ANISOTROPIC, D3D11_TEXTURE_ADDRESS_CLAMP);
+	sampler_states[ANISOTROPIC_CLAMP] = std::make_unique<Descartes::sampler_state>(device, D3D11_FILTER_ANISOTROPIC, D3D11_TEXTURE_ADDRESS_CLAMP);
 
 	//depthstencil states
 	depth_stencil_states[ZT_ON_ZW_ON] = std::make_unique<Descartes::depth_stencil_state>(device, TRUE, D3D11_DEPTH_WRITE_MASK_ALL, D3D11_COMPARISON_LESS);
@@ -215,8 +218,8 @@ const char* game_scene::update(float& elapsed_time/*Elapsed seconds from last fr
 	//ImGui::SliderFloat("spot_angle", &light_constants_buffer->data.spot_light.angle, -180.0f,180.0f);
 
 	//camera
-	if (ImGui::Button("freeLook"))
-		freelook = !freelook;
+	/*if (ImGui::Button("freeLook"))
+		freelook = !freelook;*/
 
 	if (gamePad.GetButton() & GamePad::BTN_B)
 		return "title";
@@ -233,6 +236,9 @@ void game_scene::render(ID3D11DeviceContext* immediate_context, float elapsed_ti
 	sampler_states[POINT]->active(immediate_context, 0, false);
 	sampler_states[LINEAR]->active(immediate_context, 1, false);
 	sampler_states[ANISOTROPIC]->active(immediate_context, 2, false);
+	sampler_states[POINT_CLAMP]->active(immediate_context, 3, false);
+	sampler_states[LINEAR_CLAMP]->active(immediate_context, 4, false);
+	sampler_states[ANISOTROPIC_CLAMP]->active(immediate_context, 5, false);
 
 	//viewport setting
 	D3D11_VIEWPORT viewport;
@@ -393,7 +399,7 @@ void game_scene::render(ID3D11DeviceContext* immediate_context, float elapsed_ti
 			static_mesh_vs->inactive(immediate_context);
 			spot_light_mesh_ps->inactive(immediate_context);*/
 
-	//#endif
+	//#endif3
 
 	//lim_light for static mesh
 	//lim_light_vs->active(immediate_context);
@@ -465,11 +471,11 @@ void game_scene::render(ID3D11DeviceContext* immediate_context, float elapsed_ti
 		sampler_states[POINT]->inactive(immediate_context);
 		sampler_states[LINEAR]->inactive(immediate_context);
 		sampler_states[ANISOTROPIC]->inactive(immediate_context);
+		sampler_states[POINT_CLAMP]->inactive(immediate_context);
+		sampler_states[LINEAR_CLAMP]->inactive(immediate_context);
+		sampler_states[ANISOTROPIC_CLAMP]->inactive(immediate_context);
 	}
 
-	terrains->DebugDrawGUI();
-	rocks->DebugDrawGUI();
-	trees->DebugDrawGUI();
 	
 	//water->DebugDrawGUI();
 	//structures->DebugDrawGUI();
@@ -480,29 +486,43 @@ void game_scene::render(ID3D11DeviceContext* immediate_context, float elapsed_ti
 	//player->DebugDrawGUI();
 	//post_effects->DrawDebugGUI();
 	//bloom_effect->DrawDebugGUI();
-	white->DebugDrawGUI();
-	shadowmap_df->DebugDrawGUI();
-	screen->DebugDrawGUI();
-	light_manager::instance().DrawDebugGUI();
+	//shadowmap_df->DebugDrawGUI();
 	//pbr_ship_1->DebugDrawGUI();
 
-	static bool pbr_ = false;
-	static bool w_fall = false;
+	static bool f_pbr = false;
+	static bool f_fall = false;
+	static bool f_terrain = false;
+	static bool f_rock = false;
+	static bool f_tree = false;
 
 	static bool m_camera = false;
+
+	static bool sky = false;
+
+	static bool f_light = false;
+
+	static bool f_gbuf = false;
+	static bool f_efc = false;
 
 	if (ImGui::BeginMainMenuBar())
 	{
 		//object
 		if (ImGui::BeginMenu("object"))
 		{
-			ImGui::MenuItem("pbr_obj", NULL, &pbr_);
-			ImGui::MenuItem("water_fall", NULL, &w_fall);
+			ImGui::MenuItem("pbr_obj", NULL, &f_pbr);
+			ImGui::MenuItem("water_fall", NULL, &f_fall);
+			ImGui::MenuItem("terrain", NULL, &f_terrain);
+			ImGui::MenuItem("rock", NULL, &f_rock);
+			ImGui::MenuItem("trees", NULL, &f_tree);
 			ImGui::EndMenu();
 		}
 
-		water_fall->DebugDrawGUI(w_fall);
-	    pbr_ship->DebugDrawGUI(pbr_);
+		water_fall->DebugDrawGUI(f_fall);
+	    pbr_ship->DebugDrawGUI(f_pbr);
+		terrains->DebugDrawGUI(f_terrain);
+		rocks->DebugDrawGUI(f_rock);
+		trees->DebugDrawGUI(f_tree);
+
 
 		//camera
 		if (ImGui::BeginMenu("camera"))
@@ -512,11 +532,32 @@ void game_scene::render(ID3D11DeviceContext* immediate_context, float elapsed_ti
 		}
 		eye_space_camera->DrawDebugGUI(m_camera);
 
+		if (ImGui::BeginMenu("enviroment"))
+		{
+			ImGui::MenuItem("sky", NULL, &sky);
+			ImGui::EndMenu();
+		}
+	    white->DebugDrawGUI(sky);
+
+	    //light
+	    if (ImGui::BeginMenu("light"))
+	    {
+	        ImGui::MenuItem("dir light", NULL, &f_light);
+		    ImGui::EndMenu();
+	    }
+	    light_manager::instance().DrawDebugGUI(f_light);
+
+	    if (ImGui::BeginMenu("g_buffer"))
+	    {
+	    	ImGui::MenuItem("g_buffer", NULL, &f_gbuf);
+	    	ImGui::MenuItem("post_effect", NULL, &f_efc);
+	    	ImGui::EndMenu();
+	    }
+	    screen->DebugDrawGUI(f_gbuf);
+	    screen->ef_DebugDrawGUI(f_efc);
 
 	    ImGui::EndMainMenuBar();
 	}
-
-
     ImGui::Render();
 
 	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());

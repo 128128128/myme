@@ -54,6 +54,6 @@ PS_OUT main(VS_OUT pin) :SV_TARGET0
 	float dist = length(pin.position - camera_constants.position);
 	ret.Depth = float4(dist, 0, 0, 1);
 	ret.Normal = pin.normal;
-	ret.RM = float4(0.0,0.0,0.0,1.0);//r..metallic g...pure white a...roghness
+	ret.RM = float4(0.0,0.0,1.0,1.0);//r..metallic g...pure white b...roghness
 	return ret;
 }

@@ -97,14 +97,14 @@ PS_OUT main(VS_OUT pin)
 	float3 finalcolor = diffuse;
 
 	ret.Color = float4(color.xyz, alpha);
-	ret.Normal = float4(N, 0.0);
+	ret.Normal = float4(N, 1.0);
 	ret.Position = pin.position;
 	float dist = length(pin.position - camera_constants.position);
 	ret.Depth = float4(dist, 0, 0, 1);
 	float roughness = roughness_factor* roughness_map.Sample(anisotropic_sampler_state, pin.texcoord).a;
 	float metallic = metallic_factor * roughness_map.Sample(anisotropic_sampler_state, pin.texcoord).r;
 	float white = pure_white;
-	ret.RM = float4(metallic, white, 0, roughness);
+	ret.RM = float4(metallic, white, roughness, 1.0);
 
 	return ret;
 

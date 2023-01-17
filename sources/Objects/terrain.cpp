@@ -165,21 +165,23 @@ void Terrain::render(ID3D11DeviceContext* immediate_context, Descartes::view_fru
 	vs->inactive(immediate_context);
 }
 
-void Terrain::DebugDrawGUI()
+void Terrain::DebugDrawGUI(bool flag)
 {
-	ImGui::SetNextWindowPos(ImVec2(10, 10), ImGuiCond_FirstUseEver);
-	ImGui::SetNextWindowSize(ImVec2(300, 300), ImGuiCond_FirstUseEver);
+	if (flag) {
+		ImGui::SetNextWindowPos(ImVec2(10, 10), ImGuiCond_FirstUseEver);
+		ImGui::SetNextWindowSize(ImVec2(300, 300), ImGuiCond_FirstUseEver);
 
-	if (ImGui::Begin("Terrain", nullptr, ImGuiWindowFlags_None))
-	{
-		//transform
-		if (ImGui::CollapsingHeader("Transform", ImGuiTreeNodeFlags_DefaultOpen))
+		if (ImGui::Begin("Terrain", nullptr, ImGuiWindowFlags_None))
 		{
-			//position
-			ImGui::SliderFloat3("Position", &this->position.x, -100.0f, 100.0f);
-			//Scale
-			ImGui::InputFloat3("Scale", &this->scale.x);
+			//transform
+			if (ImGui::CollapsingHeader("Transform", ImGuiTreeNodeFlags_DefaultOpen))
+			{
+				//position
+				ImGui::SliderFloat3("Position", &this->position.x, -100.0f, 100.0f);
+				//Scale
+				ImGui::InputFloat3("Scale", &this->scale.x);
+			}
 		}
+		ImGui::End();
 	}
-	ImGui::End();
 }

@@ -11,7 +11,9 @@ cbuffer FOR_PLAY:register(b4)
 	float coverage;
 	float boolrain;
 	float cloud_speed;
-	float pad;
+	float sky_state;
+	float4 top_sky_color;
+	float4 under_sky_color;
 };
 
 

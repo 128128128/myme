@@ -554,6 +554,8 @@ void gbuffer::lightning(ID3D11DeviceContext* immediate_context)
 	// Slot3 R+M
 	immediate_context->PSSetShaderResources(
 		3, 1, srv_RM.GetAddressOf());
+	immediate_context->PSSetShaderResources(
+		4, 1, srv_depth.GetAddressOf());
 	immediate_context->PSSetShaderResources(15, 1, srv_color.GetAddressOf());
 
 	ID3D11ShaderResourceView* g_buffers[]
@@ -652,41 +654,57 @@ void gbuffer::render(ID3D11DeviceContext* immediate_context)
 }
 
 
-void gbuffer::DebugDrawGUI()
+void gbuffer::DebugDrawGUI(bool flag)
 {
-	ImGui::SetNextWindowPos(ImVec2(10, 10), ImGuiCond_FirstUseEver);
-	ImGui::SetNextWindowSize(ImVec2(300, 300), ImGuiCond_FirstUseEver);
+	if (flag) {
+		ImGui::SetNextWindowPos(ImVec2(10, 10), ImGuiCond_FirstUseEver);
+		ImGui::SetNextWindowSize(ImVec2(300, 300), ImGuiCond_FirstUseEver);
 
-	if (ImGui::Begin("post effect", nullptr, ImGuiWindowFlags_None))
-	{
-		if (ImGui::CollapsingHeader("posteffect configuration", ImGuiTreeNodeFlags_DefaultOpen))
+		if (ImGui::Begin("g_buffer", nullptr, ImGuiWindowFlags_None))
 		{
-			ImGui::SliderFloat("blur", &d_posteffect_buffer->data.bloom, 0.0f, 5.0f);
-			ImGui::SliderFloat("contrast", &d_posteffect_buffer->data.contrast, 0.0f, 1.0f);
-			ImGui::SliderFloat("vignette", &d_posteffect_buffer->data.vignette, 0.0f, 1.0f);
-			ImGui::SliderFloat("saturate", &d_posteffect_buffer->data.saturate, 0.0f, 1.0f);
-			ImGui::SliderFloat("outline", &d_posteffect_buffer->data.outline, 0.0f, 5.0f);
-			ImGui::SliderFloat("color_grading", &d_posteffect_buffer->data.color_grading, 0.0f, 1.0f);
+			if (ImGui::CollapsingHeader("texture", ImGuiTreeNodeFlags_DefaultOpen))
+			{
+				ImGui::Text("composite");
+				ImGui::Image(srv_composite.Get(), { 320,180 });
+				ImGui::Text("light");
+				ImGui::Image(srv_light.Get(), { 320,180 });
+				ImGui::Text("color");
+				ImGui::Image(srv_color.Get(), { 320,180 });
+
+				ImGui::Text("depth");
+				ImGui::Image(srv_depth.Get(), { 320,180 });
+				ImGui::Text("normal");
+				ImGui::Image(srv_normal.Get(), { 320,180 });
+				ImGui::Text("position");
+				ImGui::Image(srv_position.Get(), { 320,180 });
+				ImGui::Text("roughness metallic");
+				ImGui::Image(srv_RM.Get(), { 320,180 });
+				//ImGui::Text("shadow_param");
+				//ImGui::Image(srv_shadow_param.Get(), { 320,180 });
+			}
 		}
-		if (ImGui::CollapsingHeader("texture", ImGuiTreeNodeFlags_DefaultOpen))
-		{
-			ImGui::Text("composite");
-			ImGui::Image(srv_composite.Get(), { 320,180 });
-			ImGui::Text("light");
-			ImGui::Image(srv_light.Get(), { 320,180 });
-			ImGui::Text("color");
-			ImGui::Image(srv_color.Get(), { 320,180 });
-			
-			ImGui::Text("depth");
-			ImGui::Image(srv_depth.Get(), { 320,180 });
-			ImGui::Text("normal");
-			ImGui::Image(srv_normal.Get(), { 320,180 });
-			ImGui::Text("position");
-			ImGui::Image(srv_position.Get(), { 320,180 });
-			ImGui::Text("shadow_param");
-			//ImGui::Image(srv_shadow_param.Get(), { 320,180 });
-			light_manager::instance().DrawDebugGUI();
-		}
+		ImGui::End();
 	}
-	ImGui::End();
+}
+
+void gbuffer::ef_DebugDrawGUI(bool flag)
+{
+	if (flag) {
+		ImGui::SetNextWindowPos(ImVec2(10, 10), ImGuiCond_FirstUseEver);
+		ImGui::SetNextWindowSize(ImVec2(300, 300), ImGuiCond_FirstUseEver);
+
+		if (ImGui::Begin("post effect", nullptr, ImGuiWindowFlags_None))
+		{
+			if (ImGui::CollapsingHeader("posteffect configuration", ImGuiTreeNodeFlags_DefaultOpen))
+			{
+				ImGui::SliderFloat("blur", &d_posteffect_buffer->data.bloom, 0.0f, 5.0f);
+				ImGui::SliderFloat("contrast", &d_posteffect_buffer->data.contrast, 0.0f, 1.0f);
+				ImGui::SliderFloat("vignette", &d_posteffect_buffer->data.vignette, 0.0f, 1.0f);
+				ImGui::SliderFloat("saturate", &d_posteffect_buffer->data.saturate, 0.0f, 1.0f);
+				ImGui::SliderFloat("outline", &d_posteffect_buffer->data.outline, 0.0f, 5.0f);
+				ImGui::SliderFloat("color_grading", &d_posteffect_buffer->data.color_grading, 0.0f, 1.0f);
+			}
+		}
+		ImGui::End();
+	}
 }

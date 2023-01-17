@@ -285,6 +285,11 @@ void playshader::render(ID3D11DeviceContext* immediate_context,
 		forplays->rain = rainy;
 
 		forplays->cloud_speed = c_speed;
+
+		forplays->sky_state = sky_state;
+
+		forplays->top_sky_color = top_sky_color;
+		forplays->under_sky_color = un_sky_color;
 	}
 
 	immediate_context->Unmap(forplay_buffer.Get(), 0);
@@ -361,22 +366,34 @@ void playshader::textout(ID3D11DeviceContext* immediate_context, std::string s, 
 	}
 }
 
-void playshader::DebugDrawGUI()
+void playshader::DebugDrawGUI(bool flag)
 {
-	ImGui::SetNextWindowPos(ImVec2(10, 10), ImGuiCond_FirstUseEver);
-	ImGui::SetNextWindowSize(ImVec2(300, 300), ImGuiCond_FirstUseEver);
+	if (flag) {
+		ImGui::SetNextWindowPos(ImVec2(10, 10), ImGuiCond_FirstUseEver);
+		ImGui::SetNextWindowSize(ImVec2(300, 300), ImGuiCond_FirstUseEver);
 
-	if (ImGui::Begin("Sky", nullptr, ImGuiWindowFlags_None))
-	{
-		//transform
-		if (ImGui::CollapsingHeader("Weather", ImGuiTreeNodeFlags_DefaultOpen))
+		if (ImGui::Begin("Sky", nullptr, ImGuiWindowFlags_None))
 		{
-		    //coverage –§“x
-			ImGui::SliderFloat("Coverage", &cover, 0.0f, 1.0f);
-			ImGui::SliderFloat("cloud_speed", &c_speed, 0.0f, 1.0f);
-			ImGui::SliderFloat("rain", &rainy, 0.0f, 1.0f);
+			//transform
+			if (ImGui::CollapsingHeader("Weather", ImGuiTreeNodeFlags_DefaultOpen))
+			{
+				//coverage –§“x
+				ImGui::Text("---cloud---");
+				ImGui::SliderFloat("coverage", &cover, 0.0f, 1.0f);
+				ImGui::SliderFloat("cloud_speed", &c_speed, 0.0f, 1.0f);
+				ImGui::Text("---weather---");
+				ImGui::SliderFloat("rain", &rainy, 0.0f, 1.0f);
+				ImGui::Text("---kind of sky---");
+				ImGui::Text("1.blue 2.night 3.sunset");
+				ImGui::InputFloat("sky", &sky_state, 1.0f, 1.0f);
+				if (sky_state == 0) {
+					ImGui::Text("sky color (top&under)");
+					ImGui::ColorPicker4("top", &top_sky_color.x, 0.0f);
+					ImGui::ColorPicker4("under", &un_sky_color.x, 0.0f);
+				}
+			}
 		}
+		ImGui::End();
 	}
-	ImGui::End();
 }
 
