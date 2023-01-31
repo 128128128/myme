@@ -231,5 +231,5 @@ float4 main(VS_OUT pin) : SV_TARGET
     d = saturate(d); // 0～1にクリッピング
     tex.rgb = C * d; //ライト決定
 
-    return 0;
+    return tex;//0
 }

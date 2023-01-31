@@ -18,7 +18,9 @@ class terrain
 		float mix_rate = 1.0f;
 		float texture1_num = 0.0f;
 		float texture2_num = 0.0f;
-		float pad;
+		float vertical_scale;
+		float smooth = 0.0f;
+		DirectX::XMFLOAT3 pad;
 	};
 	float rate = 1.0f;
 	float texture0 = 0.0f;
@@ -44,6 +46,7 @@ public:
 
 	float horizontal_scale = 100.0f;
 	float vertical_scale = 32.0f;
+	float smooth = 0.0f;
 	float tesselation_max_subdivision = 16;
 
 	terrain(ID3D11Device* device);

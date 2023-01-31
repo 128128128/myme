@@ -104,22 +104,22 @@ dcl_temps 6
 //   o1.x <- <main return value>.Depth.x; o1.y <- <main return value>.Depth.y; o1.z <- <main return value>.Depth.z; o1.w <- <main return value>.Depth.w; 
 //   o0.x <- <main return value>.Color.x; o0.y <- <main return value>.Color.y; o0.z <- <main return value>.Color.z; o0.w <- <main return value>.Color.w
 //
-#line 121 "C:\Users\2200167\Desktop\個人製作\myme03\myme\HLSL\terrain_ps.hlsl"
+#line 122 "C:\Users\2200167\Desktop\個人製作\myme03\myme\HLSL\terrain_ps.hlsl"
 sample_indexable(texture2d)(float,float,float,float) r0.xyzw, v5.xyxx, t0.xyzw, s2  // r0.x <- color.x; r0.y <- color.y; r0.z <- color.z; r0.w <- color.w
 
-#line 123
+#line 124
 mov r0.w, r0.w  // r0.w <- alpha
 
-#line 124
+#line 125
 dp3 r1.x, v2.xyzx, v2.xyzx
 rsq r1.x, r1.x
 mul r1.xyz, r1.xxxx, v2.xyzx  // r1.x <- N.x; r1.y <- N.y; r1.z <- N.z
 
-#line 125
+#line 126
 itof r2.xy, l(0, 0, 0, 0)  // r2.x <- T.y; r2.y <- T.z
 mov r2.z, l(1.000100)  // r2.z <- T.x
 
-#line 126
+#line 127
 mul r3.xyz, r1.yzxy, r2.yzxy
 mul r2.xyz, r1.zxyz, r2.xyzx
 mov r2.xyz, -r2.xyzx
@@ -128,7 +128,7 @@ dp3 r1.w, r2.xyzx, r2.xyzx
 rsq r1.w, r1.w
 mul r2.xyz, r1.wwww, r2.xyzx  // r2.x <- B.x; r2.y <- B.y; r2.z <- B.z
 
-#line 127
+#line 128
 mul r3.xyz, r1.zxyz, r2.yzxy
 mul r4.xyz, r1.yzxy, r2.zxyz
 mov r4.xyz, -r4.xyzx
@@ -137,16 +137,16 @@ dp3 r1.w, r3.xyzx, r3.xyzx
 rsq r1.w, r1.w
 mul r3.xyz, r1.wwww, r3.xyzx  // r3.x <- T.x; r3.y <- T.y; r3.z <- T.z
 
-#line 129
+#line 130
 sample_indexable(texture2d)(float,float,float,float) r4.xyz, v5.xyxx, t3.xyzw, s1
 mov r4.xyz, r4.xyzx  // r4.x <- normal.x; r4.y <- normal.y; r4.z <- normal.z
 
-#line 130
+#line 131
 mul r4.xyz, r4.xyzx, l(2.000000, 2.000000, 2.000000, 0.000000)
 mov r5.xyz, l(-1.000000,-1.000000,-1.000000,-0.000000)
 add r4.xyz, r4.xyzx, r5.xyzx
 
-#line 132
+#line 133
 mul r3.xyz, r3.xyzx, r4.xxxx
 mul r2.xyz, r2.xyzx, r4.yyyy
 add r2.xyz, r2.xyzx, r3.xyzx
@@ -156,41 +156,41 @@ dp3 r1.w, r1.xyzx, r1.xyzx
 rsq r1.w, r1.w
 mul r1.xyz, r1.wwww, r1.xyzx  // r1.x <- N.x; r1.y <- N.y; r1.z <- N.z
 
-#line 133
+#line 134
 mul r1.xyz, r1.xyzx, l(0.500000, 0.500000, 0.500000, 0.000000)
 add r1.xyz, r1.xyzx, l(0.500000, 0.500000, 0.500000, 0.000000)  // r1.x <- N.x; r1.y <- N.y; r1.z <- N.z
 
-#line 142
+#line 143
 mov r0.xyz, r0.xyzx  // r0.x <- ret.Color.x; r0.y <- ret.Color.y; r0.z <- ret.Color.z
 mov r0.w, r0.w  // r0.w <- ret.Color.w
 
-#line 143
+#line 144
 mov r1.xyz, r1.xyzx  // r1.x <- ret.Normal.x; r1.y <- ret.Normal.y; r1.z <- ret.Normal.z
 mov r1.w, l(1.000000)  // r1.w <- ret.Normal.w
 
-#line 144
+#line 145
 mov r2.xyzw, v1.xyzw  // r2.x <- ret.Position.x; r2.y <- ret.Position.y; r2.z <- ret.Position.z; r2.w <- ret.Position.w
 
-#line 145
+#line 146
 mov r3.xyzw, -cb1[0].xyzw
 add r3.xyzw, r3.xyzw, v1.xyzw
 dp4 r3.x, r3.xyzw, r3.xyzw
 sqrt r3.x, r3.x  // r3.x <- dist
 
-#line 146
+#line 147
 itof r3.yzw, l(0, 0, 0, 1)  // r3.y <- ret.Depth.y; r3.z <- ret.Depth.z; r3.w <- ret.Depth.w
 mov r3.x, r3.x  // r3.x <- ret.Depth.x
 
-#line 147
-mov r4.xyzw, l(0,0,0,1.000000)  // r4.x <- ret.RM.x; r4.y <- ret.RM.y; r4.z <- ret.RM.z; r4.w <- ret.RM.w
+#line 148
+mov r4.xyzw, l(0,0,1.000000,1.000000)  // r4.x <- ret.RM.x; r4.y <- ret.RM.y; r4.z <- ret.RM.z; r4.w <- ret.RM.w
 
-#line 149
+#line 150
 mul r5.x, cb0[5].x, l(255.000000)  // r5.x <- ret.Shadow_param.x
 mul r5.y, cb0[5].x, l(255.000000)  // r5.y <- ret.Shadow_param.y
 mul r5.z, cb0[5].x, l(255.000000)  // r5.z <- ret.Shadow_param.z
 mul r5.w, cb0[5].x, l(255.000000)  // r5.w <- ret.Shadow_param.w
 
-#line 150
+#line 151
 mov o0.xyzw, r0.xyzw
 mov o1.xyzw, r3.xyzw
 mov o2.xyzw, r1.xyzw

@@ -112,6 +112,9 @@
     <Filter Include="HLSL\Ibl">
       <UniqueIdentifier>{94df5a95-4061-47eb-9c1f-0499b3e031b7}</UniqueIdentifier>
     </Filter>
+    <Filter Include="HLSL\Grass">
+      <UniqueIdentifier>{1c5b30b8-fa38-4806-ad0c-cc3ba5d0d91d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Sources\Scenes\game_scene.cpp">
@@ -317,6 +320,9 @@
     </ClCompile>
     <ClCompile Include="HLSL\ibl_functions.cpp">
       <Filter>HLSL\DifferredLight</Filter>
+    </ClCompile>
+    <ClCompile Include="sources\Particles\water_fall_particle.cpp">
+      <Filter>Sources\Graphics\particles</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -533,6 +539,9 @@
     <ClInclude Include="sources\Scenes\raytracing_scene.h">
       <Filter>Sources\Scene</Filter>
     </ClInclude>
+    <ClInclude Include="sources\Particles\water_fall_particle.h">
+      <Filter>Sources\Graphics\particles</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="HLSL\render_constants.hlsli">
@@ -648,6 +657,9 @@
     </None>
     <None Include="HLSL\material_info.hlsli">
       <Filter>HLSL\DifferredLight</Filter>
+    </None>
+    <None Include="HLSL\grass_cluster.hlsli">
+      <Filter>HLSL\Grass</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
@@ -887,6 +899,15 @@
     </FxCompile>
     <FxCompile Include="HLSL\title_back_vs.hlsl">
       <Filter>HLSL\Sprites</Filter>
+    </FxCompile>
+    <FxCompile Include="HLSL\d_pbr_loadtexture_ps.hlsl">
+      <Filter>HLSL\Differdmodel</Filter>
+    </FxCompile>
+    <FxCompile Include="HLSL\grass_cluster_ps.hlsl">
+      <Filter>HLSL\Grass</Filter>
+    </FxCompile>
+    <FxCompile Include="HLSL\grass_cluster_vs.hlsl">
+      <Filter>HLSL\Grass</Filter>
     </FxCompile>
   </ItemGroup>
 </Project>

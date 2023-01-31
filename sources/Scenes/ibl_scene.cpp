@@ -49,9 +49,9 @@ bool ibl_scene::initialize(ID3D11Device* device, CONST LONG screen_width, CONST 
 				// player->player=std::make_unique<dynamic_mesh>(device, ".\\resources\\nico.fbx");
 				player->player = std::make_unique<dynamic_mesh>(device, ".\\resources\\rock_girl\\rock_girl.fbx", true);
 				//player->player= std::make_unique<pbr_dynamic_mesh>(device, ".\\resources\\objects\\chest\\chest1.fbx", ".\\resources\\objects\\chest\\WoodChest_Wood_Chest_MetallicSmoothness.png");
-				pbr_ship = std::make_unique<pbr_Stage>(device);
+				pbr_ship = std::make_unique<pbr_Stage>(device, ".\\resources\\Jummo\\Jummo.fbx");
 				//pbr_ship->position = DirectX::XMFLOAT4(-14.286f, 8.204f, 24.0f, 1.0f);
-				pbr_ship_1 = std::make_unique<pbr_Stage>(device);
+				pbr_ship_1 = std::make_unique<pbr_Stage>(device, ".\\resources\\Jummo\\Jummo.fbx");
 				//pbr_ship_1->position = DirectX::XMFLOAT4(-14.286f, 16.204f, 24.0f, 1.0f );
 				pbr_ship_1->position = DirectX::XMFLOAT4(-2.0f, 0.0f, 0.0f, 1.0f );
 				
@@ -641,7 +641,7 @@ void ibl_scene::render(ID3D11DeviceContext* immediate_context, float elapsed_tim
 		//sky->DrawDebugGUI();
 		//eye_space_camera->DrawDebugGUI();
 		//player->DebugDrawGUI();
-		//post_effects->DrawDebugGUI();
+		post_effects->DrawDebugGUI();
 		//bloom_effect->DrawDebugGUI();
 		//white->DebugDrawGUI();
 		//pbr_ship_1->DebugDrawGUI();

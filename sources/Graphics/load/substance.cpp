@@ -385,22 +385,38 @@ namespace Descartes
 			material.shading_model = surface_material->FindProperty(FbxSurfaceMaterial::sShadingModel).Get<FbxString>();
 			material.multiLayer = surface_material->FindProperty(FbxSurfaceMaterial::sMultiLayer).Get<FbxBool>();
 
+			//0
 			fetch_material_property(material, FbxSurfaceMaterial::sDiffuse, FbxSurfaceMaterial::sDiffuseFactor, true/*force_srgb*/);
+
+			//1
 			fetch_material_property(material, FbxSurfaceMaterial::sAmbient, FbxSurfaceMaterial::sAmbientFactor, true/*force_srgb*/);
 
+			//2
 			fetch_material_property(material, FbxSurfaceMaterial::sSpecular, FbxSurfaceMaterial::sSpecularFactor, false/*force_srgb*/);
 			FbxDouble shininess = surface_material->FindProperty(FbxSurfaceMaterial::sShininess).Get<FbxDouble>();
 			material.properties.at(2).color.w = static_cast<float>(shininess);
 
+			//3
 			fetch_material_property(material, FbxSurfaceMaterial::sNormalMap, FbxSurfaceMaterial::sBumpFactor, false/*force_srgb*/);
-			material.properties.at(3).color.x = material.properties.at(3).color.y = 0.5f;
-			material.properties.at(3).color.z = material.properties.at(3).color.w = 1.0f;
+			//material.properties.at(3).color.x = material.properties.at(3).color.y = 0.5f;
+			//material.properties.at(3).color.z = material.properties.at(3).color.w = 1.0f;
+
+			//4
 			fetch_material_property(material, FbxSurfaceMaterial::sBump, FbxSurfaceMaterial::sBumpFactor, false/*force_srgb*/);
 
+			//5
 		    fetch_material_property(material, FbxSurfaceMaterial::sEmissive, FbxSurfaceMaterial::sEmissiveFactor, false/*force_srgb*/);
+
+			//6
 			fetch_material_property(material, FbxSurfaceMaterial::sTransparentColor, FbxSurfaceMaterial::sTransparencyFactor, false/*force_srgb*/);
+
+			//7
 			fetch_material_property(material, FbxSurfaceMaterial::sReflection, FbxSurfaceMaterial::sReflectionFactor, false/*force_srgb*/);
+
+			//8
 			fetch_material_property(material, FbxSurfaceMaterial::sDisplacementColor, FbxSurfaceMaterial::sDisplacementFactor, false/*force_srgb*/);
+
+			//9
 			fetch_material_property(material, FbxSurfaceMaterial::sVectorDisplacementColor, FbxSurfaceMaterial::sVectorDisplacementFactor, false/*force_srgb*/);
 
 			materials.insert(std::make_pair(surface_material->GetName(), material));

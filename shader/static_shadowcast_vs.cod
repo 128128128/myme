@@ -15,16 +15,20 @@
 //       float elapsedTime;             // Offset:    8
 //       float shadow_map_num;          // Offset:   12
 //       float4x4 mlvp[3];              // Offset:   16
+//       float4 warm_factor;            // Offset:  208
+//       float4 cool_factor;            // Offset:  224
+//       float4 wind_position;          // Offset:  240
+//       float4 wind_direction;         // Offset:  256
 //
-//   } something;                       // Offset:    0 Size:   208
+//   } something;                       // Offset:    0 Size:   272
 //   
 //   struct PLAYER
 //   {
 //       
-//       float4 position;               // Offset:  208
-//       float4 direction;              // Offset:  224
+//       float4 position;               // Offset:  272
+//       float4 direction;              // Offset:  288
 //
-//   } player;                          // Offset:  208 Size:    32 [unused]
+//   } player;                          // Offset:  272 Size:    32 [unused]
 //
 // }
 //
@@ -53,19 +57,35 @@
 // TEXCOORD                 2   xyzw        2     NONE   float   xyzw
 //
 vs_5_0
-dcl_globalFlags refactoringAllowed
-dcl_constantbuffer CB3[13], dynamicIndexed
+dcl_globalFlags refactoringAllowed | skipOptimization
+dcl_constantbuffer CB3[17], dynamicIndexed
 dcl_input v0.xyzw
 dcl_output_siv o0.xyzw, position
 dcl_output o2.xyzw
-dcl_temps 2
+dcl_temps 3
+//
+// Initial variable locations:
+//   v0.x <- position.x; v0.y <- position.y; v0.z <- position.z; v0.w <- position.w; 
+//   o1.x <- <main return value>.texcoord.x; o1.y <- <main return value>.texcoord.y; 
+//   o2.x <- <main return value>.shadow_param.x; o2.y <- <main return value>.shadow_param.y; o2.z <- <main return value>.shadow_param.z; o2.w <- <main return value>.shadow_param.w; 
+//   o0.x <- <main return value>.position.x; o0.y <- <main return value>.position.y; o0.z <- <main return value>.position.z; o0.w <- <main return value>.position.w
+//
+#line 14 "C:\Users\2200167\Desktop\個人製作\myme03\myme\HLSL\static_shadowcast_vs.hlsl"
 ftou r0.x, cb3[0].w
-ishl r0.x, r0.x, l(2)
-mul r1.xyzw, v0.yyyy, cb3[r0.x + 2].xyzw
-mad r1.xyzw, cb3[r0.x + 1].xyzw, v0.xxxx, r1.xyzw
-mad r1.xyzw, cb3[r0.x + 3].xyzw, v0.zzzz, r1.xyzw
-mad r0.xyzw, cb3[r0.x + 4].xyzw, v0.wwww, r1.xyzw
+imul null, r0.x, r0.x, l(4)
+mul r1.xyzw, v0.xxxx, cb3[r0.x + 1].xyzw
+mul r2.xyzw, v0.yyyy, cb3[r0.x + 2].xyzw
+add r1.xyzw, r1.xyzw, r2.xyzw
+mul r2.xyzw, v0.zzzz, cb3[r0.x + 3].xyzw
+add r1.xyzw, r1.xyzw, r2.xyzw
+mul r0.xyzw, v0.wwww, cb3[r0.x + 4].xyzw
+add r0.xyzw, r0.xyzw, r1.xyzw  // r0.x <- pin.position.x; r0.y <- pin.position.y; r0.z <- pin.position.z; r0.w <- pin.position.w
+
+#line 15
+mov r0.xyzw, r0.xyzw  // r0.x <- pin.shadow_param.x; r0.y <- pin.shadow_param.y; r0.z <- pin.shadow_param.z; r0.w <- pin.shadow_param.w
+
+#line 17
 mov o0.xyzw, r0.xyzw
 mov o2.xyzw, r0.xyzw
 ret 
-// Approximately 9 instruction slots used
+// Approximately 13 instruction slots used

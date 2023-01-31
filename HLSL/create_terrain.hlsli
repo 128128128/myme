@@ -34,7 +34,9 @@ struct primitive_constants
 	float mix_rate;
 	float texture1_num;
 	float texture2_num;
-	float pad;
+	float vertical_scale;
+	float bool_smooth;
+	float3 pad;
 };
 cbuffer primitive_constants : register(b8)
 {

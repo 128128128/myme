@@ -6,10 +6,10 @@
 //
 // Name                                 Type  Format         Dim      HLSL Bind  Count
 // ------------------------------ ---------- ------- ----------- -------------- ------
-// sceneSampler                      sampler      NA          NA             s0      1 
-// normal_texture                    texture  float4          2d             t0      1 
-// light_texture                     texture  float4          2d             t1      1 
-// color_texture                     texture  float4          2d             t5      1 
+// decal_sampler                     sampler      NA          NA             s0      1 
+// ClampSampler                      sampler      NA          NA             s1      1 
+// reflection_map                    texture  float4          2d             t6      1 
+// composite_map                     texture  float4          2d             t7      1 
 //
 //
 //
@@ -27,27 +27,122 @@
 //
 // Name                 Index   Mask Register SysValue  Format   Used
 // -------------------- ----- ------ -------- -------- ------- ------
-// SV_TARGET                0   xyzw        0   TARGET   float   xyzw
+// SV_Target                0   xyzw        0   TARGET   float   xyzw
 //
 ps_5_0
-dcl_globalFlags refactoringAllowed
+dcl_globalFlags refactoringAllowed | skipOptimization
 dcl_sampler s0, mode_default
-dcl_resource_texture2d (float,float,float,float) t0
-dcl_resource_texture2d (float,float,float,float) t1
-dcl_resource_texture2d (float,float,float,float) t5
+dcl_sampler s1, mode_default
+dcl_resource_texture2d (float,float,float,float) t6
+dcl_resource_texture2d (float,float,float,float) t7
 dcl_input_ps linear v1.xy
 dcl_output o0.xyzw
-dcl_temps 2
-sample_indexable(texture2d)(float,float,float,float) r0.xyz, v1.xyxx, t0.xyzw, s0
-mad r0.xyz, r0.xyzx, l(2.000000, 2.000000, 2.000000, 0.000000), l(-1.000000, -1.000000, -1.000000, 0.000000)
-dp3 r0.x, r0.xyzx, r0.xyzx
-sqrt r0.x, r0.x
-ge r0.x, r0.x, l(0.500000)
-and r0.x, r0.x, l(0x3f800000)
-sample_indexable(texture2d)(float,float,float,float) r1.xyzw, v1.xyxx, t1.xyzw, s0
-add r1.xyzw, r1.xyzw, l(-1.000000, -1.000000, -1.000000, -1.000000)
-mad r0.xyzw, r0.xxxx, r1.xyzw, l(1.000000, 1.000000, 1.000000, 1.000000)
-sample_indexable(texture2d)(float,float,float,float) r1.xyzw, v1.xyxx, t5.xyzw, s0
-mul o0.xyzw, r0.xyzw, r1.xyzw
+dcl_temps 7
+dcl_indexableTemp x0[3], 4
+dcl_indexableTemp x1[3], 4
+//
+// Initial variable locations:
+//   v0.x <- pin.position.x; v0.y <- pin.position.y; v0.z <- pin.position.z; v0.w <- pin.position.w; 
+//   v1.x <- pin.texcoord.x; v1.y <- pin.texcoord.y; 
+//   v2.x <- pin.normal.x; v2.y <- pin.normal.y; v2.z <- pin.normal.z; 
+//   v3.x <- pin.worldpos.x; v3.y <- pin.worldpos.y; v3.z <- pin.worldpos.z; 
+//   o0.x <- <main return value>.x; o0.y <- <main return value>.y; o0.z <- <main return value>.z; o0.w <- <main return value>.w
+//
+#line 276 "C:\Users\2200167\Desktop\個人製作\myme03\myme\HLSL\ssr_composite.hlsl"
+sample_indexable(texture2d)(float,float,float,float) r0.xyzw, v1.xyxx, t7.xyzw, s0  // r0.x <- composite.x; r0.y <- composite.y; r0.z <- composite.z; r0.w <- composite.w
+
+#line 297
+nop 
+mov r1.xy, v1.xyxx
+
+#line 103
+mov r1.z, l(0)  // r1.z <- mip_level
+
+#line 104
+resinfo_indexable(texture2d)(float,float,float,float)_uint r1.zw, r1.z, t6.zwxy
+mov r1.z, r1.z  // r1.z <- width
+mov r1.w, r1.w  // r1.w <- height
+
+#line 108
+mov x0[1].x, l(1.384615)
+mov x0[2].x, l(3.230769)
+
+#line 109
+mov x1[0].x, l(0.227027)
+mov x1[1].x, l(0.316216)
+mov x1[2].x, l(0.070270)
+
+#line 111
+sample_indexable(texture2d)(float,float,float,float) r2.xyzw, v1.xyxx, t6.xyzw, s1
+mov r3.x, x1[0].x
+mul r2.xyzw, r2.xyzw, r3.xxxx  // r2.x <- fragment_color.x; r2.y <- fragment_color.y; r2.z <- fragment_color.z; r2.w <- fragment_color.w
+
+#line 113
+mov r3.x, l(1)  // r3.x <- i
+mov r4.xyzw, r2.xyzw  // r4.x <- fragment_color.x; r4.y <- fragment_color.y; r4.z <- fragment_color.z; r4.w <- fragment_color.w
+mov r3.y, r3.x  // r3.y <- i
+loop 
+  ilt r3.z, r3.y, l(3)
+  breakc_z r3.z
+
+#line 115
+  mov r3.z, x0[r3.y + 0].x
+  utof r3.w, r1.w
+  div r5.y, r3.z, r3.w
+  mov r5.x, l(0)
+  add r3.zw, r1.xxxy, r5.xxxy
+  sample_indexable(texture2d)(float,float,float,float) r5.xyzw, r3.zwzz, t6.xyzw, s1
+  mov r3.z, x1[r3.y + 0].x
+  mul r5.xyzw, r3.zzzz, r5.xyzw
+  add r5.xyzw, r4.xyzw, r5.xyzw  // r5.x <- fragment_color.x; r5.y <- fragment_color.y; r5.z <- fragment_color.z; r5.w <- fragment_color.w
+
+#line 116
+  mov r3.z, x0[r3.y + 0].x
+  utof r3.w, r1.w
+  div r6.y, r3.z, r3.w
+  mov r6.x, l(0)
+  mov r3.zw, -r6.xxxy
+  add r3.zw, r1.xxxy, r3.zzzw
+  sample_indexable(texture2d)(float,float,float,float) r6.xyzw, r3.zwzz, t6.xyzw, s1
+  mov r3.z, x1[r3.y + 0].x
+  mul r6.xyzw, r3.zzzz, r6.xyzw
+  add r5.xyzw, r5.xyzw, r6.xyzw
+
+#line 117
+  mov r3.z, x0[r3.y + 0].x
+  utof r3.w, r1.z
+  div r6.x, r3.z, r3.w
+  mov r6.y, l(0)
+  add r3.zw, r1.xxxy, r6.xxxy
+  sample_indexable(texture2d)(float,float,float,float) r6.xyzw, r3.zwzz, t6.xyzw, s1
+  mov r3.z, x1[r3.y + 0].x
+  mul r6.xyzw, r3.zzzz, r6.xyzw
+  add r5.xyzw, r5.xyzw, r6.xyzw
+
+#line 118
+  mov r3.z, x0[r3.y + 0].x
+  utof r3.w, r1.z
+  div r6.x, r3.z, r3.w
+  mov r6.y, l(0)
+  mov r3.zw, -r6.xxxy
+  add r3.zw, r1.xxxy, r3.zzzw
+  sample_indexable(texture2d)(float,float,float,float) r6.xyzw, r3.zwzz, t6.xyzw, s1
+  mov r3.z, x1[r3.y + 0].x
+  mul r6.xyzw, r3.zzzz, r6.xyzw
+  add r4.xyzw, r5.xyzw, r6.xyzw  // r4.x <- fragment_color.x; r4.y <- fragment_color.y; r4.z <- fragment_color.z; r4.w <- fragment_color.w
+
+#line 119
+  iadd r3.y, r3.y, l(1)
+endloop 
+
+#line 121
+mov r4.xyzw, r4.xyzw  // r4.x <- <blur return value>.x; r4.y <- <blur return value>.y; r4.z <- <blur return value>.z; r4.w <- <blur return value>.w
+
+#line 297
+mul r1.xyzw, r4.xyzw, l(0.300000, 0.300000, 0.300000, 0.300000)
+add r0.xyzw, r0.xyzw, r1.xyzw
+
+#line 298
+mov o0.xyzw, r0.xyzw
 ret 
-// Approximately 12 instruction slots used
+// Approximately 66 instruction slots used

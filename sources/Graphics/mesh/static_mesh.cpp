@@ -63,6 +63,7 @@ void static_mesh::render(ID3D11DeviceContext* immediate_context, const XMFLOAT4X
 			immediate_context->PSSetShaderResources(1, 1, material->properties.at(1).shader_resource_view.GetAddressOf());
 			immediate_context->PSSetShaderResources(2, 1, material->properties.at(2).shader_resource_view.GetAddressOf());
 			immediate_context->PSSetShaderResources(3, 1, material->properties.at(3).shader_resource_view.GetAddressOf());
+			immediate_context->PSSetShaderResources(4, 1, material->properties.at(4).shader_resource_view.GetAddressOf());
 
 			immediate_context->DrawIndexed(subset.index_count, subset.index_start, 0);
 		}

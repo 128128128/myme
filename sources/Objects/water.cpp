@@ -3,15 +3,15 @@
 
 Water::Water(ID3D11Device* device)
 {
-	water_plane = std::make_unique<static_mesh>(device, ".\\resources\\enviroments\\water\\water_1119.fbx");
+	water_plane = std::make_unique<static_mesh>(device, ".\\resources\\enviroments\\water\\ocean_plane_big.fbx");
 
 	vs = std::make_unique<vertex_shader<static_mesh::vertex>>(device, "shader//water_vs.cso");
 	ps = std::make_unique<pixel_shader>(device, "shader//water_ps.cso");
 
 	velocity = XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f);
 
-	load_texture_from_file(device, ".\\resources\\skymaps\\envmap_miramar\\miramar_bk.tga", sky_map.GetAddressOf(), true, true);
-	load_texture_from_file(device, ".\\resources\\enviroments\\water\\sea_normal.png", sea_normal_map.GetAddressOf(), true, true);
+	load_texture_from_file(device, ".\\resources\\enviroments\\water\\sky-texture1.png", sky_map.GetAddressOf(), true, true);
+	load_texture_from_file(device, ".\\resources\\enviroments\\water\\ocean_plane.fbm\\Stream_Detail_Normals.dds", sea_normal_map.GetAddressOf(), true, true);
 
 	float angle = 0;
 	direction.x = sinf(angle * 0.01745f);
@@ -53,7 +53,7 @@ void Water::render(ID3D11DeviceContext* immediate_context)
 	ps->active(immediate_context);
 	vs->active(immediate_context);
 	immediate_context->PSSetShaderResources(8, 1, sky_map.GetAddressOf());
-	immediate_context->PSSetShaderResources(9, 1, sea_normal_map.GetAddressOf());
+	immediate_context->VSSetShaderResources(4, 1, sea_normal_map.GetAddressOf());
 	water_plane->render(immediate_context, world_transform);
 
 	ps->inactive(immediate_context);

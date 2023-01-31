@@ -6,10 +6,19 @@ Texture2D diffuse_map : register(t0);
 Texture2D ambient_map : register(t1);
 Texture2D specular_map : register(t2);
 Texture2D normal_map : register(t3);
+Texture2D bump_map : register(t4);
 
 //sky texture
 Texture2D sky_color:register(t8);
 Texture2D seaTexture:register(t9);
+
+//波の速さ・向き
+static const float2 wave1 = { 0.005,0.001 };
+static const float2 wave2 = { -0.005,0.016 };
+//波の大きさ
+static const float wave_size = 1.0f;
+//波による揺らぎ
+static const float fluctuation = 0.01f;
 
 SamplerState point_sampler_state : register(s0);
 SamplerState linear_sampler_state : register(s1);
@@ -296,27 +305,38 @@ PS_OUT main(VS_OUT pin)
 	float3 B = normalize(cross(N, T));
 	T = normalize(cross(B, N));
 
-	float4 normal = normal_map.Sample(linear_sampler_state, pin.texcoord);
+	float4 normal = bump_map.Sample(linear_sampler_state, pin.texcoord);
 	normal = (normal * 2.0) - 1.0;
 	normal.w = 0;
 	N = normalize((normal.x * T) + (normal.y * B) + (normal.z * N));
 	N = N * 0.5 + 0.5;//0~1
 
+    float2 temp_cast_0 = float2(0.0266, 0.0266);
+    float2 panner21 = (pin.texcoord + something.iTime * temp_cast_0);
+
+    float2 uv_Ripples2 = pin.texcoord/* * _Ripples2_ST.xy + _Ripples2_ST.zw*/;
+
+    float3 normal1 = bump_map.Sample(linear_sampler_state, panner21).rgb * 2 - 1;
+    float3 normal2 = bump_map.Sample(linear_sampler_state, uv_Ripples2).rgb * 2 - 1;
+    float3 temp_output_23_0 = (normal1 + normal2);
+    temp_output_23_0 = temp_output_23_0 * 0.5 + 0.5;
+
+    color.rgb= float3 (0.29, 0.29, 0.34);
 	ret.Color = float4(color.rgb, alpha);
-	ret.Normal = float4(N,1.0);
+	ret.Normal = float4(temp_output_23_0,1.0);
 	ret.Position = pin.position;
 	float depth = length(pin.position - camera_constants.position);
 	ret.Depth = float4(depth, 0, 0, 1);
-	ret.RM = float4(0.0, 0.0, 0.0, 1.0);
+	ret.RM = float4(1.0, 0.0, 0.0, 1.0);
 	return ret;
 
     //{
     //    // 法線取得(UV スクロール)
-    //    float3 N1 = seaTexture.Sample(linear_sampler_state,
+    //    float3 N1 = sky_color.Sample(linear_sampler_state,
     //        pin.texcoord + wave1 * something.iTime).xyz;
     //    N1 = N1 * 2.0f - 1.0f;
     //    // 法線取得(UV スクロール)
-    //    float3 N2 = seaTexture.Sample(linear_sampler_state,
+    //    float3 N2 = sky_color.Sample(linear_sampler_state,
     //        pin.texcoord + wave2 * something.iTime).xyz;
     //    N2 = N2 * 2.0f - 1.0f;
     //    float3 normal = normalize(
@@ -324,24 +344,29 @@ PS_OUT main(VS_OUT pin)
     //        N1 + N2 + float3(0, 0, 10)
     //    );
     //    // 変換行列生成
-    //    float3 Tangent = normalize(pin.tangent); // 接線(右)
-    //    float3 Binormal = -normalize(pin.binormal); // 従法線(上)
-    //    float3 Normal = normalize(pin.normal); // 法線(正面)
-    //    float3x3 m = { Tangent, Binormal, Normal };
+	   // float3 N = normalize(pin.normal.xyz);
+    //     float3 T = float3(1.0001, 0, 0);
+    //     float3 B = normalize(cross(N, T));
+    //     T = normalize(cross(B, N));
+    //    //float3 Tangent = normalize(pin.tangent); // 接線(右)
+    //    //float3 Binormal = -normalize(pin.binormal); // 従法線(上)
+    //    //float3 Normal = normalize(pin.normal); // 法線(正面)
+    //    //float3x3 m = { Tangent, Binormal, Normal };
+    //    float3x3 m = { T, B, N };
     //    // 法線を変換
     //    normal = mul(normal, m); // 法線 * 姿勢行列
     //    normal = normalize(normal);
     //    //水面のカラー
-    //    float4 Color = float4(1, 1, 1, 1.0);
-    //    ret.Color = Color;
+    //
+    //    ret.Color = color;
     //    float dist = length(pin.position.xyz - camera_constants.position.xyz);
-    //    ret.Depth = float4(dist, dist, dist, 1);
+    //    ret.Depth = float4(dist, 0, 0, 1);
     //    ret.Normal = float4(normal * 0.5 + 0.5, 1);
     //    ret.Position = float4(pin.position.xyz, 1);
-    //    //0713 R+M
+    //    // R+M
     //    float roughness = 0;// RoughnessTexture.Sample(diffuseMapSamplerState, pin.texcoord).r;
     //    float metallic = 1;// MetallicTexture.Sample(diffuseMapSamplerState, pin.texcoord).r;
-    //    ret.RM = float4(roughness, metallic, 0, 1);
+    //    ret.RM = float4(metallic, 0, roughness, 1);
     //    return ret;
-    
+   // }
 }

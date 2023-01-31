@@ -44,6 +44,17 @@ float d_ggx(float NoH/*ƒ‰ƒCƒgƒxƒNƒgƒ‹‚Æ‹üƒxƒNƒgƒ‹‚ğ‘«‚µ‚Ä³‹K‰»‚µ‚½ƒxƒNƒgƒ‹‚Æ–
 	float f = (NoH * NoH) * (alpha_roughness_sq - 1.0) + 1.0;
 	return alpha_roughness_sq / (PI * f * f);
 }
+// Beckmann distribution
+float Beckmann( float NoH)
+{
+	float microfacet = 0.76f;
+	float t2 = NoH * NoH;
+	float t4 = NoH * NoH * NoH * NoH;
+	float m2 = microfacet * microfacet;
+	float D = 1.0f / (4.0f * m2 * t4);
+	D *= exp((-1.0f / m2) * (1.0f - t2) / t2);
+	return D;
+}
 
 //  https://github.com/KhronosGroup/glTF/tree/master/specification/2.0#acknowledgments AppendixB
 //VoH...dot half vec*view vec
@@ -54,7 +65,7 @@ float3 brdf_specular_ggx(float3 f0, float3 f90, float alpha_roughness, float spe
 {
 	float3 F = f_schlick(f0, f90, VoH);//ƒtƒ‰ƒlƒ‹
 	float Vis = v_ggx(NoL, NoV, alpha_roughness);//Šô‰½Šw“IŒ¸Š
-	float D = d_ggx(NoH, alpha_roughness);//ƒ}ƒCƒNƒƒtƒ@ƒZƒbƒg–@ü•ª•zŠÖ”
+	float D =/* Beckmann(NoH);*/ d_ggx(NoH, alpha_roughness);//ƒ}ƒCƒNƒƒtƒ@ƒZƒbƒg–@ü•ª•zŠÖ”
 
 	return specular_weight * F * Vis * D;
 }

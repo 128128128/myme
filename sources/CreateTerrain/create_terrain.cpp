@@ -137,6 +137,8 @@ void terrain::draw(ID3D11DeviceContext* immediate_context)
 	primitive_data.mix_rate = rate;
 	primitive_data.texture1_num = texture0;
 	primitive_data.texture2_num = texture1;
+	primitive_data.vertical_scale = vertical_scale;
+	primitive_data.smooth = smooth;
 
 	immediate_context->UpdateSubresource(constant_buffer.Get(), 0, 0, &primitive_data, 0, 0);
 	//immediate_context->VSSetConstantBuffers(8, 1, constant_buffer.GetAddressOf());
@@ -184,6 +186,10 @@ void terrain::DebugDrawGUI()
 
 	if (ImGui::Begin("Texture", nullptr, ImGuiWindowFlags_None))
 	{
+		if (ImGui::CollapsingHeader("smooth", ImGuiTreeNodeFlags_DefaultOpen))
+		{
+			ImGui::SliderFloat("terrain smooth", &smooth, 0.0f, 1.0f);
+		}
 		if (ImGui::CollapsingHeader("Rate", ImGuiTreeNodeFlags_DefaultOpen))
 		{
 			ImGui::SliderFloat("mix rate", &rate, 1.0f, 5.0f);

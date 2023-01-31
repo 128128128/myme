@@ -41,7 +41,7 @@ bool particle_scene::initialize(ID3D11Device* device, CONST LONG screen_width, C
 	{
 		player = std::make_unique<Player>();
 		player->player = std::make_unique<dynamic_mesh>(device, ".\\resources\\rock_girl\\rock_girl.fbx", true);
-		pbr_ship = std::make_unique<pbr_Stage>(device);
+		pbr_ship = std::make_unique<pbr_Stage>(device, ".\\resources\\Jummo\\Jummo.fbx");
 		pbr_ship->mesh= std::make_unique<pbr_static_mesh>(device, ".\\resources\\Jummo\\Jummo.fbx");
 		pbr_ship->SetPosition({ 0.0f, 0.0f, 0.0f ,0.0f });
 		
@@ -221,7 +221,7 @@ void particle_scene::render(ID3D11DeviceContext* immediate_context, float elapse
 	{
 		particles->integrate(immediate_context, elapsed_time);
 	}
-	snow->integrate(immediate_context, XMFLOAT3(pbr_ship->position.x, pbr_ship->position.y, pbr_ship->position.z), eye_space_camera->view(), eye_space_camera->view_projection(), elapsed_time, time);
+	snow->integrate(immediate_context, XMFLOAT3(pbr_ship->position.x, pbr_ship->position.y, pbr_ship->position.z), eye_space_camera->view(), eye_space_camera->projection(), elapsed_time, time);
 	
 
 	//render target clear active

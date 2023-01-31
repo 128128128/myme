@@ -12,7 +12,7 @@ Rocks::Rocks(ID3D11Device* device, bool shadow_reciever)
     rocks[5] = std::make_unique<static_mesh>(device, ".\\resources\\enviroments\\rocks\\new_Rocks\\CliffEdge04.fbx");
     rocks[6] = std::make_unique<static_mesh>(device, ".\\resources\\enviroments\\rocks\\new_Rocks\\RockLedge.fbx");
     rocks[7] = std::make_unique<static_mesh>(device, ".\\resources\\enviroments\\rocks\\new_Rocks\\RockSwamp01.fbx");*/
-    rock = std::make_unique<static_mesh>(device, ".\\resources\\enviroments\\rocks\\stage_rocks.fbx",shadow_reciever);
+    rock = std::make_unique<static_mesh>(device, ".\\resources\\enviroments\\rocks\\stage_rocks_0124.fbx",shadow_reciever);
 
 	vs = std::make_unique<vertex_shader<static_mesh::vertex>>(device, "shader//static_mesh_vs.cso");
 	ps = std::make_unique<pixel_shader>(device, "shader//rocks_ps.cso");

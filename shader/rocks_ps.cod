@@ -183,7 +183,7 @@ itof r3.yzw, l(0, 0, 0, 1)  // r3.y <- ret.Depth.y; r3.z <- ret.Depth.z; r3.w <-
 mov r3.x, r3.x  // r3.x <- ret.Depth.x
 
 #line 46
-itof r4.xyzw, l(0, 1, 0, 1)  // r4.x <- ret.RM.x; r4.y <- ret.RM.y; r4.z <- ret.RM.z; r4.w <- ret.RM.w
+itof r4.xyzw, l(0, 0, 1, 1)  // r4.x <- ret.RM.x; r4.y <- ret.RM.y; r4.z <- ret.RM.z; r4.w <- ret.RM.w
 
 #line 48
 mul r5.x, cb0[5].x, l(255.000000)  // r5.x <- ret.Shadow_param.x

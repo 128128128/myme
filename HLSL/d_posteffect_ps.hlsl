@@ -96,6 +96,8 @@ float3 bloom(float2 uv)
 	return ret;
 }
 
+
+
 // ColorGrading
 float3 color_grading(float3 color)
 {
@@ -146,11 +148,58 @@ float outline(float2 uv) {
 	return 1;
 }
 
+float3 atmospheric_effects(float3 default_color, float3 pixel_position/*world space*/, float3 eye_position/*world space*/)
+{
+	float3 eye_to_pixel = pixel_position - eye_position;
+	float eye_to_pixel_distance = max(0, length(eye_to_pixel) - fog.start_depth);
+	eye_to_pixel = normalize(eye_to_pixel);
+
+	float fog_factor = 0;
+	float b1 = fog.global_density * 0.001 * smoothstep(-2.2, 2.2, fog.height_falloff - eye_to_pixel.y);
+	float b2 = fog.global_density * 0.001 * smoothstep(-2.2, 2.2, fog.height_falloff - eye_to_pixel.y);
+	float in_scattering = exp(-eye_to_pixel_distance * b1);
+	float extinction = exp(-eye_to_pixel_distance * b2);
+
+	//Find the sum highlight and use it to blend the fog color
+	const float sun_distance = 255;
+	float sun_highlight_factor = saturate(dot(eye_to_pixel, normalize((-light_direction.direction.xyz * sun_distance) - eye_position)));
+	sun_highlight_factor = pow(sun_highlight_factor, 16.0);
+	float3 fog_color = lerp(fog.color.rgb, fog.highlight_color.rgb, sun_highlight_factor);
+
+	return (1 - in_scattering) * fog_color + extinction * default_color;
+}
+
+
 float4 main(VS_OUT pin) : SV_TARGET0{
+
 	float4 tex = diffuse_texture.Sample(sampler_states[0], pin.texcoord);
 	//float4 depth = depth_texture.Sample(sampler_states[0], input.tex);
 
+
 	float4 color = tex;
+
+	float4 depth_map_color = depth_texture.Sample(sampler_states[LINEAR], pin.texcoord);
+
+
+	float4 position_in_ndc;
+	//texture space to ndc//テクスチャをndcへ変換
+	position_in_ndc.x = pin.texcoord.x * 2 - 1;
+	position_in_ndc.y = pin.texcoord.y * -2 + 1;
+	position_in_ndc.z = depth_map_color.x;
+	position_in_ndc.w = 1;
+
+	//ndc to world space
+	float4 position_in_world_space = mul(position_in_ndc, camera_constants.inverse_view_projection);
+	position_in_world_space /= position_in_world_space.w;
+
+	//color.rgb = apply_fog(color.rgb, position_in_world_space.xyz, camera_constants.position.xyz);
+
+	float4 P = position_texture.Sample(sampler_states[LINEAR], pin.texcoord);
+
+
+	//color.rgb = atmospheric_effects(color.rgb, position_in_world_space.xyz, player.position.xyz);
+
+
 	// Bloom
 	color.rgb = bloom(pin.texcoord);
 
@@ -169,6 +218,9 @@ float4 main(VS_OUT pin) : SV_TARGET0{
 
 	//color.rgb = depth;
 
+	//fog
+	color.rgb = apply_fog(color.rgb, P.xyz/*position_in_world_space*/, depth_map_color.x, camera_constants.position.xyz);
+
 	// tone mapping(0~1に収める)
 	uint mip_level = 0, width, height, number_of_levels;
 	diffuse_texture.GetDimensions(mip_level, width, height, number_of_levels);
@@ -178,6 +230,8 @@ float4 main(VS_OUT pin) : SV_TARGET0{
 	color.rgb = tonemap(color.rgb);
 	// gamma corection
 	pow(color.rgb, 1.0 / 2.2);
+
+
 
 	return color;
 }

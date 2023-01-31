@@ -42,7 +42,7 @@ float3 ibl_radiance_lambertian(float3 N, float3 V, float roughness, float3 diffu
 	//Projection of the surrounding environment reflected by the normal
 	//法線で反射した周囲環境を投影
 	float3 irradiance = diffuse_iem.Sample(sampler_states[LINEAR_CLAMP], N).rgb;
-	//return float4(f_ab,0, 1);
+	//return float4(NoV,0,0, 1);
 
 	// see https://bruop.github.io/ibl/#single_scattering_results at Single Scattering Results
 	// Roughness dependent fresnel, from Fdez-Aguera //Roughness 依存のフラネル
@@ -211,8 +211,7 @@ float4 physically_based_rendering(material_info material_info,float3 L, float3 V
 	float clearcoat_factor = 0.0;
 	float3 clearcoat_fresnel = 0.0;
 
-	float3 F = f_schlick(material_info.f0, material_info.f90, HoV);//フラネル
-	color = f_emissive + f_diffuse*(1-F) + f_specular;
+	color = f_emissive + f_diffuse + f_specular;
 	color = f_sheen + color * albedo_sheen_scaling;
 	color = color * (1.0 - clearcoat_factor * clearcoat_fresnel) + f_clearcoat;
 	return float4(max(0, color), material_info.basecolor.a);

@@ -1,12 +1,14 @@
 #include "static_mesh.hlsli"
 #include "scene_constants.hlsli"
 
+Texture2D bump_map : register(t4);
+SamplerState linear_sampler_state : register(s1);
+
 VS_OUT main(VS_IN vin)
 {
 	VS_OUT vout;
 	vout.sv_position = mul(vin.position, mul(world, camera_constants.view_projection));
 
-	vout.position = mul(vin.position, world);
 	vin.normal.w = 0;
 	vout.normal = normalize(mul(vin.normal, world));
 
@@ -16,6 +18,14 @@ VS_OUT main(VS_IN vin)
 	vout.texcoord = vin.texcoord;
 
 	vout.color = vin.color;
+
+	vout.position = mul(vin.position, world);
+	/*float2 temp_cast_0 = float2(0.266, 0.266);
+	float2 panner21 = (vin.texcoord.xy + something.iTime.x * temp_cast_0);
+	float3 ase_vertexNormal = vin.normal.xyz;
+	vout.position.xyz += (bump_map.SampleLevel(linear_sampler_state, float4(panner21, 0, 0.0),0.0) * float4((ase_vertexNormal * 0.0), 0.0)).rgb;*/
+
+	
 
 	return vout;
 }

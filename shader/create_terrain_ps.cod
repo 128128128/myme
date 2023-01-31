@@ -15,9 +15,11 @@
 //       float mix_rate;                // Offset:   80
 //       float texture1_num;            // Offset:   84
 //       float texture2_num;            // Offset:   88
-//       float pad;                     // Offset:   92
+//       float vertical_scale;          // Offset:   92
+//       float bool_smooth;             // Offset:   96
+//       float3 pad;                    // Offset:  100
 //
-//   } primitive_data;                  // Offset:    0 Size:    96
+//   } primitive_data;                  // Offset:    0 Size:   112
 //
 // }
 //
@@ -42,6 +44,7 @@
 //
 // Name                                 Type  Format         Dim      HLSL Bind  Count
 // ------------------------------ ---------- ------- ----------- -------------- ------
+// sampler_states[1]                 sampler      NA          NA             s1      1 
 // sampler_states[2]                 sampler      NA          NA             s2      1 
 // color_map1                        texture  float4          2d             t0      1 
 // color_map2                        texture  float4          2d             t1      1 
@@ -68,9 +71,10 @@
 // SV_TARGET                0   xyzw        0   TARGET   float   xyzw
 //
 ps_5_0
-dcl_globalFlags refactoringAllowed
-dcl_constantbuffer CB8[6], immediateIndexed
+dcl_globalFlags refactoringAllowed | skipOptimization
+dcl_constantbuffer CB8[7], immediateIndexed
 dcl_constantbuffer CB0[9], immediateIndexed
+dcl_sampler s1, mode_default
 dcl_sampler s2, mode_default
 dcl_resource_texture2d (float,float,float,float) t0
 dcl_resource_texture2d (float,float,float,float) t1
@@ -78,17 +82,75 @@ dcl_resource_texture2d (float,float,float,float) t2
 dcl_input_ps linear v2.xyz
 dcl_input_ps linear v3.xy
 dcl_output o0.xyzw
-dcl_temps 3
-sample_indexable(texture2d)(float,float,float,float) r0.xyz, v3.xyxx, t2.xyzw, s2
-mul r0.xyz, r0.xyzx, cb8[5].xxxx
-sample_indexable(texture2d)(float,float,float,float) r1.xyz, v3.xyxx, t0.xyzw, s2
-sample_indexable(texture2d)(float,float,float,float) r2.xyz, v3.xyxx, t1.xyzw, s2
-add r1.xyz, r1.xyzx, -r2.xyzx
-mad r0.xyz, r0.xyzx, r1.xyzx, r2.xyzx
-dp3 r0.w, v2.xyzx, -cb0[8].xyzx
-mad r0.w, r0.w, l(0.800000), l(0.800000)
-max r0.w, r0.w, l(0.000000)
+dcl_temps 4
+//
+// Initial variable locations:
+//   v0.x <- pin.sv_position.x; v0.y <- pin.sv_position.y; v0.z <- pin.sv_position.z; v0.w <- pin.sv_position.w; 
+//   v1.x <- pin.position.x; v1.y <- pin.position.y; v1.z <- pin.position.z; v1.w <- pin.position.w; 
+//   v2.x <- pin.normal.x; v2.y <- pin.normal.y; v2.z <- pin.normal.z; v2.w <- pin.normal.w; 
+//   v3.x <- pin.texcoord.x; v3.y <- pin.texcoord.y; 
+//   o0.x <- <main return value>.x; o0.y <- <main return value>.y; o0.z <- <main return value>.z; o0.w <- <main return value>.w
+//
+#line 10 "C:\Users\2200167\Desktop\個人製作\myme03\myme\HLSL\create_terrain_ps.hlsl"
+sample_indexable(texture2d)(float,float,float,float) r0.xyz, v3.xyxx, t0.xyzw, s2
+mov r0.xyz, r0.xyzx  // r0.x <- color1.x; r0.y <- color1.y; r0.z <- color1.z
+
+#line 11
+sample_indexable(texture2d)(float,float,float,float) r1.xyz, v3.xyxx, t1.xyzw, s2
+mov r1.xyz, r1.xyzx  // r1.x <- color2.x; r1.y <- color2.y; r1.z <- color2.z
+
+#line 12
+sample_indexable(texture2d)(float,float,float,float) r2.xyz, v3.xyxx, t2.xyzw, s2
+mov r2.xyz, r2.xyzx  // r2.x <- noise.x; r2.y <- noise.y; r2.z <- noise.z
+
+#line 15
+mul r2.xyz, r2.xyzx, cb8[5].xxxx
+mov r3.xyz, -r1.xyzx
+add r0.xyz, r0.xyzx, r3.xyzx
+mul r0.xyz, r0.xyzx, r2.xyzx
+add r0.xyz, r0.xyzx, r1.xyzx  // r0.x <- color.x; r0.y <- color.y; r0.z <- color.z
+
+#line 17
+mov r1.xyz, -cb0[8].xyzx  // r1.x <- L.x; r1.y <- L.y; r1.z <- L.z
+
+#line 19
+lt r0.w, l(0.000000), cb8[6].x
+if_nz r0.w
+
+#line 21
+  mov r0.w, cb8[5].w  // r0.w <- depth_in_pixels
+
+#line 22
+  sample_indexable(texture2d)(float,float,float,float) r1.w, v3.xyxx, t2.yzwx, s1  // r1.w <- h
+
+#line 23
+  deriv_rtx_coarse r2.x, r1.w
+  mov r2.x, -r2.x
+  mul r2.x, r0.w, r2.x
+  deriv_rty_coarse r1.w, r1.w
+  mov r1.w, -r1.w
+  mul r2.z, r0.w, r1.w
+  itof r2.y, l(1)
+  dp3 r0.w, r2.xyzx, r2.xyzx
+  rsq r0.w, r0.w
+  mul r2.xyz, r0.wwww, r2.xyzx  // r2.x <- N.x; r2.y <- N.y; r2.z <- N.z
+
+#line 24
+else 
+
+#line 26
+  mov r2.xyz, v2.xyzx  // r2.x <- N.x; r2.y <- N.y; r2.z <- N.z
+endif 
+
+#line 28
+itof r0.w, l(0)
+dp3 r1.x, r2.xyzx, r1.xyzx
+mul r1.x, r1.x, l(0.800000)
+add r1.x, r1.x, l(0.800000)
+max r0.w, r0.w, r1.x  // r0.w <- diffuse_factor
+
+#line 29
 mul o0.xyz, r0.wwww, r0.xyzx
-mov o0.w, l(1.000000)
+itof o0.w, l(1)
 ret 
-// Approximately 12 instruction slots used
+// Approximately 37 instruction slots used

@@ -84,18 +84,28 @@ Texture2D env_texture : register(t15);
 
 SamplerState ClampSampler : register(s1);
 
+float noise(float2 seed)
+{
+    return frac(sin(dot(seed.xy, float2(12.9898, 78.233))) * 43758.5453);
+}
+
 //SSR
 // 映りこむ画面テクスチャのUVを返す
 // P : 座標　R:視線の反射
-float2 ssr(float3 P, float3 R)
+float3 ssr(float3 P, float3 R,float2 uv)
 {
+    float step = 0.3;
     // reflect vec //反射ベクトル(視線と法線で反射)
     R = normalize(R);
     // ちょっとずつ進める
-    R *= 0.3; //0.1 = 一回で進める距離
+    R *= step; //0.1 = 一回で進める距離
+   // float3 step = 2.0 / 100 * R;
+    float maxThickness = 2;
+
     [loop] //Loopのまま
-    for (int i = 0; i < 100; i++) {
-        P += R; //進める
+    for (int i = 0; i < 10; i++) {
+        float ray = 1.0;// (i + noise(uv/* + something.iTime.x*/));
+        P += R * ray; //進める
         // 何かにぶつかった？
         // Pまでの距離と
         float DistP = length(P - camera_constants.position);
@@ -115,10 +125,23 @@ float2 ssr(float3 P, float3 R)
         float DistS = depth_texture.Sample(
             decal_sampler, Puv).x;
 
+        float maxLength = 2.0;
         // 距離比較(２以上近い場合はNG)
-        if (DistP > DistS && DistP - 2 < DistS) {
+        if (DistP > DistS && DistP - DistS< maxThickness) {
+            float a = 0.2 * pow(min(1.0, (maxLength / 2) / length(ray)), 2.0);
             // 交差 = 映り込みポイント
-            return Puv;
+            return float3(Puv,a);
+           /* float sign = -1.0;
+            for (int m = 1; m <= 4; ++m) {
+                P += sign * pow(0.5, m) * step;
+                screenP = mul(camera_constants.view_projection, float4(P, 1.0));
+                Puv = screenP.xy / screenP.w * 0.5 + 0.5;
+                DistP = length(P - camera_constants.position);
+                DistS = depth_texture.Sample(
+                    decal_sampler, Puv).x;
+                sign = DistP - DistS > 0 ? -1 : 1;
+                return Puv;
+            }*/
         }
     }
     return -1; // non reflect 映り込み無
@@ -174,6 +197,9 @@ float4 main(PS_IN pin) : SV_Target0
       float4 P = position_texture.Sample(decal_sampler, pin.texcoord);
       float3 E = P.xyz - camera_constants.position.xyz;//視線
       float3 R = reflect(normalize(E), N);
+
+      //return float4(R,1);
+      //
       // Rを上下と方向に分解
       float2 v;
       v.y = R.y; //Yはそのまま
@@ -207,16 +233,18 @@ float4 main(PS_IN pin) : SV_Target0
       env.rgb = env.rgb / (100 + env.rgb);
 
       //SSR 映り込みのUVを受け取る
-      float2 l_ssr = ssr(P, R);
+      float3 l_ssr = ssr(P, R,pin.texcoord);
       if (l_ssr.x >= 0) {
           float4 texR = albedo_texture.Sample(
               decal_sampler, l_ssr);
           // blend based roughnessブレンド
           float rate = roughness;
-          rate = rate * 0.6 + 0.0; //0.4---1.0
-          env =  lerp(texR, env, roughness);
+          rate = rate * 0.6 + 0.4; //0.4---1.0
+          env = lerp(texR, env, rate);
       }
+      float a = l_ssr.z;
 
+     
       return env;
 }
 

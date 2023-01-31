@@ -258,6 +258,7 @@
     <ClCompile Include="sources\Objects\water_fall.cpp" />
     <ClCompile Include="sources\Particles\husk_particles.cpp" />
     <ClCompile Include="sources\Particles\snow_particles.cpp" />
+    <ClCompile Include="sources\Particles\water_fall_particle.cpp" />
     <ClCompile Include="sources\Scenes\create_terrain_scene.cpp" />
     <ClCompile Include="Sources\Scenes\game_scene.cpp" />
     <ClCompile Include="sources\Scenes\ibl_scene.cpp" />
@@ -330,6 +331,7 @@
     <ClInclude Include="sources\Objects\water_fall.h" />
     <ClInclude Include="sources\Particles\husk_particles.h" />
     <ClInclude Include="sources\Particles\snow_particles.h" />
+    <ClInclude Include="sources\Particles\water_fall_particle.h" />
     <ClInclude Include="sources\Scenes\create_terrain_scene.h" />
     <ClInclude Include="Sources\Scenes\game_scene.h" />
     <ClInclude Include="sources\Scenes\ibl_scene.h" />
@@ -347,6 +349,7 @@
     <None Include="HLSL\d_posteffect.hlsli" />
     <None Include="HLSL\fullscreen_quad.hlsli" />
     <None Include="HLSL\geometric_primitive.hlsli" />
+    <None Include="HLSL\grass_cluster.hlsli" />
     <None Include="HLSL\husk_particles.hlsli" />
     <None Include="HLSL\ibl.hlsli" />
     <None Include="HLSL\image_based_lighting.hlsli" />
@@ -453,6 +456,12 @@
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
     </FxCompile>
+    <FxCompile Include="HLSL\d_pbr_loadtexture_ps.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+    </FxCompile>
     <FxCompile Include="HLSL\d_pbr_static_mesh_ps.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
@@ -548,6 +557,14 @@
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+    </FxCompile>
+    <FxCompile Include="HLSL\grass_cluster_ps.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+    </FxCompile>
+    <FxCompile Include="HLSL\grass_cluster_vs.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
     </FxCompile>
     <FxCompile Include="HLSL\hask_particles_copy_buffer_cs.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Compute</ShaderType>

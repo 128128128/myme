@@ -6,6 +6,7 @@ Texture2D diffuse_map1 : register(t0);//moss_albedo
 Texture2D ambient_map : register(t1);
 Texture2D specular_map : register(t2);
 Texture2D normal_map : register(t3);
+Texture2D bump_map : register(t3);
 //Texture2D diffuse_map2 : register(t5);//MuddyGround_Albedo
 //Texture2D normal_map1 : register(t6);//moss_normal
 //Texture2D normal_detail_map1 : register(t7);//Moss_detail_Normal
@@ -144,7 +145,7 @@ PS_OUT main(VS_OUT pin)
 	ret.Position = pin.position;
 	float dist = length(pin.position - camera_constants.position);
     ret.Depth = float4(dist, 0, 0, 1);
-	ret.RM = float4(0.0,0.0,0.0,1.0);
+	ret.RM = float4(0.0,0.0,1.0,1.0);
 
 	ret.Shadow_param = float4(255.0f * shadow_reciever, 255.0f * shadow_reciever, 255.0f * shadow_reciever, 255.0f * shadow_reciever);
 	return ret;

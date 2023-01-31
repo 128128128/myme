@@ -37,6 +37,7 @@ snow_particles::snow_particles(ID3D11Device* device, DirectX::XMFLOAT3 initial_p
 	particles.resize(snow_particle_count);
 
 	std::mt19937 mt{ std::random_device{}() };
+	
 	std::uniform_real_distribution<float> rand(-interval * 0.5f, +interval * 0.5f);
 
 	size_t index{ 0 };
@@ -56,7 +57,10 @@ snow_particles::snow_particles(ID3D11Device* device, DirectX::XMFLOAT3 initial_p
 				DirectX::XMVector3Normalize(vec);
 				DirectX::XMFLOAT3 v = {};
 				DirectX::XMStoreFloat3(&v, vec);
-				particles.at(index++).velocity = { 0.0f, fall_speed + rand(mt) * (fall_speed * 0.5f) * v.y, 0.0f };
+				float rand_speed = rand(mt);
+				if (rand_speed > 0.0f)
+					rand_speed *= -1;
+				particles.at(index++).velocity = { 0.0f, fall_speed + rand_speed*(fall_speed * 0.5f) * v.y, 0.0f };
 				//particles.at(index++).velocity = { 0.0f, fall_speed, 0.0f };
 			}
 		}

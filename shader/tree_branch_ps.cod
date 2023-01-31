@@ -57,16 +57,20 @@
 //       float elapsedTime;             // Offset:    8
 //       float shadow_map_num;          // Offset:   12
 //       float4x4 mlvp[3];              // Offset:   16
+//       float4 warm_factor;            // Offset:  208
+//       float4 cool_factor;            // Offset:  224
+//       float4 wind_position;          // Offset:  240
+//       float4 wind_direction;         // Offset:  256
 //
-//   } something;                       // Offset:    0 Size:   208
+//   } something;                       // Offset:    0 Size:   272
 //   
 //   struct PLAYER
 //   {
 //       
-//       float4 position;               // Offset:  208
-//       float4 direction;              // Offset:  224
+//       float4 position;               // Offset:  272
+//       float4 direction;              // Offset:  288
 //
-//   } player;                          // Offset:  208 Size:    32 [unused]
+//   } player;                          // Offset:  272 Size:    32 [unused]
 //
 // }
 //

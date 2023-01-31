@@ -15,9 +15,11 @@
 //       float mix_rate;                // Offset:   80
 //       float texture1_num;            // Offset:   84
 //       float texture2_num;            // Offset:   88
-//       float pad;                     // Offset:   92
+//       float vertical_scale;          // Offset:   92
+//       float bool_smooth;             // Offset:   96
+//       float3 pad;                    // Offset:  100
 //
-//   } primitive_data;                  // Offset:    0 Size:    96
+//   } primitive_data;                  // Offset:    0 Size:   112
 //
 // }
 //

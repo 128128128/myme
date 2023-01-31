@@ -15,9 +15,11 @@
 //       float mix_rate;                // Offset:   80
 //       float texture1_num;            // Offset:   84
 //       float texture2_num;            // Offset:   88
-//       float pad;                     // Offset:   92
+//       float vertical_scale;          // Offset:   92
+//       float bool_smooth;             // Offset:   96
+//       float3 pad;                    // Offset:  100
 //
-//   } primitive_data;                  // Offset:    0 Size:    96
+//   } primitive_data;                  // Offset:    0 Size:   112
 //
 // }
 //
@@ -69,7 +71,8 @@ dcl_constantbuffer CB8[4], immediateIndexed
 dcl_constantbuffer CB0[4], immediateIndexed
 dcl_input v[3][0].xyzw
 dcl_input v[3][1].xy
-dcl_temps 5
+dcl_temps 4
+dcl_indexableTemp x0[3], 4
 dcl_inputprimitive triangle 
 dcl_outputtopology trianglestrip 
 dcl_output_siv o0.xyzw, position
@@ -77,55 +80,140 @@ dcl_output o1.xyzw
 dcl_output o2.xyzw
 dcl_output o3.xy
 dcl_maxout 3
-mul r0.xyzw, cb8[1].xyzw, v[0][0].yyyy
-mad r0.xyzw, v[0][0].xxxx, cb8[0].xyzw, r0.xyzw
-mad r0.xyzw, v[0][0].zzzz, cb8[2].xyzw, r0.xyzw
-mad r0.xyzw, v[0][0].wwww, cb8[3].xyzw, r0.xyzw
-mul r1.xyzw, r0.yyyy, cb0[1].xyzw
-mad r1.xyzw, r0.xxxx, cb0[0].xyzw, r1.xyzw
-mad r1.xyzw, r0.zzzz, cb0[2].xyzw, r1.xyzw
-mad r1.xyzw, r0.wwww, cb0[3].xyzw, r1.xyzw
-mov o0.xyzw, r1.xyzw
-mov o1.xyzw, r0.xyzw
+//
+// Initial variable locations:
+//   m0 <- output; 
+//   v[0][0].x <- input[0].position.x; v[0][0].y <- input[0].position.y; v[0][0].z <- input[0].position.z; v[0][0].w <- input[0].position.w; 
+//   v[0][1].x <- input[0].texcoord.x; v[0][1].y <- input[0].texcoord.y; 
+//   v[1][0].x <- input[1].position.x; v[1][0].y <- input[1].position.y; v[1][0].z <- input[1].position.z; v[1][0].w <- input[1].position.w; 
+//   v[1][1].x <- input[1].texcoord.x; v[1][1].y <- input[1].texcoord.y; 
+//   v[2][0].x <- input[2].position.x; v[2][0].y <- input[2].position.y; v[2][0].z <- input[2].position.z; v[2][0].w <- input[2].position.w; 
+//   v[2][1].x <- input[2].texcoord.x; v[2][1].y <- input[2].texcoord.y; 
+//   x0 <- positions
+//
+#line 10 "C:\Users\2200167\Desktop\個人製作\myme03\myme\HLSL\create_terrain_gs.hlsl"
+mul r0.xyzw, cb8[0].xyzw, v[0][0].xxxx
+mul r1.xyzw, cb8[1].xyzw, v[0][0].yyyy
+add r0.xyzw, r0.xyzw, r1.xyzw
+mul r1.xyzw, cb8[2].xyzw, v[0][0].zzzz
+add r0.xyzw, r0.xyzw, r1.xyzw
+mul r1.xyzw, cb8[3].xyzw, v[0][0].wwww
+add r0.xyzw, r0.xyzw, r1.xyzw
+mov x0[0].xyzw, r0.xyzw
+
+#line 11
+mul r0.xyzw, cb8[0].xyzw, v[1][0].xxxx
+mul r1.xyzw, cb8[1].xyzw, v[1][0].yyyy
+add r0.xyzw, r0.xyzw, r1.xyzw
+mul r1.xyzw, cb8[2].xyzw, v[1][0].zzzz
+add r0.xyzw, r0.xyzw, r1.xyzw
+mul r1.xyzw, cb8[3].xyzw, v[1][0].wwww
+add r0.xyzw, r0.xyzw, r1.xyzw
+mov x0[1].xyzw, r0.xyzw
+
+#line 12
+mul r0.xyzw, cb8[0].xyzw, v[2][0].xxxx
 mul r1.xyzw, cb8[1].xyzw, v[2][0].yyyy
-mad r1.xyzw, v[2][0].xxxx, cb8[0].xyzw, r1.xyzw
-mad r1.xyzw, v[2][0].zzzz, cb8[2].xyzw, r1.xyzw
-mad r1.xyzw, v[2][0].wwww, cb8[3].xyzw, r1.xyzw
-add r2.xyz, -r0.zxyz, r1.zxyz
-mul r3.xyzw, cb8[1].xyzw, v[1][0].yyyy
-mad r3.xyzw, v[1][0].xxxx, cb8[0].xyzw, r3.xyzw
-mad r3.xyzw, v[1][0].zzzz, cb8[2].xyzw, r3.xyzw
-mad r3.xyzw, v[1][0].wwww, cb8[3].xyzw, r3.xyzw
-add r0.xyz, -r0.yzxy, r3.yzxy
-mul r4.xyz, r0.xyzx, r2.xyzx
-mad r0.xyz, r2.zxyz, r0.yzxy, -r4.xyzx
+add r0.xyzw, r0.xyzw, r1.xyzw
+mul r1.xyzw, cb8[2].xyzw, v[2][0].zzzz
+add r0.xyzw, r0.xyzw, r1.xyzw
+mul r1.xyzw, cb8[3].xyzw, v[2][0].wwww
+add r0.xyzw, r0.xyzw, r1.xyzw
+mov x0[2].xyzw, r0.xyzw
+
+#line 14
+mov r0.xyz, x0[2].xyzx
+mov r1.xyz, x0[0].xyzx
+mov r1.xyz, -r1.zxyz
+add r0.xyz, r0.zxyz, r1.xyzx
+mov r1.xyz, x0[1].xyzx
+mov r2.xyz, x0[0].xyzx
+mov r2.xyz, -r2.yzxy
+add r1.xyz, r1.yzxy, r2.xyzx
+mul r2.xyz, r0.zxyz, r1.yzxy
+mul r0.xyz, r0.xyzx, r1.xyzx
+mov r0.xyz, -r0.xyzx
+add r0.xyz, r0.xyzx, r2.xyzx
 dp3 r0.w, r0.xyzx, r0.xyzx
 rsq r0.w, r0.w
-mul r0.xyz, r0.wwww, r0.xyzx
-mov o2.xyz, r0.xyzx
-mov o2.w, l(0)
-mov o3.xy, v[0][1].xyxx
+mul r0.xyz, r0.wwww, r0.xyzx  // r0.x <- normal.x; r0.y <- normal.y; r0.z <- normal.z
+
+#line 15
+itof r0.w, l(0)  // r0.w <- element.normal.w
+mov r0.xyz, r0.xyzx  // r0.x <- element.normal.x; r0.y <- element.normal.y; r0.z <- element.normal.z
+
+#line 17
+mov r1.xyzw, x0[0].xyzw
+mul r2.xyzw, r1.xxxx, cb0[0].xyzw
+mul r3.xyzw, r1.yyyy, cb0[1].xyzw
+add r2.xyzw, r2.xyzw, r3.xyzw
+mul r3.xyzw, r1.zzzz, cb0[2].xyzw
+add r2.xyzw, r2.xyzw, r3.xyzw
+mul r1.xyzw, r1.wwww, cb0[3].xyzw
+add r1.xyzw, r1.xyzw, r2.xyzw  // r1.x <- element.sv_position.x; r1.y <- element.sv_position.y; r1.z <- element.sv_position.z; r1.w <- element.sv_position.w
+
+#line 18
+mov r2.xyzw, x0[0].xyzw  // r2.x <- element.position.x; r2.y <- element.position.y; r2.z <- element.position.z; r2.w <- element.position.w
+
+#line 19
+mov r3.xy, v[0][1].xyxx  // r3.x <- element.texcoord.x; r3.y <- element.texcoord.y
+
+#line 20
+mov o0.xyzw, r1.xyzw
+mov o1.xyzw, r2.xyzw
+mov o2.xyzw, r0.xyzw
+mov o3.xy, r3.xyxx
 emit 
-mul r2.xyzw, r3.yyyy, cb0[1].xyzw
-mad r2.xyzw, r3.xxxx, cb0[0].xyzw, r2.xyzw
-mad r2.xyzw, r3.zzzz, cb0[2].xyzw, r2.xyzw
-mad r2.xyzw, r3.wwww, cb0[3].xyzw, r2.xyzw
-mov o0.xyzw, r2.xyzw
-mov o1.xyzw, r3.xyzw
-mov o2.xyz, r0.xyzx
-mov o2.w, l(0)
-mov o3.xy, v[1][1].xyxx
+
+#line 22
+mov r1.xyzw, x0[1].xyzw
+mul r2.xyzw, r1.xxxx, cb0[0].xyzw
+mul r3.xyzw, r1.yyyy, cb0[1].xyzw
+add r2.xyzw, r2.xyzw, r3.xyzw
+mul r3.xyzw, r1.zzzz, cb0[2].xyzw
+add r2.xyzw, r2.xyzw, r3.xyzw
+mul r1.xyzw, r1.wwww, cb0[3].xyzw
+add r1.xyzw, r1.xyzw, r2.xyzw  // r1.x <- element.sv_position.x; r1.y <- element.sv_position.y; r1.z <- element.sv_position.z; r1.w <- element.sv_position.w
+
+#line 23
+mov r2.xyzw, x0[1].xyzw  // r2.x <- element.position.x; r2.y <- element.position.y; r2.z <- element.position.z; r2.w <- element.position.w
+
+#line 24
+mov r3.xy, v[1][1].xyxx  // r3.x <- element.texcoord.x; r3.y <- element.texcoord.y
+
+#line 25
+mov o0.xyzw, r1.xyzw
+mov o1.xyzw, r2.xyzw
+mov o2.xyzw, r0.xyzw
+mov o3.xy, r3.xyxx
 emit 
-mul r2.xyzw, r1.yyyy, cb0[1].xyzw
-mad r2.xyzw, r1.xxxx, cb0[0].xyzw, r2.xyzw
-mad r2.xyzw, r1.zzzz, cb0[2].xyzw, r2.xyzw
-mad r2.xyzw, r1.wwww, cb0[3].xyzw, r2.xyzw
-mov o0.xyzw, r2.xyzw
-mov o1.xyzw, r1.xyzw
-mov o2.xyz, r0.xyzx
-mov o2.w, l(0)
-mov o3.xy, v[2][1].xyxx
+
+#line 27
+mov r1.xyzw, x0[2].xyzw
+mul r2.xyzw, r1.xxxx, cb0[0].xyzw
+mul r3.xyzw, r1.yyyy, cb0[1].xyzw
+add r2.xyzw, r2.xyzw, r3.xyzw
+mul r3.xyzw, r1.zzzz, cb0[2].xyzw
+add r2.xyzw, r2.xyzw, r3.xyzw
+mul r1.xyzw, r1.wwww, cb0[3].xyzw
+add r1.xyzw, r1.xyzw, r2.xyzw  // r1.x <- element.sv_position.x; r1.y <- element.sv_position.y; r1.z <- element.sv_position.z; r1.w <- element.sv_position.w
+
+#line 28
+mov r2.xyzw, x0[2].xyzw  // r2.x <- element.position.x; r2.y <- element.position.y; r2.z <- element.position.z; r2.w <- element.position.w
+
+#line 29
+mov r3.xy, v[2][1].xyxx  // r3.x <- element.texcoord.x; r3.y <- element.texcoord.y
+
+#line 30
+mov o0.xyzw, r1.xyzw
+mov o1.xyzw, r2.xyzw
+mov o2.xyzw, r0.xyzw
+mov o3.xy, r3.xyxx
 emit 
+
+#line 32
 cut 
+
+#line 33
 ret 
-// Approximately 51 instruction slots used
+// Approximately 88 instruction slots used

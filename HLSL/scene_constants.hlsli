@@ -7,6 +7,10 @@ struct SOMETHING
 	float elapsedTime;
 	float shadow_map_num;
 	float4x4 mlvp[1][3];
+	float4 warm_factor;
+	float4 cool_factor;
+	float4 wind_position;
+	float4 wind_direction;
 };
 
 struct PLAYER

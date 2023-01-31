@@ -92,10 +92,11 @@ public:
 	//objects
 	std::unique_ptr<Player> player;
 	std::unique_ptr<pbr_Stage>pbr_ship;
-	//std::unique_ptr<pbr_Stage>pbr_ship_1;
+	std::unique_ptr<pbr_Base>base;
 	//std::unique_ptr<Ground>ground;//factory
 	//std::unique_ptr<dynamic_mesh> test;
 	std::unique_ptr<Terrain> terrains;
+	std::unique_ptr<grass_Terrain> grass_terrains;
 	std::unique_ptr<Rocks> rocks;
 	std::unique_ptr<Trees> trees;
 	std::unique_ptr<Ground>shadow_trees;
@@ -104,6 +105,8 @@ public:
 	//std::unique_ptr<Structures> structures;
 	//std::unique_ptr<VegetationSmall> vegetation_small;
 
+	//particles
+	std::unique_ptr<snow_particles> snow;
 
 	//std::unique_ptr<Descartes::collision::mesh> collision_mesh;
 	//scenery[s]
@@ -130,6 +133,7 @@ public:
 	std::unique_ptr<vertex_shader<pbr_dynamic_mesh::vertex>> pbr_dynamic_mesh_vs;
 	std::unique_ptr<vertex_shader<pbr_static_mesh::vertex>> pbr_static_mesh_vs;
 	std::unique_ptr<pixel_shader> pbr_dynamic_mesh_ps;
+	std::unique_ptr<pixel_shader> pbr_loadtexture_ps;
 	std::unique_ptr<vertex_shader<static_mesh::vertex>>static_mesh_vs;
 	std::unique_ptr<pixel_shader> static_mesh_ps;
 	std::unique_ptr<pixel_shader> spot_light_mesh_ps;
@@ -166,6 +170,10 @@ public:
 			float elapse_time = 0;
 			float shadow_map_num=0;
 			Matrix mlvp[NUM_DEFERRED_LIGHTING_DIRECTIONAL_LIGHT][NUM_SHADOW_MAP];
+			XMFLOAT4 warm_factor = XMFLOAT4(5 / 255.0f, 0 / 255.0f, 0 / 255.0f, 255 / 255.0f); // w:intensity 
+			XMFLOAT4 cool_factor = XMFLOAT4(0 / 255.0f, 0 / 255.0f, 1 / 255.0f, 5 / 255.0f); // w:intensity
+			XMFLOAT4 wind_position;
+			XMFLOAT4 wind_direction;
 		};
 		something_constants cb_somthing;
 
@@ -254,6 +262,7 @@ private:
 	bool enable_lens_flare = false;
 	bool enable_post_effects = false;
 
+	
     shadow::CascadeShadowMapMatrix m_cascadeShadowMapMatrix;    // カスケードシャドウマップの行列を扱うオブジェクト
 
 };

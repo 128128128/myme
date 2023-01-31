@@ -23,7 +23,13 @@ public:
 
 	void DebugDrawGUI(bool flag=false);
 	void ef_DebugDrawGUI(bool flag=false);
+	void ssr_DebugDrawGUI(bool flag=false);
 protected:
+	struct ssr_param {
+		float noise = 0.0f;
+		DirectX::XMFLOAT3 pad;
+	};
+	std::unique_ptr<Descartes::constant_buffer<ssr_param>> ssr_buffer;
 
 	struct d_posteffect_param {
 		float contrast = 1.5f;
@@ -43,8 +49,8 @@ protected:
 			float highlight_power = 18.0f;
 			float global_density = 0.0110f;
 			float height_falloff = 0.050f;
-			float start_depth = 0.0f;
-			float start_height = -25.0f;
+			float start_depth = 75.0f;
+			float start_height = 0.0f;
 
 			template<class Archive>
 			void serialize(Archive& archive)
@@ -88,6 +94,11 @@ private:
 	Microsoft::WRL::ComPtr <ID3D11RenderTargetView> rtv_light;
 	Microsoft::WRL::ComPtr <ID3D11ShaderResourceView> srv_light;
 
+	//enviroment buffer
+	Microsoft::WRL::ComPtr <ID3D11Texture2D> tex_env;
+	Microsoft::WRL::ComPtr <ID3D11RenderTargetView> rtv_env;
+	Microsoft::WRL::ComPtr <ID3D11ShaderResourceView> srv_env;
+
 	// Shadow Param buffer
 	Microsoft::WRL::ComPtr <ID3D11Texture2D> tex_shadow_param;
 	Microsoft::WRL::ComPtr <ID3D11RenderTargetView> rtv_shadow_param;
@@ -104,6 +115,11 @@ private:
 	Microsoft::WRL::ComPtr < ID3D11Texture2D> tex_composite;
 	Microsoft::WRL::ComPtr < ID3D11RenderTargetView> rtv_composite;
 	Microsoft::WRL::ComPtr < ID3D11ShaderResourceView> srv_composite;
+
+	Microsoft::WRL::ComPtr < ID3D11Texture2D> tex_ref_composite;
+	Microsoft::WRL::ComPtr < ID3D11RenderTargetView> rtv_ref_composite;
+	Microsoft::WRL::ComPtr < ID3D11ShaderResourceView> srv_ref_composite;
+
 	void lightning(ID3D11DeviceContext* immediate_context);
 
 	enum { NONE, ALPHA, ADD, ALPHA_TO_COVERAGE };
@@ -127,6 +143,7 @@ private:
 	Microsoft::WRL::ComPtr<ID3D11VertexShader> differred_light_vs;
 	Microsoft::WRL::ComPtr<ID3D11PixelShader> env_light_ps;
 	std::unique_ptr<pixel_shader> composite_ps;
+	std::unique_ptr<pixel_shader> ssr_composite_ps;
 	Microsoft::WRL::ComPtr<ID3D11VertexShader> post_effect_vs;
 	Microsoft::WRL::ComPtr<ID3D11PixelShader> post_effect_ps;
 

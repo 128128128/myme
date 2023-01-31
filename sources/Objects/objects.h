@@ -81,7 +81,7 @@ public:
 	struct pbr_constants
 	{
 		float metallic = 1;
-		float roughness = 1;
+		float roughness = 0;
 		float pure_white = 1;
 		float pad = 0.0f;
 	};
@@ -90,7 +90,7 @@ public:
 	Microsoft::WRL::ComPtr <ID3D11ShaderResourceView> r_srv;
 	Microsoft::WRL::ComPtr <ID3D11ShaderResourceView> m_srv;
 public:
-	pbr_Stage(ID3D11Device* device);
+	pbr_Stage(ID3D11Device* device, const char* filename);
 	~pbr_Stage() = default;
 
 	void update(float elapsed_time);
@@ -115,6 +115,63 @@ public:
 	}
 	//Debug
 	void DebugDrawGUI(bool flag=false);
+
+	//getter setter
+	XMFLOAT4 GetPosition() { return position; }
+	void SetPosition(XMFLOAT4 pos) { position = pos; }
+	XMFLOAT4 GetDirection() { return direction; }
+	void SetDirection(XMFLOAT4 dir) { direction = dir; }
+	void SetScale(XMFLOAT3 s) { scale = s; }
+
+
+private:
+	XMFLOAT4X4 world_transform;
+
+};
+
+class pbr_Base
+{
+public:
+	std::unique_ptr<pbr_static_mesh> mesh;
+	XMFLOAT4 position = XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f);
+	XMFLOAT4 direction = XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f);
+	XMFLOAT4 velocity = XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f);
+	XMFLOAT3 scale = XMFLOAT3(1.0f, 1.0f, 1.0f);
+
+	struct pbr_constants
+	{
+		float metallic = 1;
+		float roughness = 0;
+		float pure_white = 1;
+		float pad = 0.0f;
+	};
+	std::unique_ptr<Descartes::constant_buffer<pbr_constants>> pbr_constant_buffer;
+
+public:
+	pbr_Base(ID3D11Device* device, const char* filename);
+	~pbr_Base() = default;
+
+	void update(float elapsed_time);
+
+	void render(ID3D11DeviceContext* immediate_context, ID3D11PixelShader* replaced_pixel_shader = nullptr)
+	{
+		pbr_constant_buffer->active(immediate_context, 4, true, true);
+		
+		mesh->render(immediate_context, world_transform, replaced_pixel_shader);
+
+		pbr_constant_buffer->inactive(immediate_context);
+	}
+
+	void reset(XMFLOAT4& location)
+	{
+		position = location;
+		float angle = 180;
+		direction.x = sinf(angle * 0.01745f);
+		direction.y = 0;
+		direction.z = cosf(angle * 0.01745f);
+	}
+	//Debug
+	void DebugDrawGUI(bool flag = false);
 
 	//getter setter
 	XMFLOAT4 GetPosition() { return position; }

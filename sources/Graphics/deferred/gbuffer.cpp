@@ -73,6 +73,7 @@ void gbuffer::initialize(ID3D11Device* device, DirectX::XMFLOAT3 dir)
 
 	//create_ps_from_cso(device, "shader//composite_ps.cso", composite_ps.GetAddressOf());
 	composite_ps = std::make_unique<pixel_shader>(device, "shader//composite_ps.cso");
+    ssr_composite_ps = std::make_unique<pixel_shader>(device, "shader//ssr_composite.cso");
 
 	create_vs_from_cso(device, "shader//d_posteffect_vs.cso", post_effect_vs.GetAddressOf(), input_layout_1.GetAddressOf(), input_element_desc, _countof(input_element_desc));
 	create_ps_from_cso(device, "shader//d_posteffect_ps.cso", post_effect_ps.GetAddressOf());
@@ -321,7 +322,46 @@ void gbuffer::initialize(ID3D11Device* device, DirectX::XMFLOAT3 dir)
 		if (FAILED(hr)) return;
 	}
 
-	
+	//environment buffer
+	{
+		D3D11_TEXTURE2D_DESC td;
+		ZeroMemory(&td, sizeof(D3D11_TEXTURE2D_DESC));
+		td.Width = screenW;
+		td.Height = screenH;
+		td.MipLevels = 1;
+		td.ArraySize = 1;
+		td.Format = DXGI_FORMAT_R16G16B16A16_FLOAT;
+		td.SampleDesc.Count = 1;
+		td.SampleDesc.Quality = 0;
+		td.Usage = D3D11_USAGE_DEFAULT;
+		td.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
+		td.CPUAccessFlags = 0;
+		td.MiscFlags = 0;
+		// create texture
+		hr = device->CreateTexture2D(
+			&td, NULL, tex_env.GetAddressOf());
+		if (FAILED(hr)) return;
+
+		//	render target view
+		D3D11_RENDER_TARGET_VIEW_DESC rtvDesc;
+		memset(&rtvDesc, 0, sizeof(rtvDesc));
+		rtvDesc.Format = td.Format;
+		rtvDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
+		hr = device->CreateRenderTargetView(
+			tex_env.Get(), &rtvDesc, rtv_env.GetAddressOf());
+
+		//setting shader resource view
+		D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc;
+		memset(&srvDesc, 0, sizeof(srvDesc));
+		srvDesc.Format = rtvDesc.Format;
+		srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+		srvDesc.Texture2D.MipLevels = 1;
+		// create shader resource view
+		hr = device->CreateShaderResourceView(
+			tex_env.Get(), &srvDesc, srv_env.GetAddressOf());
+		if (FAILED(hr)) return;
+	}
+
 	//shadow param buffer
 	{
 		D3D11_TEXTURE2D_DESC td;
@@ -407,6 +447,46 @@ void gbuffer::initialize(ID3D11Device* device, DirectX::XMFLOAT3 dir)
 		if (FAILED(hr)) return;
 	}
 
+	//reflection composite buffer
+	{
+		D3D11_TEXTURE2D_DESC td;
+		ZeroMemory(&td, sizeof(D3D11_TEXTURE2D_DESC));
+		td.Width = screenW;
+		td.Height = screenH;
+		td.MipLevels = 1;
+		td.ArraySize = 1;
+		td.Format = DXGI_FORMAT_R16G16B16A16_FLOAT;
+		td.SampleDesc.Count = 1;
+		td.SampleDesc.Quality = 0;
+		td.Usage = D3D11_USAGE_DEFAULT;
+		td.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
+		td.CPUAccessFlags = 0;
+		td.MiscFlags = 0;
+		// create texture
+		hr = device->CreateTexture2D(
+			&td, NULL, tex_ref_composite.GetAddressOf());
+		if (FAILED(hr)) return;
+
+		//	render target view
+		D3D11_RENDER_TARGET_VIEW_DESC rtvDesc;
+		memset(&rtvDesc, 0, sizeof(rtvDesc));
+		rtvDesc.Format = td.Format;
+		rtvDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
+		hr = device->CreateRenderTargetView(
+			tex_ref_composite.Get(), &rtvDesc, rtv_ref_composite.GetAddressOf());
+
+		// setting shader resource view
+		D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc;
+		memset(&srvDesc, 0, sizeof(srvDesc));
+		srvDesc.Format = rtvDesc.Format;
+		srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+		srvDesc.Texture2D.MipLevels = 1;
+		// create shader resource view
+		hr = device->CreateShaderResourceView(
+			tex_ref_composite.Get(), &srvDesc, srv_ref_composite.GetAddressOf());
+		if (FAILED(hr)) return;
+	}
+
 	// depth stencil
 	{
 		// setting depth stencil 
@@ -476,6 +556,7 @@ void gbuffer::initialize(ID3D11Device* device, DirectX::XMFLOAT3 dir)
 	//constants buffer
 	{
 		d_posteffect_buffer = std::make_unique<Descartes::constant_buffer<d_posteffect_param>>(device);
+		ssr_buffer = std::make_unique<Descartes::constant_buffer<ssr_param>>(device);
 	}
 
 
@@ -539,10 +620,10 @@ void gbuffer::lightning(ID3D11DeviceContext* immediate_context)
 {
 	//render target to light buffer
 	immediate_context->OMSetRenderTargets(
-		1, rtv_light.GetAddressOf(), depth_stencil_view.Get());
+		1, rtv_env.GetAddressOf(), depth_stencil_view.Get());
 	float clear_color[4] = { 0, 0, 0, 1 };
 	immediate_context->ClearRenderTargetView(
-		rtv_light.Get(), clear_color);
+		rtv_env.Get(), clear_color);
 
 	//render from buffers
 	immediate_context->PSSetShaderResources(
@@ -594,6 +675,11 @@ void gbuffer::lightning(ID3D11DeviceContext* immediate_context)
 	light_set(immediate_context,0);
 	    immediate_context->DrawIndexed(4, 0, 0);*/
 
+		//render target to light buffer
+	immediate_context->OMSetRenderTargets(
+		1, rtv_light.GetAddressOf(), depth_stencil_view.Get());
+	immediate_context->ClearRenderTargetView(
+		rtv_light.Get(), clear_color);
 
 	//direction light and point light draw
 	light_manager::instance().draw(immediate_context,g_buffers, G_BUFFERS_NUM);
@@ -618,6 +704,21 @@ void gbuffer::lightning(ID3D11DeviceContext* immediate_context)
 	composite_ps->active(immediate_context);
     immediate_context->DrawIndexed(4, 0, 0);
 	composite_ps->inactive(immediate_context);
+
+	immediate_context->ClearRenderTargetView(rtv_ref_composite.Get(), clear_color);
+	immediate_context->OMSetRenderTargets(
+		1, rtv_ref_composite.GetAddressOf(), depth_stencil_view.Get());
+
+	//constants buffer
+	ssr_buffer->active(immediate_context, 9);
+
+    immediate_context->PSSetShaderResources(6, 1, srv_env.GetAddressOf());
+
+	immediate_context->PSSetShaderResources(7, 1, srv_composite.GetAddressOf());
+
+	ssr_composite_ps->active(immediate_context);
+	immediate_context->DrawIndexed(4, 0, 0);
+	ssr_composite_ps->inactive(immediate_context);
 }
 
 void gbuffer::inactive(ID3D11DeviceContext* immediate_context) {
@@ -638,10 +739,11 @@ void gbuffer::render(ID3D11DeviceContext* immediate_context)
 	immediate_context->VSSetShader(post_effect_vs.Get(), nullptr, 0);
 	immediate_context->PSSetShader(post_effect_ps.Get(), nullptr, 0);
 
-	immediate_context->PSSetShaderResources(0, 1, srv_composite.GetAddressOf());
+	immediate_context->PSSetShaderResources(0, 1, srv_ref_composite.GetAddressOf());
 	immediate_context->PSSetShaderResources(1, 1, srv_depth.GetAddressOf());
 	
 	immediate_context->PSSetShaderResources(2, 1, srv_normal.GetAddressOf());
+	immediate_context->PSSetShaderResources(3, 1, srv_position.GetAddressOf());
 	
 	UINT stride = sizeof(vertex);
 	UINT offset = 0;
@@ -679,6 +781,8 @@ void gbuffer::DebugDrawGUI(bool flag)
 				ImGui::Image(srv_position.Get(), { 320,180 });
 				ImGui::Text("roughness metallic");
 				ImGui::Image(srv_RM.Get(), { 320,180 });
+				ImGui::Text("env reflection");
+				ImGui::Image(srv_env.Get(), { 320,180 });
 				//ImGui::Text("shadow_param");
 				//ImGui::Image(srv_shadow_param.Get(), { 320,180 });
 			}
@@ -703,7 +807,31 @@ void gbuffer::ef_DebugDrawGUI(bool flag)
 				ImGui::SliderFloat("saturate", &d_posteffect_buffer->data.saturate, 0.0f, 1.0f);
 				ImGui::SliderFloat("outline", &d_posteffect_buffer->data.outline, 0.0f, 5.0f);
 				ImGui::SliderFloat("color_grading", &d_posteffect_buffer->data.color_grading, 0.0f, 1.0f);
+
+				ImGui::Text("fog param");
+				ImGui::ColorEdit3("fog_color", reinterpret_cast<float*>(&d_posteffect_buffer->data.fog_buffer.color));
+				ImGui::ColorEdit3("fog_highlight_color", reinterpret_cast<float*>(&d_posteffect_buffer->data.fog_buffer.highlight_color));
+				ImGui::InputFloat("highlight_intensity", &d_posteffect_buffer->data.fog_buffer.highlight_intensity, 0.1f, 1.0f);
+				ImGui::InputFloat("fog_highlight_power", &d_posteffect_buffer->data.fog_buffer.highlight_power, 0.1f, 1.0f);
+				ImGui::InputFloat("fog_global_density", &d_posteffect_buffer->data.fog_buffer.global_density, 0.0001f, 0.001f, "%.4f");
+				ImGui::InputFloat("fog_height_falloff", &d_posteffect_buffer->data.fog_buffer.height_falloff, 0.0001f, 0.001f, "%.4f");
+				ImGui::InputFloat("fog_start_depth", &d_posteffect_buffer->data.fog_buffer.start_depth, 0.1f, 1.0f);
+				ImGui::InputFloat("fog_start_height", &d_posteffect_buffer->data.fog_buffer.start_height, 0.1f, 1.0f);
 			}
+		}
+		ImGui::End();
+	}
+}
+
+void gbuffer::ssr_DebugDrawGUI(bool flag)
+{
+	if (flag) {
+		ImGui::SetNextWindowPos(ImVec2(10, 10), ImGuiCond_FirstUseEver);
+		ImGui::SetNextWindowSize(ImVec2(300, 300), ImGuiCond_FirstUseEver);
+
+		if (ImGui::Begin("screen space reflection", nullptr, ImGuiWindowFlags_None))
+		{
+			ImGui::SliderFloat("noise", &ssr_buffer->data.noise, 0.0f, 1.0f);
 		}
 		ImGui::End();
 	}
