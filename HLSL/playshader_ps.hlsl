@@ -332,7 +332,7 @@ float noise_iq(
 float3 hash_w(
     const in float3 x
 ) {
-#if 0
+#if 1
     float3 xx = float3(dot(x, float3(127.1, 311.7, 74.7)),
         dot(x, float3(269.5, 183.3, 246.1)),
         dot(x, float3(113.5, 271.9, 124.6)));
@@ -355,6 +355,7 @@ float3 noise_w(
 
     float id = 0.0;
     float2 res = float2(100.0, 100.0);
+    [loop]
     for (int k = -1; k <= 1; k++)
         for (int j = -1; j <= 1; j++)
             for (int i = -1; i <= 1; i++)

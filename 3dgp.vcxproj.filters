@@ -661,6 +661,9 @@
     <None Include="HLSL\grass_cluster.hlsli">
       <Filter>HLSL\Grass</Filter>
     </None>
+    <None Include="HLSL\water_fall_particles.hlsli">
+      <Filter>HLSL\Particles</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="HLSL\skymap_ps.hlsl">
@@ -908,6 +911,18 @@
     </FxCompile>
     <FxCompile Include="HLSL\grass_cluster_vs.hlsl">
       <Filter>HLSL\Grass</Filter>
+    </FxCompile>
+    <FxCompile Include="HLSL\water_fall_particles_ps.hlsl">
+      <Filter>HLSL\Particles</Filter>
+    </FxCompile>
+    <FxCompile Include="HLSL\water_fall_particles_cs.hlsl">
+      <Filter>HLSL\Particles</Filter>
+    </FxCompile>
+    <FxCompile Include="HLSL\water_fall_particles_vs.hlsl">
+      <Filter>HLSL\Particles</Filter>
+    </FxCompile>
+    <FxCompile Include="HLSL\water_fall_particles_gs.hlsl">
+      <Filter>HLSL\Particles</Filter>
     </FxCompile>
   </ItemGroup>
 </Project>

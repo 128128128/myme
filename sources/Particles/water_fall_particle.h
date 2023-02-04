@@ -11,6 +11,7 @@ struct water_fall_particles
 	{
 		DirectX::XMFLOAT3 position;
 		DirectX::XMFLOAT3 velocity;
+		DirectX::XMFLOAT3 direction;
 	};
 	std::vector<water_fall_particle> particles;
 
@@ -31,7 +32,7 @@ struct water_fall_particles
 
 		float elapsed_time;
 		float time;
-		DirectX::XMFLOAT2 padd;
+		DirectX::XMFLOAT2 pad;
 	};
 	particle_constants particle_data;
 

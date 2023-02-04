@@ -15,7 +15,9 @@ class gbuffer
 {
 public:
 	gbuffer(){};
-	~gbuffer(){};
+	~gbuffer(){
+		light_manager::instance().delete_light("dir light");
+	}
 	void initialize(ID3D11Device* device, DirectX::XMFLOAT3 dir);
 	void active(ID3D11DeviceContext* immediate_context);
 	void inactive(ID3D11DeviceContext* immediate_context);

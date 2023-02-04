@@ -167,7 +167,8 @@ float3 ibl_radiance_lambertian(float3 N, float3 V, float roughness, float3 diffu
 	float ems = (1.0 - (f_ab.x + f_ab.y));
 	float3 f_avg = specular_weight * (f0 + (1.0 - f0) / 21.0);
 	float3 fms_ems = ems * fss_ess * f_avg / (1.0 - f_avg * ems);
-	float3 k_d = diffuse_color * (1.0 - fss_ess + fms_ems); // we use +FmsEms as indicated by the formula in the blog post (might be a typo in the implementation)
+
+	float3 k_d = diffuse_color * (1.0 - fss_ess - fms_ems);//+fms_ems? *fms_ems? 論文によって異なるためよりよく見える方を採用（計算的には＊が適切(個人的に行った計算によるため正解かは)）
 
 	return (fms_ems + k_d) * irradiance;
 }

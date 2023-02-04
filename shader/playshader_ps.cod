@@ -100,49 +100,49 @@ dcl_temps 12
 #line 120 "C:\Users\2200167\Desktop\個人製作\myme03\myme\HLSL\playshader_ps.hlsl"
 mov r0.xyzw, l(0,0,0,100000008.000000)  // r0.x <- no_hit.origin.x; r0.y <- no_hit.origin.y; r0.z <- no_hit.origin.z; r0.w <- no_hit.t
 
-#line 580
+#line 581
 mov r1.xyz, l(1.000000,0.700000,0.550000,0)  // r1.x <- sun_color.x; r1.y <- sun_color.y; r1.z <- sun_color.z
 
-#line 581
+#line 582
 mov r2.xyz, l(0.900000,0.900000,0.900000,0)  // r2.x <- moon_color.x; r2.y <- moon_color.y; r2.z <- moon_color.z
 
-#line 584
+#line 585
 itof r3.xyz, l(0, -450, 0, 0)  // r3.x <- atmosphere.origin.x; r3.y <- atmosphere.origin.y; r3.z <- atmosphere.origin.z
 
-#line 814
+#line 815
 itof r4.xy, l(1280, 720, 0, 0)  // r4.x <- iResolution.x; r4.y <- iResolution.y
 
-#line 816
+#line 817
 div r5.x, r4.x, r4.y  // r5.x <- aspect_ratio.x
 itof r5.y, l(1)  // r5.y <- aspect_ratio.y
 
-#line 819
+#line 820
 mov r1.w, l(1.000000)  // r1.w <- fov
 
-#line 821
+#line 822
 div r4.xz, v0.xxyx, r4.xxyx  // r4.x <- point_ndc.x; r4.z <- point_ndc.y
 
-#line 823
+#line 824
 mov r2.w, -r4.z
 add r4.y, r2.w, l(1.000000)  // r4.y <- point_ndc.y
 
-#line 825
+#line 826
 mul r4.zw, r4.xxxy, l(0.000000, 0.000000, 2.000000, 2.000000)
 mov r5.zw, l(-0.000000,-0.000000,-1.000000,-1.000000)
 add r4.zw, r4.zzzw, r5.zzzw
 mul r4.zw, r5.xxxy, r4.zzzw
 mul r4.zw, r1.wwww, r4.zzzw  // r4.z <- point_cam.x; r4.w <- point_cam.y
 
-#line 838
+#line 839
 itof r5.xz, l(0, 0, 0, 0)  // r5.x <- eye.x; r5.z <- eye.z
 mov r5.y, l(1.000000)
 mov r5.xyz, r5.xyzx  // r5.y <- eye.y
 
-#line 839
+#line 840
 itof r6.xz, l(0, 0, -1, 0)  // r6.x <- look_at.x; r6.z <- look_at.z
 mov r6.y, l(1.600000)  // r6.y <- look_at.y
 
-#line 840
+#line 841
 nop 
 mov r5.xyz, r5.xyzx
 mov r6.xyz, r6.xyzx
@@ -181,15 +181,15 @@ mul r6.xyz, r1.wwww, r6.xyzx  // r6.x <- r.direction.x; r6.y <- r.direction.y; r
 #line 163
 mov r6.xyz, r6.xyzx  // r6.x <- <get_primary_ray return value>.direction.x; r6.y <- <get_primary_ray return value>.direction.y; r6.z <- <get_primary_ray return value>.direction.z
 
-#line 840
+#line 841
 mov r6.xyz, r6.xyzx  // r6.x <- eye_ray.direction.x; r6.y <- eye_ray.direction.y; r6.z <- eye_ray.direction.z
 
-#line 842
+#line 843
 itof r1.w, l(0)
 lt r1.w, r1.w, cb4[0].w
 if_nz r1.w
 
-#line 843
+#line 844
   nop 
   mov r1.w, cb4[0].y
   mul r1.w, r1.w, l(0.130000)
@@ -208,11 +208,11 @@ if_nz r1.w
   mov r7.xw, r7.xxxw  // r7.x <- <rotate_2d return value>._m00; r7.w <- <rotate_2d return value>._m11
   mov r7.z, r7.z  // r7.z <- <rotate_2d return value>._m10
 
-#line 843
+#line 844
   dp2 r8.y, r7.xyxx, r6.yzyy  // r8.y <- eye_ray.direction.y
   dp2 r6.w, r7.zwzz, r6.yzyy  // r6.w <- eye_ray.direction.z
 
-#line 844
+#line 845
   nop 
   mov r1.w, -cb4[0].x
   mul r1.w, r1.w, l(0.390000)
@@ -231,27 +231,27 @@ if_nz r1.w
   mov r7.xw, r7.xxxw
   mov r7.z, r7.z
 
-#line 844
+#line 845
   dp2 r8.x, r7.xyxx, r6.xwxx  // r8.x <- eye_ray.direction.x
   dp2 r8.z, r7.zwzz, r6.xwxx  // r8.z <- eye_ray.direction.z
 
-#line 845
+#line 846
   mov r6.xyz, r8.xyzx  // r6.x <- eye_ray.direction.x; r6.y <- eye_ray.direction.y; r6.z <- eye_ray.direction.z
 endif 
 
-#line 857
+#line 858
 nop 
 mov r4.zw, v2.xxxy
 
-#line 603
+#line 604
 mov r6.xyz, r6.xyzx  // r6.x <- rd.x; r6.y <- rd.y; r6.z <- rd.z
 
-#line 607
+#line 608
 itof r1.w, l(0)
 ge r1.w, r1.w, cb4[1].w
 if_nz r1.w
 
-#line 610
+#line 611
   mul r1.w, cb3[0].x, l(0.050000)
   sincos r1.w, null, r1.w
   mov r2.w, -r1.w
@@ -261,11 +261,11 @@ if_nz r1.w
   rsq r1.w, r1.w
   mul r7.xyz, r1.wwww, r7.xyzx  // r7.x <- sun_dir.x; r7.y <- sun_dir.y; r7.z <- sun_dir.z
 
-#line 611
+#line 612
   dp3 r1.w, r6.xyzx, r7.xyzx
   max r1.w, r1.w, l(0.000000)  // r1.w <- sun_amount
 
-#line 613
+#line 614
   mov r2.w, -r6.y
   add r2.w, r2.w, l(1.000000)
   mov r7.xyz, -cb4[2].xyzx
@@ -273,7 +273,7 @@ if_nz r1.w
   mul r7.xyz, r2.wwww, r7.xyzx
   add r7.xyz, r7.xyzx, cb4[2].xyzx  // r7.x <- sky_color.x; r7.y <- sky_color.y; r7.z <- sky_color.z
 
-#line 614
+#line 615
   log r2.w, r1.w
   mul r2.w, r2.w, l(1500.000000)
   exp r2.w, r2.w
@@ -282,7 +282,7 @@ if_nz r1.w
   mul r8.xyz, r1.xyzx, r2.wwww
   add r7.xyz, r7.xyzx, r8.xyzx
 
-#line 615
+#line 616
   log r1.w, r1.w
   mul r1.w, r1.w, l(10.000000)
   exp r1.w, r1.w
@@ -291,13 +291,13 @@ if_nz r1.w
   mul r8.xyz, r1.wwww, r1.xyzx
   add r7.xyz, r7.xyzx, r8.xyzx
 
-#line 617
+#line 618
   mov r7.xyz, r7.xyzx  // r7.x <- <render_sky_color return value>.x; r7.y <- <render_sky_color return value>.y; r7.z <- <render_sky_color return value>.z
 
-#line 620
+#line 621
 else 
 
-#line 623
+#line 624
   itof r1.w, l(0)
   ge r1.w, cb4[1].w, r1.w
   itof r2.w, l(1)
@@ -305,7 +305,7 @@ else
   and r1.w, r1.w, r2.w
   if_nz r1.w
 
-#line 625
+#line 626
     mul r1.w, cb3[0].x, l(0.050000)
     sincos r1.w, null, r1.w
     mov r2.w, -r1.w
@@ -315,50 +315,50 @@ else
     rsq r1.w, r1.w
     mul r8.xyz, r1.wwww, r8.xyzx  // r8.x <- moon_dir.x; r8.y <- moon_dir.y; r8.z <- moon_dir.z
 
-#line 626
+#line 627
     dp3 r1.w, r6.xyzx, r8.xyzx
     max r1.w, r1.w, l(0.000000)  // r1.w <- moon_amount
 
-#line 628
+#line 629
     mov r2.w, l(30.000000)  // r2.w <- size
 
-#line 629
+#line 630
     mov r3.w, l(0.950000)  // r3.w <- prob
 
-#line 631
+#line 632
     div r5.w, l(1.000000), r2.w
     mul r8.xy, r4.zwzz, r5.wwww
     round_ni r8.xy, r8.xyxx  // r8.x <- pos.x; r8.y <- pos.y
 
-#line 633
+#line 634
     mov r5.w, l(0)  // r5.w <- color
 
-#line 634
+#line 635
     nop 
     mov r8.xy, r8.xyxx
 
-#line 596
+#line 597
     dp2 r6.w, r8.xyxx, l(12.989800, 78.233002, 0.000000, 0.000000)
     sincos r6.w, null, r6.w
     mul r6.w, r6.w, l(43758.546875)
     frc r6.w, r6.w  // r6.w <- <star_rand return value>
 
-#line 634
+#line 635
     mov r6.w, r6.w  // r6.w <- star_value
 
-#line 635
+#line 636
     itof r8.zw, l(0, 0, 1280, 720)  // r8.z <- iResolution.x; r8.w <- iResolution.y
 
-#line 637
+#line 638
     lt r7.w, r3.w, r6.w
     if_nz r7.w
 
-#line 639
+#line 640
       mul r8.xy, r2.wwww, r8.xyxx
       mul r9.xy, r2.wwww, l(0.500000, 0.500000, 0.000000, 0.000000)
       add r8.xy, r8.xyxx, r9.xyxx  // r8.x <- center.x; r8.y <- center.y
 
-#line 641
+#line 642
       mov r7.w, -r3.w
       add r6.w, r6.w, r7.w
       mov r3.w, -r3.w
@@ -370,7 +370,7 @@ else
       mul r3.w, r3.w, l(0.200000)
       add r3.w, r3.w, l(0.900000)  // r3.w <- t
 
-#line 643
+#line 644
       mov r9.xy, -r8.xyxx
       add r9.xy, r4.zwzz, r9.xyxx
       dp2 r6.w, r9.xyxx, r9.xyxx
@@ -380,7 +380,7 @@ else
       mov r2.w, -r2.w
       add r2.w, r2.w, l(1.000000)  // r2.w <- color
 
-#line 644
+#line 645
       mul r2.w, r3.w, r2.w
       mov r6.w, -r8.y
       add r6.w, r4.w, r6.w
@@ -394,37 +394,37 @@ else
       max r3.w, r3.w, r6.w
       div r5.w, r2.w, r3.w  // r5.w <- color
 
-#line 645
+#line 646
     else   // Prior locations: r2.w <- size; r3.w <- prob; r8.x <- pos.x; r8.y <- pos.y; r6.w <- star_value
 
-#line 646
+#line 647
       nop 
       div r8.xy, r4.zwzz, r8.zwzz
 
-#line 596
+#line 597
       dp2 r2.w, r8.xyxx, l(12.989800, 78.233002, 0.000000, 0.000000)
       sincos r2.w, null, r2.w
       mul r2.w, r2.w, l(43758.546875)
       frc r2.w, r2.w  // r2.w <- <star_rand return value>
 
-#line 646
+#line 647
       lt r2.w, l(0.996000), r2.w
       if_nz r2.w
 
-#line 648
+#line 649
         nop 
         mov r4.zw, r4.zzzw
 
-#line 596
+#line 597
         dp2 r2.w, r4.zwzz, l(12.989800, 78.233002, 0.000000, 0.000000)
         sincos r2.w, null, r2.w
         mul r2.w, r2.w, l(43758.546875)
         frc r2.w, r2.w  // r2.w <- <star_rand return value>
 
-#line 648
+#line 649
         mov r2.w, r2.w  // r2.w <- r
 
-#line 649
+#line 650
         mul r3.w, r2.w, l(5.000000)
         mul r3.w, r3.w, cb3[0].x
         mul r4.z, r2.w, l(720.000000)
@@ -433,17 +433,17 @@ else
         add r3.w, r3.w, l(0.750000)
         mul r5.w, r2.w, r3.w
 
-#line 650
+#line 651
       endif 
     endif 
 
-#line 652
+#line 653
     mov r8.xyz, l(0.100000,0.100000,0.400000,0)  // r8.x <- sky_color.x; r8.y <- sky_color.y; r8.z <- sky_color.z
 
-#line 653
+#line 654
     add r8.xyz, r5.wwww, r8.xyzx
 
-#line 654
+#line 655
     log r1.w, r1.w
     mul r1.w, r1.w, l(500.000000)
     exp r1.w, r1.w
@@ -452,20 +452,20 @@ else
     mul r2.xyz, r1.wwww, r2.xyzx
     add r7.xyz, r2.xyzx, r8.xyzx  // r7.x <- sky_color.x; r7.y <- sky_color.y; r7.z <- sky_color.z
 
-#line 656
+#line 657
     mov r7.xyz, r7.xyzx  // r7.x <- <render_sky_color return value>.x; r7.y <- <render_sky_color return value>.y; r7.z <- <render_sky_color return value>.z
 
-#line 657
+#line 658
   else   // Prior locations: r2.x <- moon_color.x; r2.y <- moon_color.y; r2.z <- moon_color.z; r4.z <- texcoord.x; r4.w <- texcoord.y; r2.x <- moon_color.x; r2.y <- moon_color.y; r2.z <- moon_color.z
 
-#line 662
+#line 663
     mov r2.xyz, l(0,0,-1.000000,0)  // r2.x <- sun_dir.x; r2.y <- sun_dir.y; r2.z <- sun_dir.z
 
-#line 663
+#line 664
     dp3 r1.w, r6.xyzx, r2.xyzx
     max r1.w, r1.w, l(0.000000)  // r1.w <- sun_amount
 
-#line 665
+#line 666
     mov r2.x, -r6.y
     add r2.x, r2.x, l(1.000000)
     mov r2.yzw, l(-0.000000,-0.090000,-0.090000,-0.400000)
@@ -473,7 +473,7 @@ else
     mul r2.xyz, r2.yzwy, r2.xxxx
     add r2.xyz, r2.xyzx, l(0.090000, 0.090000, 0.400000, 0.000000)  // r2.x <- sky_color.x; r2.y <- sky_color.y; r2.z <- sky_color.z
 
-#line 666
+#line 667
     log r2.w, r1.w
     mul r2.w, r2.w, l(1500.000000)
     exp r2.w, r2.w
@@ -482,7 +482,7 @@ else
     mul r8.xyz, r1.xyzx, r2.wwww
     add r2.xyz, r2.xyzx, r8.xyzx
 
-#line 667
+#line 668
     log r1.w, r1.w
     mul r1.w, r1.w, l(10.000000)
     exp r1.w, r1.w
@@ -491,23 +491,23 @@ else
     mul r1.xyz, r1.wwww, r1.xyzx
     add r7.xyz, r1.xyzx, r2.xyzx  // r7.x <- sky_color.x; r7.y <- sky_color.y; r7.z <- sky_color.z
 
-#line 669
+#line 670
     mov r7.xyz, r7.xyzx  // r7.x <- <render_sky_color return value>.x; r7.y <- <render_sky_color return value>.y; r7.z <- <render_sky_color return value>.z
 
-#line 670
+#line 671
   endif 
 endif 
 
-#line 857
+#line 858
 mov r7.xyz, r7.xyzx  // r7.x <- sky.x; r7.y <- sky.y; r7.z <- sky.z
 
-#line 858
+#line 859
 nop 
 
-#line 720
+#line 721
 mov r0.xyzw, r0.xyzw  // r0.x <- hit.origin.x; r0.y <- hit.origin.y; r0.z <- hit.origin.z; r0.w <- hit.t
 
-#line 721
+#line 722
 nop 
 mov r0.xyzw, r0.xyzw
 
@@ -559,41 +559,41 @@ if_z r0.w
 #line 272
 endif 
 
-#line 721
+#line 722
 mov r0.xyz, r0.xyzx  // r0.x <- hit.origin.x; r0.y <- hit.origin.y; r0.z <- hit.origin.z
 
-#line 727
+#line 728
 mov r0.w, l(25)  // r0.w <- steps
 
-#line 728
+#line 729
 mov r1.x, l(0.600000)  // r1.x <- march_step
 
-#line 730
+#line 731
 div r1.yzw, r6.xxyz, r6.yyyy
 mul r1.yzw, r1.xxxx, r1.yyzw  // r1.y <- dir_step.x; r1.z <- dir_step.y; r1.w <- dir_step.z
 
-#line 731
+#line 732
 mov r0.xyz, r0.xyzx  // r0.x <- pos.x; r0.y <- pos.y; r0.z <- pos.z
 
-#line 734
+#line 735
 mov r2.x, l(1.000000)  // r2.x <- T
 
-#line 736
+#line 737
 itof r2.y, l(2)
 ge r2.y, cb4[1].w, r2.y
 if_nz r2.y
 
-#line 737
+#line 738
   mov r2.x, l(0.600000)
 endif 
 
-#line 739
+#line 740
 itof r2.yzw, l(0, 0, 0, 0)  // r2.y <- C.x; r2.z <- C.y; r2.w <- C.z
 
-#line 740
+#line 741
 mov r3.x, l(0)  // r3.x <- alpha
 
-#line 742
+#line 743
 mov r3.y, l(0)  // r3.y <- i
 mov r5.xyz, r0.xyzx  // r5.x <- pos.x; r5.y <- pos.y; r5.z <- pos.z
 mov r6.xyz, r2.yzwy  // r6.x <- C.x; r6.y <- C.y; r6.z <- C.z
@@ -604,31 +604,31 @@ loop
   ilt r4.z, r3.w, r0.w
   breakc_z r4.z
 
-#line 743
+#line 744
   itof r4.z, r3.w
   itof r4.w, r0.w
   div r4.z, r4.z, r4.w  // r4.z <- h
 
-#line 745
+#line 746
   nop 
   mov r4.w, -cb3[0].x
   mul r8.z, r4.w, cb4[1].z
 
-#line 680
+#line 681
   mul r9.xyz, r5.xyzx, l(0.021224, 0.021224, 0.021224, 0.000000)
   itof r8.xy, l(0, 0, 0, 0)
   add r8.xyz, r8.xyzx, r9.xyzx  // r8.x <- p.x; r8.y <- p.y; r8.z <- p.z
 
-#line 681
+#line 682
   nop 
 
-#line 577
+#line 578
   nop 
-
-#line 565
-  mov r8.xyz, r8.xyzx  // r8.x <- p.x; r8.y <- p.y; r8.z <- p.z
 
 #line 566
+  mov r8.xyz, r8.xyzx  // r8.x <- p.x; r8.y <- p.y; r8.z <- p.z
+
+#line 567
   nop 
 
 #line 312
@@ -752,13 +752,13 @@ loop
   mul r4.w, r4.w, r10.z
   add r4.w, r4.w, r5.w  // r4.w <- <noise_iq return value>
 
-#line 566
+#line 567
   mul r4.w, r4.w, l(0.517497)  // r4.w <- t
 
-#line 567
+#line 568
   mul r8.xyz, r8.xyzx, l(2.764340, 2.764340, 2.764340, 0.000000)
 
-#line 568
+#line 569
   nop 
 
 #line 312
@@ -882,12 +882,12 @@ loop
   mul r5.w, r5.w, r10.z
   add r5.w, r5.w, r7.w  // r5.w <- <noise_iq return value>
 
-#line 568
+#line 569
   mul r5.w, r5.w, l(0.255849)
   add r4.w, r4.w, r5.w
   mul r8.xyz, r8.xyzx, l(2.764340, 2.764340, 2.764340, 0.000000)
 
-#line 569
+#line 570
   nop 
 
 #line 312
@@ -1011,12 +1011,12 @@ loop
   mul r5.w, r5.w, r10.z
   add r5.w, r5.w, r7.w  // r5.w <- <noise_iq return value>
 
-#line 569
+#line 570
   mul r5.w, r5.w, l(0.125276)
   add r4.w, r4.w, r5.w
   mul r8.xyz, r8.xyzx, l(2.764340, 2.764340, 2.764340, 0.000000)
 
-#line 570
+#line 571
   nop 
 
 #line 312
@@ -1140,24 +1140,24 @@ loop
   mul r5.w, r5.w, r8.z
   add r5.w, r5.w, r7.w  // r5.w <- <noise_iq return value>
 
-#line 570
+#line 571
   mul r5.w, r5.w, l(0.062559)
   add r4.w, r4.w, r5.w
 
-#line 572
+#line 573
   mov r4.w, r4.w  // r4.w <- <fbm return value>
 
-#line 577
+#line 578
   mov r4.w, r4.w  // r4.w <- <get_noise return value>
 
-#line 681
+#line 682
   mov r4.w, r4.w  // r4.w <- dens
 
-#line 683
+#line 684
   mov r5.w, -cb4[1].x
   add r5.w, r5.w, l(1.000000)  // r5.w <- cov
 
-#line 687
+#line 688
   add r7.w, r5.w, l(0.050000)
   mov r5.w, -r5.w
   add r7.w, r5.w, r7.w
@@ -1172,29 +1172,29 @@ loop
   mul r5.w, r5.w, r7.w
   mul r4.w, r4.w, r5.w
 
-#line 689
+#line 690
   max r4.w, r4.w, l(0.000000)
   min r4.w, r4.w, l(1.000000)  // r4.w <- <density return value>
 
-#line 745
+#line 746
   mov r4.w, r4.w  // r4.w <- dens
 
-#line 747
+#line 748
   mul r5.w, r4.w, l(-1.030725)
   mul r5.w, r1.x, r5.w
   mul r5.w, r5.w, l(1.442695)
   exp r5.w, r5.w  // r5.w <- T_i
 
-#line 748
+#line 749
   mul r3.z, r3.z, r5.w
 
-#line 749
+#line 750
   lt r7.w, r3.z, l(0.010000)
   if_nz r7.w
     break 
   endif 
 
-#line 751
+#line 752
   mul r4.z, r4.z, l(1.442695)
   exp r4.z, r4.z
   div r4.z, r4.z, l(1.750000)
@@ -1203,7 +1203,7 @@ loop
   mul r4.z, r1.x, r4.z
   add r8.xyz, r4.zzzz, r6.xyzx  // r8.x <- C.x; r8.y <- C.y; r8.z <- C.z
 
-#line 759
+#line 760
   mov r4.z, -r5.w
   add r4.z, r4.z, l(1.000000)
   mov r4.w, -r6.w
@@ -1211,10 +1211,10 @@ loop
   mul r4.z, r4.w, r4.z
   add r4.z, r4.z, r6.w  // r4.z <- alpha
 
-#line 761
+#line 762
   add r5.xyz, r1.yzwy, r5.xyzx
 
-#line 762
+#line 763
   dp3 r4.w, r5.xyzx, r5.xyzx
   sqrt r4.w, r4.w
   lt r4.w, l(1000.000000), r4.w
@@ -1226,25 +1226,25 @@ loop
   mov r6.xyz, r8.xyzx  // r6.x <- C.x; r6.y <- C.y; r6.z <- C.z
   mov r6.w, r4.z  // r6.w <- alpha
 
-#line 742
+#line 743
   iadd r3.w, r3.w, l(1)
 
-#line 763
+#line 764
 endloop 
 
-#line 765
+#line 766
 mov r6.xyz, r6.xyzx  // r6.x <- <render_clouds return value>.x; r6.y <- <render_clouds return value>.y; r6.z <- <render_clouds return value>.z
 mov r6.w, r6.w  // r6.w <- <render_clouds return value>.w
 
-#line 858
+#line 859
 mov r6.xyzw, r6.xyzw  // r6.x <- cld.x; r6.y <- cld.y; r6.z <- cld.z; r6.w <- cld.w
 
-#line 860
+#line 861
 itof r0.x, l(0)
 ge r0.x, r0.x, cb4[1].w
 if_nz r0.x
 
-#line 861
+#line 862
   add r0.x, r6.w, l(0.000001)
   div r0.xyz, r6.xyzx, r0.xxxx
   mov r1.xyz, -r7.xyzx
@@ -1253,12 +1253,12 @@ if_nz r0.x
   add r0.xyz, r0.xyzx, r7.xyzx  // r0.x <- col.x; r0.y <- col.y; r0.z <- col.z
 else 
 
-#line 862
+#line 863
   itof r1.x, l(1)
   ge r1.x, r1.x, cb4[1].w
   if_nz r1.x
 
-#line 863
+#line 864
     add r1.x, r6.w, l(0.000001)
     div r1.xyz, r6.xyzx, r1.xxxx
     mov r2.xyz, -r7.xyzx
@@ -1267,7 +1267,7 @@ else
     add r0.xyz, r1.xyzx, r7.xyzx  // r0.x <- col.x; r0.y <- col.y; r0.z <- col.z
   else 
 
-#line 865
+#line 866
     add r1.x, r6.w, l(0.000001)
     div r1.xyz, r6.xyzx, r1.xxxx
     mov r2.xyz, -r7.xyzx
@@ -1277,104 +1277,104 @@ else
   endif 
 endif 
 
-#line 878
+#line 879
 lt r1.x, l(0.000000), cb4[1].y
 if_nz r1.x
 
-#line 879
+#line 880
   nop 
   mov r4.xy, r4.xyxx
 
-#line 795
+#line 796
   mul r1.x, cb3[0].x, l(0.200000)
   add r1.x, r1.x, l(0.100000)  // r1.x <- travelTime
 
-#line 797
+#line 798
   mov r1.yz, l(0,1.000000,0.010000,0)  // r1.y <- tiling.x; r1.z <- tiling.y
 
-#line 798
+#line 799
   mul r1.w, r1.x, l(0.500000)
   mul r2.x, r4.x, l(0.200000)
   add r2.x, r1.w, r2.x  // r2.x <- offset.x
   mul r2.y, r1.x, l(0.200000)  // r2.y <- offset.y
 
-#line 800
+#line 801
   mul r1.xy, r1.yzyy, r4.xyxx
   add r1.xy, r2.xyxx, r1.xyxx  // r1.x <- st.x; r1.y <- st.y
 
-#line 802
+#line 803
   mov r1.z, l(0.100000)  // r1.z <- rain
 
-#line 803
+#line 804
   nop 
   mul r2.xy, r1.xyxx, l(200.500000, 200.500000, 0.000000, 0.000000)
 
-#line 780
+#line 781
   round_ni r2.zw, r2.xxxy  // r2.z <- i.x; r2.w <- i.y
 
-#line 781
+#line 782
   frc r2.xy, r2.xyxx  // r2.x <- f.x; r2.y <- f.y
 
-#line 782
+#line 783
   mul r3.xy, r2.xyxx, r2.xyxx
   mul r2.xy, r2.xyxx, l(2.000000, 2.000000, 0.000000, 0.000000)
   mov r2.xy, -r2.xyxx
   add r2.xy, r2.xyxx, l(3.000000, 3.000000, 0.000000, 0.000000)
   mul r2.xy, r2.xyxx, r3.xyxx  // r2.x <- f.x; r2.y <- f.y
 
-#line 784
+#line 785
   nop 
   add r3.xy, r2.zwzz, l(0.000000, 0.000000, 0.000000, 0.000000)
 
-#line 773
+#line 774
   dp2 r1.w, r3.xyxx, l(12.989800, 78.233002, 0.000000, 0.000000)
   sincos r1.w, null, r1.w
   mul r1.w, r1.w, l(43758.546875)
   frc r1.w, r1.w  // r1.w <- <rain_random return value>
 
-#line 784
+#line 785
   mov r1.w, r1.w  // r1.w <- lb
 
-#line 785
+#line 786
   nop 
   add r3.xy, r2.zwzz, l(1.000000, 0.000000, 0.000000, 0.000000)
 
-#line 773
+#line 774
   dp2 r3.x, r3.xyxx, l(12.989800, 78.233002, 0.000000, 0.000000)
   sincos r3.x, null, r3.x
   mul r3.x, r3.x, l(43758.546875)
   frc r3.x, r3.x  // r3.x <- <rain_random return value>
 
-#line 785
+#line 786
   mov r3.x, r3.x  // r3.x <- rb
 
-#line 786
+#line 787
   nop 
   add r3.yz, r2.zzwz, l(0.000000, 0.000000, 1.000000, 0.000000)
 
-#line 773
+#line 774
   dp2 r3.y, r3.yzyy, l(12.989800, 78.233002, 0.000000, 0.000000)
   sincos r3.y, null, r3.y
   mul r3.y, r3.y, l(43758.546875)
   frc r3.y, r3.y  // r3.y <- <rain_random return value>
 
-#line 786
+#line 787
   mov r3.y, r3.y  // r3.y <- lt
 
-#line 787
+#line 788
   nop 
   add r2.zw, r2.zzzw, l(0.000000, 0.000000, 1.000000, 1.000000)
 
-#line 773
+#line 774
   dp2 r2.z, r2.zwzz, l(12.989800, 78.233002, 0.000000, 0.000000)
   sincos r2.z, null, r2.z
   mul r2.z, r2.z, l(43758.546875)
   frc r2.z, r2.z  // r2.z <- <rain_random return value>
 
-#line 787
+#line 788
   mov r2.z, r2.z  // r2.z <- rt
 
-#line 789
+#line 790
   mov r2.w, -r1.w
   add r2.w, r2.w, r3.x
   mul r2.w, r2.w, r2.x
@@ -1388,76 +1388,76 @@ if_nz r1.x
   mul r2.x, r2.x, r2.y
   add r1.w, r1.w, r2.x  // r1.w <- <rain_noise return value>
 
-#line 803
+#line 804
   nop 
   mul r1.xy, r1.xyxx, l(125.500000, 125.500000, 0.000000, 0.000000)
 
-#line 780
+#line 781
   round_ni r2.xy, r1.xyxx  // r2.x <- i.x; r2.y <- i.y
 
-#line 781
+#line 782
   frc r1.xy, r1.xyxx  // r1.x <- f.x; r1.y <- f.y
 
-#line 782
+#line 783
   mul r2.zw, r1.xxxy, r1.xxxy
   mul r1.xy, r1.xyxx, l(2.000000, 2.000000, 0.000000, 0.000000)
   mov r1.xy, -r1.xyxx
   add r1.xy, r1.xyxx, l(3.000000, 3.000000, 0.000000, 0.000000)
   mul r1.xy, r1.xyxx, r2.zwzz  // r1.x <- f.x; r1.y <- f.y
 
-#line 784
+#line 785
   nop 
   add r2.zw, r2.xxxy, l(0.000000, 0.000000, 0.000000, 0.000000)
 
-#line 773
+#line 774
   dp2 r2.z, r2.zwzz, l(12.989800, 78.233002, 0.000000, 0.000000)
   sincos r2.z, null, r2.z
   mul r2.z, r2.z, l(43758.546875)
   frc r2.z, r2.z  // r2.z <- <rain_random return value>
 
-#line 784
+#line 785
   mov r2.z, r2.z  // r2.z <- lb
 
-#line 785
+#line 786
   nop 
   add r3.xy, r2.xyxx, l(1.000000, 0.000000, 0.000000, 0.000000)
 
-#line 773
+#line 774
   dp2 r2.w, r3.xyxx, l(12.989800, 78.233002, 0.000000, 0.000000)
   sincos r2.w, null, r2.w
   mul r2.w, r2.w, l(43758.546875)
   frc r2.w, r2.w  // r2.w <- <rain_random return value>
 
-#line 785
+#line 786
   mov r2.w, r2.w  // r2.w <- rb
 
-#line 786
+#line 787
   nop 
   add r3.xy, r2.xyxx, l(0.000000, 1.000000, 0.000000, 0.000000)
 
-#line 773
+#line 774
   dp2 r3.x, r3.xyxx, l(12.989800, 78.233002, 0.000000, 0.000000)
   sincos r3.x, null, r3.x
   mul r3.x, r3.x, l(43758.546875)
   frc r3.x, r3.x  // r3.x <- <rain_random return value>
 
-#line 786
+#line 787
   mov r3.x, r3.x  // r3.x <- lt
 
-#line 787
+#line 788
   nop 
   add r2.xy, r2.xyxx, l(1.000000, 1.000000, 0.000000, 0.000000)
 
-#line 773
+#line 774
   dp2 r2.x, r2.xyxx, l(12.989800, 78.233002, 0.000000, 0.000000)
   sincos r2.x, null, r2.x
   mul r2.x, r2.x, l(43758.546875)
   frc r2.x, r2.x  // r2.x <- <rain_random return value>
 
-#line 787
+#line 788
   mov r2.x, r2.x  // r2.x <- rt
 
-#line 789
+#line 790
   mov r2.y, -r2.z
   add r2.y, r2.y, r2.w
   mul r2.y, r1.x, r2.y
@@ -1471,10 +1471,10 @@ if_nz r1.x
   mul r1.x, r1.x, r1.y
   add r1.x, r1.x, r2.y  // r1.x <- <rain_noise return value>
 
-#line 803
+#line 804
   mul r1.x, r1.x, r1.w  // r1.x <- f
 
-#line 804
+#line 805
   mov r1.y, -r1.x
   max r1.x, r1.y, r1.x
   log r1.x, r1.x
@@ -1487,36 +1487,36 @@ if_nz r1.x
   max r1.x, r1.x, l(0.000000)
   min r1.x, r1.x, l(0.250000)  // r1.x <- f
 
-#line 805
+#line 806
   mov r1.x, r1.x  // r1.x <- <rain return value>
 
-#line 879
+#line 880
   mov r1.x, r1.x  // r1.x <- rainy
 
-#line 881
+#line 882
   mul r1.xyz, r1.xxxx, l(1.000000, 1.000000, 1.000000, 0.000000)
   add r0.xyz, r0.xyzx, r1.xyzx
 
-#line 882
+#line 883
 endif 
 
-#line 884
+#line 885
 mov r0.xyz, r0.xyzx  // r0.x <- ret.Color.x; r0.y <- ret.Color.y; r0.z <- ret.Color.z
 mov r0.w, l(1.000000)  // r0.w <- ret.Color.w
 
-#line 885
+#line 886
 mov r1.xyzw, l(0,0,0,0)  // r1.x <- ret.Depth.x; r1.y <- ret.Depth.y; r1.z <- ret.Depth.z; r1.w <- ret.Depth.w
 
-#line 886
+#line 887
 mov r2.xyzw, l(0,0,1.000000,1.000000)  // r2.x <- ret.RM.x; r2.y <- ret.RM.y; r2.z <- ret.RM.z; r2.w <- ret.RM.w
 
-#line 887
+#line 888
 mov r3.xyzw, l(0,0,0,0)  // r3.x <- ret.Position.x; r3.y <- ret.Position.y; r3.z <- ret.Position.z; r3.w <- ret.Position.w
 
-#line 888
+#line 889
 mov r4.xyzw, l(0,0,0,0)  // r4.x <- ret.Normal.x; r4.y <- ret.Normal.y; r4.z <- ret.Normal.z; r4.w <- ret.Normal.w
 
-#line 889
+#line 890
 mov o0.xyzw, r0.xyzw
 mov o1.xyzw, r1.xyzw
 mov o2.xyzw, r4.xyzw

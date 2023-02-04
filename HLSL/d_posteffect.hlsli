@@ -1,3 +1,4 @@
+
 struct VS_OUT
 {
 	float4 position : SV_POSITION;
@@ -11,7 +12,7 @@ struct FOG_BUFFER
 	float3 highlight_color;//...ハイライトカラー
 	float highlight_power;//ハイライト強さ
 	float global_density;//密度
-	float height_falloff;//ハイライト落ちる場所
+	float height_falloff;//フォグ高さ
 	float start_depth;//開始深度
 	float start_height;//開始高度
 };
@@ -51,6 +52,17 @@ float3 apply_fog(float3 default_color, float3 pixel_position/*world space*/,floa
 
 	//Combine both factors to get the final factor
 	float fog_final_factor = exp(-fog.global_density * fog_intensity);
+
+	//case of having fog & sun
+	//Find the sum highlight and use it to blend the fog color
+	const float distance_to_sun = 0; //TODO://太陽までの距離
+	float sun_highlight_factor = saturate(dot(normalize(eye_to_pixel), normalize((float3(1.0f, 1.0f, 1.0f )* distance_to_sun) - eye_position)));
+	sun_highlight_factor = pow(sun_highlight_factor, fog.highlight_power);
+	float3 fog_final_color = lerp(fog.color.rgb, fog.highlight_color * fog.highlight_intensity, sun_highlight_factor * smoothstep(0, 100, eye_to_pixel_distance));
+	//float3 fog_final_color = lerp(fog.color.rgb, fog.highlight_color * fog.highlight_intensity, 0);
+
+	return lerp(fog_final_color, default_color, fog_final_factor);
+	return lerp(fog.color.rgb, default_color, fog_final_factor);
 
 	return lerp(fog.color.rgb, default_color, fog_final_factor);
 }

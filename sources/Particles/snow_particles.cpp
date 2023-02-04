@@ -57,10 +57,10 @@ snow_particles::snow_particles(ID3D11Device* device, DirectX::XMFLOAT3 initial_p
 				DirectX::XMVector3Normalize(vec);
 				DirectX::XMFLOAT3 v = {};
 				DirectX::XMStoreFloat3(&v, vec);
-				float rand_speed = rand(mt);
+				float rand_speed = fall_speed + rand(mt) * (fall_speed * 0.5f) * v.y;
 				if (rand_speed > 0.0f)
 					rand_speed *= -1;
-				particles.at(index++).velocity = { 0.0f, fall_speed + rand_speed*(fall_speed * 0.5f) * v.y, 0.0f };
+				particles.at(index++).velocity = { 0.0f,rand_speed , 0.0f };
 				//particles.at(index++).velocity = { 0.0f, fall_speed, 0.0f };
 			}
 		}

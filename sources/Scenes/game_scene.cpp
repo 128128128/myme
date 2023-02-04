@@ -116,7 +116,7 @@ bool game_scene::initialize(ID3D11Device* device, CONST LONG screen_width, CONST
 			//particle
 			{
 				snow = std::make_unique<snow_particles>(device, XMFLOAT3(eye_space_camera->position.x, eye_space_camera->position.y, eye_space_camera->position.z));
-
+				water_fall_particle = std::make_unique<water_fall_particles>(device, XMFLOAT3(waterfall_pos.x, waterfall_pos.y, waterfall_pos.z));
 			}
 
     framebuffers[0] = std::make_unique<Descartes::framebuffer>(device, screen_width, screen_height, DXGI_FORMAT_R16G16B16A16_FLOAT, DXGI_FORMAT_R24G8_TYPELESS);
@@ -406,11 +406,13 @@ void game_scene::render(ID3D11DeviceContext* immediate_context, float elapsed_ti
 		
 		blend_states[ALPHA]->active(immediate_context);
 		depth_stencil_states[ZT_ON_ZW_OFF]->active(immediate_context);
-		snow->render(immediate_context);
+		//snow->render(immediate_context);
+		//water_fall_particle->render(immediate_context);
 		depth_stencil_states[ZT_ON_ZW_OFF]->inactive(immediate_context);
 		depth_stencil_states[ZT_ON_ZW_ON]->active(immediate_context);
 		
 		snow->integrate(immediate_context, XMFLOAT3(eye_space_camera->position.x, eye_space_camera->position.y, eye_space_camera->position.z), eye_space_camera->view(), eye_space_camera->projection(), elapsed_time, time);
+		water_fall_particle->integrate(immediate_context, XMFLOAT3(waterfall_pos.x, waterfall_pos.y, waterfall_pos.z), eye_space_camera->view(), eye_space_camera->projection(), elapsed_time, time);
 		//snowfall->render(immediate_context);
 
 		//depth_stencil_states[ZT_ON_ZW_OFF]->inactive(immediate_context);

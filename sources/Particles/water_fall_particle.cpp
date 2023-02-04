@@ -11,11 +11,11 @@ using namespace DirectX;
 water_fall_particles::water_fall_particles(ID3D11Device* device, DirectX::XMFLOAT3 initial_position)
 {
 	// Radius of outermost orbit 
-	float outermost_radius{ 30 };
+	float outermost_radius{ 8 };
 	// Interval between two particles
 	float interval{ 0.5f };
 	// Height of snowfall area
-	float snowfall_area_height{ 15 };
+	float area_height{ 6 };
 	// Falling speed of snowflake
 	float fall_speed{ -0.5f };
 
@@ -28,7 +28,7 @@ water_fall_particles::water_fall_particles(ID3D11Device* device, DirectX::XMFLOA
 
 		for (float theta = 0; theta < 2 * 3.14159265358979f; theta += interval / radius)
 		{
-			for (float height = 0; height < snowfall_area_height; height += interval)
+			for (float height = 0; height < area_height; height += interval)
 			{
 				particle_count++;
 			}
@@ -38,6 +38,7 @@ water_fall_particles::water_fall_particles(ID3D11Device* device, DirectX::XMFLOA
 
 	std::mt19937 mt{ std::random_device{}() };
 	std::uniform_real_distribution<float> rand(-interval * 0.5f, +interval * 0.5f);
+	std::uniform_real_distribution<float> rand_d(-1.0f, +1.0f);
 
 	size_t index{ 0 };
 	for (int orbit_index = 1; orbit_index <= orbit_count; ++orbit_index)
@@ -48,15 +49,20 @@ water_fall_particles::water_fall_particles(ID3D11Device* device, DirectX::XMFLOA
 		{
 			const float x{ radius * cosf(theta) };
 			const float z{ radius * sinf(theta) };
-			for (float height = -snowfall_area_height * 0.5f; height < snowfall_area_height * 0.5f; height += interval)
+			for (float height = -area_height * 0.5f; height < area_height * 0.5f; height += interval)
 			{
-				particles.at(index).position = { x + initial_position.x + rand(mt), height + initial_position.y + rand(mt), z + initial_position.z + rand(mt) };
+				particles.at(index).position = { x + initial_position.x + rand(mt),  initial_position.y , z + initial_position.z + rand(mt) };
 				//DirectX::XMFLOAT3 vec={0 - particles.at(index).position.x, 0 - particles.at(index).position.y, 0 - particles.at(index).position.z};
 				DirectX::XMVECTOR vec = { 0 - particles.at(index).position.x, 0 - particles.at(index).position.y, 0 - particles.at(index).position.z };
 				DirectX::XMVector3Normalize(vec);
 				DirectX::XMFLOAT3 v = {};
 				DirectX::XMStoreFloat3(&v, vec);
-				particles.at(index++).velocity = { 0.0f, fall_speed + rand(mt) * (fall_speed * 0.5f) * v.y, 0.0f };
+				float rand_speed = fall_speed + rand(mt) * (fall_speed * 0.5f) * v.y;
+				if (rand_speed < 0.0f)
+					rand_speed *= -1;
+				particles.at(index).velocity = { 0.0f,rand_speed , 0.0f };
+				particles.at(index).direction = { rand_d(mt),1.0f ,  rand_d(mt) };
+				index++;
 				//particles.at(index++).velocity = { 0.0f, fall_speed, 0.0f };
 			}
 		}
@@ -111,9 +117,10 @@ water_fall_particles::water_fall_particles(ID3D11Device* device, DirectX::XMFLOA
 
 	particle_data.current_eye_position = { initial_position.x,initial_position.y,initial_position.z,1.0f };
 	particle_data.previous_eye_position = { initial_position.x,initial_position.y,initial_position.z,1.0f };
-	particle_data.snowfall_area_height = snowfall_area_height;
+	particle_data.snowfall_area_height = area_height;
 	particle_data.outermost_radius = outermost_radius;
-	particle_data.particle_size = 0.01f;
+	particle_data.particle_size = 0.2f;
+	
 	particle_data.particle_count = static_cast<uint32_t>(particle_count);
 
 }

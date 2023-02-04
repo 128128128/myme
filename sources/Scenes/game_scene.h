@@ -49,6 +49,7 @@
 
 //----particle-----//
 #include "../Particles/snow_particles.h"
+#include "../Particles/water_fall_particle.h"
 
 //----IMGUI---//
 #include "../../imgui/imgui.h"
@@ -107,6 +108,7 @@ public:
 
 	//particles
 	std::unique_ptr<snow_particles> snow;
+	std::unique_ptr<water_fall_particles> water_fall_particle;
 
 	//std::unique_ptr<Descartes::collision::mesh> collision_mesh;
 	//scenery[s]
@@ -264,5 +266,7 @@ private:
 
 	
     shadow::CascadeShadowMapMatrix m_cascadeShadowMapMatrix;    // カスケードシャドウマップの行列を扱うオブジェクト
+
+	DirectX::XMFLOAT3 waterfall_pos = XMFLOAT3(-23.5f, -18.7f, -60.5f);
 
 };
