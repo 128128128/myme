@@ -362,6 +362,7 @@ grass_Terrain::grass_Terrain(ID3D11Device* device)
 	rasterizer_state = std::make_unique<Descartes::rasterizer_state>(device, D3D11_FILL_SOLID, D3D11_CULL_NONE, true/*front_counter_clockwise*/, true/*antialiasing*/, true/*depth_clip_enable*/);
 
 	plant("Ground", meadow->grasses, 100, 0.022f, 0.018f, 0.25f);
+	plant("Ground", flower->grasses, 150, 0.022f, 0.018f, 0.25f);
 
 	//plant("Ground", pampas->grasses, 150, 0.05f, 0.025f, 0.15f);
 
@@ -437,6 +438,8 @@ void grass_Terrain::render(ID3D11DeviceContext* immediate_context)
 	vs->inactive(immediate_context);
 	ps->inactive(immediate_context);
 }
+
+//mesh_name...草を生やすメッシュの指定をする pitch...草を生やす密度 scale...草のスケール（サイズ）
 void grass_Terrain::plant(const char* mesh_name, std::vector<grass_cluster::grass>& grasses, int pitch_cm, float scale_w, float scale_h, float noise/*ratio for height*/)
 {
 	std::vector<grass_cluster::grass> provisional_grasses;
@@ -468,7 +471,7 @@ void grass_Terrain::plant(const char* mesh_name, std::vector<grass_cluster::gras
 		XMFLOAT3 bounding_box_min = mesh->bounding_box.min;
 		XMFLOAT3 bounding_box_max = mesh->bounding_box.max;
 
-		float pitch_m = pitch_cm * 0.01f; // metric units in world space
+		float pitch_m = pitch_cm * 0.01f; // metric units in world space//メートルに直す
 		XMFLOAT3 pitch;
 		DirectX::XMStoreFloat3(&pitch, XMVector3Transform(XMVectorSet(pitch_m, 0, pitch_m, 0), T)); // transform to model space
 		pitch.x = fabsf(pitch.x);
@@ -513,6 +516,7 @@ void grass_Terrain::plant(const char* mesh_name, std::vector<grass_cluster::gras
 	std::uniform_real_distribution<float> distribution(0.0f, scale_h * noise);
 	for (grass_cluster::grass& grass : provisional_grasses)
 	{
+		//寸法
 		grass.dimension.x = scale_w + distribution(generator);
 		grass.dimension.z = scale_w + distribution(generator);
 		grass.dimension.y = scale_h + distribution(generator);
